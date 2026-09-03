@@ -7,7 +7,7 @@ import Login from "./Login";
 import MinhaConta from "./MinhaConta";
 import ProdutoDetalhes from "./ProdutoDetalhes";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://valt-on.onrender.com";
 
 // =====================================================
 // TRANSFORMAR URL DA IMAGEM
