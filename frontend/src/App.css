@@ -1,0 +1,389 @@
+/* =========================================================
+   VALT-ON - ESTILO PRINCIPAL DA LOJA
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f6f8;
+  color: #222;
+}
+
+/* =========================================================
+   ÁREA PRINCIPAL
+   ========================================================= */
+
+#root {
+  min-height: 100vh;
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+header {
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+header button {
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+header button:hover {
+  background: #f0f2f5;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   CATEGORIAS
+   ========================================================= */
+
+nav {
+  background: #ffffff;
+}
+
+nav button {
+  border: 1px solid #ddd;
+  background: #ffffff;
+  padding: 9px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+nav button:hover {
+  background: #f0f2f5;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   BANNER
+   ========================================================= */
+
+section {
+  background: linear-gradient(
+    135deg,
+    #f8f9fa,
+    #e9edf2
+  );
+  border-bottom: 1px solid #ddd;
+}
+
+section h2 {
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+section p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+section button {
+  border: none;
+  background: #111827;
+  color: white;
+  padding: 13px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+section button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================
+   ÁREA DOS PRODUTOS
+   ========================================================= */
+
+main {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+/* =========================================================
+   CARDS DOS PRODUTOS
+   ========================================================= */
+
+main > div {
+  align-items: stretch;
+}
+
+main > div > div {
+  background: #ffffff;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 18px !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+main > div > div:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.13);
+}
+
+/* =========================================================
+   IMAGENS DOS PRODUTOS
+   ========================================================= */
+
+main img {
+  width: 100% !important;
+  height: 210px !important;
+  object-fit: contain !important;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+main > div > div:hover img {
+  transform: scale(1.04);
+}
+
+/* =========================================================
+   NOME DO PRODUTO
+   ========================================================= */
+
+main h3 {
+  color: #222;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+main p {
+  color: #666;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   PREÇO
+   ========================================================= */
+
+main h3:last-of-type {
+  font-size: 23px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* =========================================================
+   BOTÃO COMPRAR
+   ========================================================= */
+
+main > div > div button {
+  width: 100%;
+  border: none;
+  background: #111827;
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+main > div > div button:hover {
+  background: #000000;
+  transform: translateY(-1px);
+}
+
+main > div > div button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   CARRINHO
+   ========================================================= */
+
+button {
+  font-family: inherit;
+}
+
+div[style*="position: fixed"] {
+  animation: aparecerCarrinho 0.2s ease;
+}
+
+@keyframes aparecerCarrinho {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   BOTÕES DO CARRINHO
+   ========================================================= */
+
+div[style*="position: fixed"] button {
+  border: 1px solid #ddd;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+div[style*="position: fixed"] button:hover {
+  background: #f1f1f1;
+}
+
+/* =========================================================
+   RESPONSIVIDADE - TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  header h1 {
+    font-size: 23px;
+  }
+
+  section h2 {
+    font-size: 30px;
+  }
+
+  section p {
+    font-size: 16px;
+  }
+
+  main {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVIDADE - CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  header {
+    position: relative;
+  }
+
+  header {
+    flex-direction: column !important;
+    gap: 15px;
+  }
+
+  header h1 {
+    font-size: 24px;
+  }
+
+  header > div {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  header button {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  nav {
+    justify-content: center !important;
+  }
+
+  nav button {
+    padding: 8px 13px;
+  }
+
+  section {
+    padding: 35px 15px !important;
+  }
+
+  section h2 {
+    font-size: 27px;
+  }
+
+  section p {
+    font-size: 15px;
+  }
+
+  main {
+    padding: 15px !important;
+  }
+
+  main > h2 {
+    font-size: 24px;
+  }
+
+  main img {
+    height: 180px !important;
+  }
+
+  div[style*="position: fixed"] {
+    right: 10px !important;
+    top: 70px !important;
+    width: calc(100% - 20px) !important;
+  }
+}
+
+/* =========================================================
+   ANIMAÇÃO DOS CARDS
+   ========================================================= */
+
+@keyframes aparecerProduto {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main > div > div {
+  animation: aparecerProduto 0.4s ease;
+}
+
+.logo-valt-on {
+  width: 180px;
+  height: auto;
+  display: block;
+}
