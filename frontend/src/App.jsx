@@ -4,6 +4,7 @@ import "./App.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
+import Cadastro from "./Cadastro";
 import MinhaConta from "./MinhaConta";
 import ProdutoDetalhes from "./ProdutoDetalhes";
 
@@ -57,6 +58,7 @@ function App() {
   const [mostrarAdmin, setMostrarAdmin] =
     useState(false);
 
+  const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [mostrarLogin, setMostrarLogin] =
     useState(false);
 
@@ -72,7 +74,7 @@ function App() {
     useState(1);
 
   // =====================================================
-  // RECUPERAR USUÁRIO SALVO
+  // RECUPERAR USUARIO SALVO
   // =====================================================
 
   useEffect(() => {
@@ -157,7 +159,7 @@ function App() {
 
   const loginRealizado = (dadosUsuario) => {
     console.log(
-      "USUÁRIO LOGADO:",
+      "USUÁRIO LOGADO",
       dadosUsuario
     );
 
@@ -195,7 +197,7 @@ function App() {
     );
 
     alert(
-      "Você saiu da sua conta."
+      "Você saiu da sua conta. "
     );
   };
 
@@ -374,17 +376,15 @@ function App() {
       0
     );
 
-  // =====================================================
-  // FINALIZAR COMPRA
-  // =====================================================
 
   // =====================================================
   // FINALIZAR COMPRA
   // =====================================================
+
   const finalizarCompra = async () => {
     // Verificar se está logado
     if (!usuario || !usuario.id) {
-      alert("⚠️ Você precisa estar logado para finalizar a compra.");
+      alert("❌ Você precisa estar logado para finalizar a compra.");
       return;
     }
 
@@ -442,7 +442,7 @@ function App() {
       // COMPRA REALIZADA
       // ---------------------------------------------------
       alert(
-        `🎉 Compra realizada com sucesso!\n\n` +
+        `✅ Compra realizada com sucesso!\n\n` +
         `📦 Pedido: #${dados.pedido_id}\n` +
         `👤 Cliente: ${usuario.nome}\n` +
         `💰 Total: CVT ${Number(dados.total).toFixed(2)}`
@@ -513,9 +513,23 @@ function App() {
     return (
       <Login
         onLogin={loginRealizado}
-        onVoltar={() =>
-          setMostrarLogin(false)
-        }
+        onVoltar={() => setMostrarLogin(false)}
+      />
+    );
+  }
+
+  // =====================================================
+  // TELA DE CADASTRO
+  // =====================================================
+
+  if (mostrarCadastro) {
+    return (
+      <Cadastro
+        onCadastroSucesso={() => {
+          setMostrarCadastro(false);
+          setMostrarLogin(true);
+        }}
+        onVoltar={() => setMostrarCadastro(false)}
       />
     );
   }
@@ -528,11 +542,9 @@ function App() {
     return (
       <MinhaConta
         usuario={usuario}
-
         onVoltar={() => {
           setMostrarConta(false);
         }}
-
         onLogout={sairDaConta}
       />
     );
@@ -556,7 +568,6 @@ function App() {
           for (let i = 0; i < quantidadeDetalhes; i++) {
             adicionarCarrinho(produtoSelecionado);
           }
-
           setProdutoSelecionado(null);
           setQuantidadeDetalhes(1);
         }}
@@ -650,7 +661,7 @@ function App() {
                 setMostrarConta(true)
               }
             >
-              👤 {usuario.nome}
+             👤 {usuario.nome}
             </button>
           ) : (
             <button
@@ -662,6 +673,13 @@ function App() {
             </button>
           )}
 
+          <button
+            onClick={() =>
+              setMostrarCadastro(true)
+            }
+          >
+            📝 Cadastro
+          </button>
           {/* ADMIN */}
 
           <button
@@ -870,7 +888,7 @@ function App() {
                           "center",
                       }}
                     >
-                      🛍️
+                      🖼️
                     </div>
                   )}
                 </div>

@@ -586,6 +586,7 @@ def finalizar_compra(
     # VERIFICAR PRODUTOS E ESTOQUE
     # -----------------------------------------------------
 
+    prazo_entrega = 0
     for item in compra.itens:
 
         produto_id = item.produto_id
@@ -632,6 +633,11 @@ def finalizar_compra(
                 )
             )
 
+        prazo_entrega = max(
+                prazo_entrega,
+                produto.prazo_entrega_dias
+        )
+
         produtos_compra.append(
             (
                 produto,
@@ -674,7 +680,8 @@ def finalizar_compra(
     pedido = models.Pedido(
         cliente_id=compra.cliente_id,
         status="Pago",
-        total=total
+        total=total,
+        prazo_entrega=prazo_entrega
     )
 
     db.add(pedido)
@@ -821,12 +828,11 @@ def listar_pedidos_cliente(
         )
 
     return resultado
-
-
 # =========================================================
 # ALTERAR STATUS DO PEDIDO
 # ADMINISTRADOR
 # =========================================================
+
 
 @app.put(
     "/pedidos/{pedido_id}/status"
@@ -979,5 +985,3 @@ def listar_espacos_cliente(
 
         )
     return resultado
-
-

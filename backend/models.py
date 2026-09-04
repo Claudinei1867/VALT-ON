@@ -8,8 +8,6 @@ from sqlalchemy import (
 
 from database import Base
 
-
-
 # =========================================================
 # PRODUTOS
 # =========================================================
@@ -37,7 +35,6 @@ class Produto(Base):
 # CLIENTES
 # =========================================================
 
-
 class Cliente(Base):
     __tablename__ = "clientes"
 
@@ -53,8 +50,8 @@ class Cliente(Base):
 # PEDIDOS
 # =========================================================
 
-
 class Pedido(Base):
+
     __tablename__ = "pedidos"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -75,11 +72,15 @@ class Pedido(Base):
         default=0
     )
 
+    prazo_entrega = Column(
+        Integer,
+        nullable=False
+    )
+
 
 # =========================================================
 # ITENS DO PEDIDO
 # =========================================================
-
 
 class ItemPedido(Base):
     __tablename__ = "itens_pedido"
@@ -112,7 +113,6 @@ class ItemPedido(Base):
 # =========================================================
 # ESPAÇOS DO CLIENTE
 # =========================================================
-
 
 class EspacoCliente(Base):
     __tablename__ = "espacos_clientes"
