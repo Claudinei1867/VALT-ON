@@ -661,7 +661,7 @@ function App() {
                 setMostrarConta(true)
               }
             >
-             👤 {usuario.nome}
+              👤 {usuario.nome}
             </button>
           ) : (
             <button
@@ -680,15 +680,18 @@ function App() {
           >
             📝 Cadastro
           </button>
-          {/* ADMIN */}
 
-          <button
-            onClick={() =>
-              setMostrarAdmin(true)
-            }
-          >
-            ⚙️ Administrador
-          </button>
+          {/* ADMIN */}
+          
+          {usuario?.admin && (
+            <button
+              onClick={() =>
+                setMostrarAdmin(true)
+              }
+            >
+              ⚙️ Administrador
+            </button>
+          )}
 
           {/* CARRINHO */}
 

@@ -21,7 +21,7 @@ function Login({ onLogin, onVoltar }) {
     setCarregando(true);
 
     try {
-      const resposta = await fetch(`${API_URL}/login`, {
+      let resposta = await fetch(`${API_URL}/login-admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,26 +32,47 @@ function Login({ onLogin, onVoltar }) {
         }),
       });
 
-      const dados = await resposta.json();
+      let dados = await resposta.json();
 
       if (!resposta.ok) {
-        throw new Error(
-          dados.detail || "E-mail ou senha inválidos."
-        );
+        resposta = await fetch(`${API_URL}/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            senha: senha,
+          }),
+        });
+
+        dados = await resposta.json();
+        if (!resposta.ok) {
+          throw new Error(
+            dados.detail || "E-mail ou senha inválidos."
+          );
+        }
       }
 
       console.log("LOGIN REALIZADO:", dados);
 
-      // Envia os dados do cliente para o App.jsx
+      // Envia os dados do usuário para o App.jsx
       if (onLogin) {
-        onLogin(dados.cliente);
+        if (dados.admin) {
+          onLogin({
+            admin: true,
+            email: dados.email,
+          });
+        } else {
+          onLogin(dados.cliente);
+        }
       }
     } catch (error) {
       console.error("ERRO NO LOGIN:", error);
 
       setErro(
         error.message ||
-          "Não foi possível realizar o login."
+        "Não foi possível realizar o login."
       );
     } finally {
       setCarregando(false);

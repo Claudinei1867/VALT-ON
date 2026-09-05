@@ -13,17 +13,22 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
+import os
+from dotenv import load_dotenv
 
 from database import engine, Base, SessionLocal
 import models
 import schemas
 
+load_dotenv()
 
 # =========================================================
 # CONFIGURAÇÃO DA API
 # =========================================================
-
 app = FastAPI(title="VALT-ON API")
+
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 
 # =========================================================
@@ -535,6 +540,29 @@ def login(
 
 
 # =========================================================
+# LOGIN DO ADMINISTRADOR
+# =========================================================
+
+@app.post("/login-admin")
+def login_admin(dados: schemas.ClienteLogin):
+
+    if (
+        dados.email != ADMIN_EMAIL
+        or dados.senha != ADMIN_PASSWORD
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="E-mail ou senha de administrador inválidos."
+        )
+
+    return {
+        "mensagem": "Login de administrador realizado com sucesso!",
+        "admin": True,
+        "email": dados.email
+    }
+
+
+# =========================================================
 # FINALIZAR COMPRA
 # =========================================================
 
@@ -828,12 +856,12 @@ def listar_pedidos_cliente(
         )
 
     return resultado
+
+
 # =========================================================
 # ALTERAR STATUS DO PEDIDO
 # ADMINISTRADOR
 # =========================================================
-
-
 @app.put(
     "/pedidos/{pedido_id}/status"
 )
