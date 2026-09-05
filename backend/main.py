@@ -454,10 +454,16 @@ def cadastrar_cliente(
     # O saldo inicial é definido automaticamente
     # pelo models.py através de default=1000.0
 
+    agora = datetime.now()
+    dias_desde_domingo = (agora.weekday() + 1) % 7
+    domingo = agora - timedelta(days=dias_desde_domingo)
+    data_domingo = domingo.strftime("%Y-%m-%d")
+
     novo_cliente = models.Cliente(
         nome=cliente.nome,
         email=cliente.email,
-        senha=cliente.senha
+        senha=cliente.senha,
+        ultimo_credito_cvt=data_domingo
     )
 
     db.add(novo_cliente)
