@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 
 const API_URL = "https://valt-on.onrender.com";
 
-function Admin() {
+function Admin({ onVoltar }) {
   const [produtos, setProdutos] = useState([]);
+  const [buscaProduto, setBuscaProduto] = useState("");
+  const [pedidos, setPedidos] = useState([]);
+  const [buscaPedido, setBuscaPedido] = useState("");
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -43,13 +46,82 @@ function Admin() {
       });
   };
 
+  const carregarPedidos = () => {
+    fetch(`${API_URL}/pedidos`)
+      .then((resposta) => {
+        if (!resposta.ok) {
+          throw new Error("Erro ao carregar pedidos");
+        }
+
+        return resposta.json();
+      })
+      .then((dados) => {
+        setPedidos(dados);
+      })
+      .catch((erro) => {
+        console.error(erro);
+        setMensagem("❌ Erro ao carregar pedidos.");
+      });
+  };
+
+  const alterarStatusPedido = async (pedidoId, novoStatus) => {
+    try {
+      const resposta = await fetch(
+        `${API_URL}/pedidos/${pedidoId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: novoStatus,
+          }),
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail || "Erro ao alterar status do pedido."
+        );
+      }
+
+      setPedidos((pedidosAtuais) =>
+        pedidosAtuais.map((pedido) =>
+          pedido.pedido_id === pedidoId
+            ? { ...pedido, status: dados.status }
+            : pedido
+        )
+      );
+
+      setMensagem("Status do pedido atualizado com sucesso!");
+    } catch (erro) {
+      console.error(erro);
+      setMensagem("Erro ao alterar status do pedido.");
+    }
+  };
+
   useEffect(() => {
     carregarProdutos();
+    carregarPedidos();
   }, []);
 
   // =====================================================
   // LIMPAR FORMULÁRIO
   // =====================================================
+
+  const produtosFiltrados = produtos.filter((produto) => {
+    const texto = buscaProduto.toLowerCase().trim();
+
+    if (!texto) return true;
+
+    return (
+      (produto.nome || "").toLowerCase().includes(texto) ||
+      (produto.descricao || "").toLowerCase().includes(texto) ||
+      (produto.categoria || "").toLowerCase().includes(texto)
+    );
+  });
 
   const limparFormulario = () => {
     setNome("");
@@ -62,6 +134,19 @@ function Admin() {
     setArquivoImagem(null);
     setEditandoId(null);
   };
+
+  const pedidosFiltrados = pedidos.filter((pedido) => {
+    const texto = buscaPedido.toLowerCase().trim();
+
+    if (!texto) return true;
+
+    return (
+      String(pedido.pedido_id || "").includes(texto) ||
+      (pedido.cliente_nome || "").toLowerCase().includes(texto) ||
+      (pedido.cliente_email || "").toLowerCase().includes(texto) ||
+      (pedido.status || "").toLowerCase().includes(texto)
+    );
+  });
 
   // =====================================================
   // SELECIONAR IMAGEM
@@ -281,25 +366,25 @@ function Admin() {
   // =====================================================
 
   const obterUrlImagem = (url) => {
-  if (!url) {
-    return "";
-  }
+    if (!url) {
+      return "";
+    }
 
-  // URL completa
-  if (
-    url.startsWith("http://") ||
-    url.startsWith("https://")
-  ) {
-    return url;
-  }
+    // URL completa
+    if (
+      url.startsWith("http://") ||
+      url.startsWith("https://")
+    ) {
+      return url;
+    }
 
-  // URL do backend
-  if (url.startsWith("/")) {
-    return `${API_URL}${url}`;
-  }
+    // URL do backend
+    if (url.startsWith("/")) {
+      return `${API_URL}${url}`;
+    }
 
-  return `${API_URL}/${url}`;
-};
+    return `${API_URL}/${url}`;
+  };
 
   // =====================================================
   // TELA
@@ -313,7 +398,34 @@ function Admin() {
         margin: "0 auto",
       }}
     >
+      <button
+        onClick={onVoltar}
+        style={{
+          padding: "12px 20px",
+          marginBottom: "20px",
+          cursor: "pointer",
+        }}
+      >
+        🛍️ Voltar para a loja
+      </button>
+
       <h1>⚙️ Administrador</h1>
+
+      <div style={{ marginBottom: "25px" }}>
+        <input
+          type="text"
+          placeholder="🔎 Buscar produto..."
+          value={buscaProduto}
+          onChange={(evento) => setBuscaProduto(evento.target.value)}
+          style={{
+            width: "100%",
+            maxWidth: "600px",
+            padding: "12px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
 
       <h2>
         {editandoId !== null
@@ -483,7 +595,7 @@ function Admin() {
           />
         </div>
 
-                {/* PRAZO DE ENTREGA */}
+        {/* PRAZO DE ENTREGA */}
 
         <div style={{ marginBottom: "15px" }}>
           <label>
@@ -599,7 +711,7 @@ function Admin() {
       {produtos.length === 0 ? (
         <p>Nenhum produto cadastrado.</p>
       ) : (
-        produtos.map((produto) => (
+        produtosFiltrados.map((produto) => (
           <div
             key={produto.id}
             style={{
@@ -672,6 +784,93 @@ function Admin() {
             >
               🗑️ Excluir
             </button>
+          </div>
+        ))
+      )}
+
+      {/* =====================================================
+          LISTA DE PEDIDOS
+      ===================================================== */}
+
+      <hr
+        style={{
+          margin: "35px 0",
+        }}
+      />
+
+      <h2>📦 Pedidos</h2>
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="🔎 Buscar pedido..."
+          value={buscaPedido}
+          onChange={(evento) => setBuscaPedido(evento.target.value)}
+          style={{
+            width: "100%",
+            maxWidth: "600px",
+            padding: "12px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      {pedidos.length === 0 ? (
+        <p>Nenhum pedido encontrado.</p>
+      ) : pedidosFiltrados.length === 0 ? (
+        <p>Nenhum pedido corresponde à pesquisa.</p>
+      ) : (
+        pedidosFiltrados.map((pedido) => (
+          <div
+            key={pedido.pedido_id}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "15px",
+              marginBottom: "15px",
+            }}
+          >
+            <h3>Pedido #{pedido.pedido_id}</h3>
+
+            <p>
+              <strong>Cliente:</strong> {pedido.cliente_nome}
+              <br />
+              <strong>E-mail:</strong> {pedido.cliente_email || "Não informado"}
+              <br />
+              <strong>Status:</strong> {pedido.status}
+              <br />
+
+              <label>
+                <strong>Alterar status:</strong>{" "}
+                <select
+                  value={pedido.status}
+                  onChange={(evento) =>
+                    alterarStatusPedido(
+                      pedido.pedido_id,
+                      evento.target.value
+                    )
+                  }
+                  style={{
+                    padding: "8px",
+                    marginTop: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="Pago">Pago</option>
+                  <option value="Preparando">Preparando</option>
+                  <option value="Enviado">Enviado</option>
+                  <option value="A caminho">A caminho</option>
+                  <option value="Entregue">Entregue</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </label>
+              <strong>Total:</strong> CVT{" "}
+              {Number(pedido.total).toFixed(2)}
+              <br />
+              <strong>Prazo de entrega:</strong>{" "}
+              {pedido.prazo_entrega} dias
+            </p>
           </div>
         ))
       )}
