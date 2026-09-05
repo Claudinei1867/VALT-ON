@@ -479,7 +479,10 @@ function App() {
   if (mostrarAdmin) {
     return (
       <div>
-        <Admin />
+        <Admin onVoltar={() => {
+          setMostrarAdmin(false);
+          carregarProdutos();
+        }} />
 
         <div
           style={{
@@ -682,7 +685,7 @@ function App() {
           </button>
 
           {/* ADMIN */}
-          
+
           {usuario?.admin && (
             <button
               onClick={() =>
@@ -826,7 +829,7 @@ function App() {
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit, minmax(220px, 1fr))",
+              "repeat(8, minmax(0, 1fr))",
             gap: "20px",
           }}
         >
@@ -850,7 +853,7 @@ function App() {
                     textAlign:
                       "center",
                     marginBottom:
-                      "15px",
+                      "5px",
                   }}
                 >
                   {produto.imagem ? (
@@ -867,7 +870,7 @@ function App() {
                       }}
                       style={{
                         width: "100%",
-                        height: "180px",
+                        height: "60px",
                         objectFit:
                           "contain",
                         borderRadius:
@@ -882,7 +885,7 @@ function App() {
                         textAlign:
                           "center",
                         height:
-                          "180px",
+                          "100px",
                         display:
                           "flex",
                         alignItems:
@@ -909,16 +912,16 @@ function App() {
                   {produto.nome}
                 </h3>
 
-                <p>
+                <p style={{ fontSize: "8px" }}>
                   {produto.descricao}
                 </p>
 
-                <p>
+                <p style={{ fontSize: "8px" }}>
                   Categoria:{" "}
                   {produto.categoria}
                 </p>
 
-                <p>
+                <p style={{ fontSize: "8px" }}>
                   Estoque:{" "}
                   {produto.estoque}
                 </p>
