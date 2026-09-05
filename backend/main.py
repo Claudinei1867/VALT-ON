@@ -58,7 +58,7 @@ app.add_middleware(
     ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 
@@ -945,6 +945,53 @@ def alterar_status_pedido(
         "status":
             pedido.status
     }
+
+
+# =========================================================
+# LISTAR TODOS OS PEDIDOS
+# ADMINISTRADOR
+# =========================================================
+
+@app.get("/pedidos")
+def listar_todos_pedidos(
+    db: Session = Depends(get_db)
+):
+
+    pedidos = (
+        db.query(models.Pedido)
+        .order_by(
+            models.Pedido.id.desc()
+        )
+        .all()
+    )
+
+    resultado = []
+
+    for pedido in pedidos:
+
+        cliente = (
+            db.query(models.Cliente)
+            .filter(
+                models.Cliente.id == pedido.cliente_id
+            )
+            .first()
+        )
+
+        resultado.append(
+            {
+                "pedido_id": pedido.id,
+                "cliente_id": pedido.cliente_id,
+                "cliente_nome": (
+                    cliente.nome if cliente else "Cliente não encontrado"
+                ),
+                "cliente_email": cliente.email if cliente else "",
+                "status": pedido.status,
+                "total": pedido.total,
+                "prazo_entrega": pedido.prazo_entrega
+            }
+        )
+
+    return resultado
 
 
 # =========================================================
