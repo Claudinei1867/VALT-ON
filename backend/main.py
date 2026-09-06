@@ -54,7 +54,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://valt-ksxlm14x4-claudinei1867.vercel.app"
+        "https://valt-on.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
