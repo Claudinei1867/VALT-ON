@@ -826,10 +826,9 @@ function App() {
           )}
 
         <div
+          className="produtos-grid"
           style={{
             display: "grid",
-            gridTemplateColumns:
-              "repeat(8, minmax(0, 1fr))",
             gap: "20px",
           }}
         >

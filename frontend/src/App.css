@@ -388,3 +388,29 @@ main > div > div {
   height: auto;
   display: block;
 }
+
+/* =========================================================
+   GRADE DE PRODUTOS - RESPONSIVA
+   ========================================================= */
+
+.produtos-grid {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+@media (max-width: 1400px) {
+  .produtos-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .produtos-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .produtos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
