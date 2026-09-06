@@ -856,6 +856,11 @@ def listar_pedidos_cliente(
                         if produto
                         else "Produto não encontrado"
                     ),
+                    "imagem": (
+                        produto.imagem
+                        if produto
+                        else None
+                    ),
                     "quantidade": item.quantidade,
                     "preco_unitario": item.preco_unitario
                 }
