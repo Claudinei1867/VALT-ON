@@ -711,11 +711,20 @@ def finalizar_compra(
     # CRIAR PEDIDO
     # -----------------------------------------------------
 
+    data_pedido = datetime.now()
+    data_entrega_prevista = (
+        data_pedido + timedelta(days=prazo_entrega)
+    )
+
     pedido = models.Pedido(
         cliente_id=compra.cliente_id,
         status="Pago",
         total=total,
-        prazo_entrega=prazo_entrega
+        prazo_entrega=prazo_entrega,
+        data_pedido=data_pedido.strftime("%Y-%m-%d %H:%M:%S"),
+        data_entrega_prevista=data_entrega_prevista.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
     )
 
     db.add(pedido)
@@ -850,13 +859,15 @@ def listar_pedidos_cliente(
                     "quantidade": item.quantidade,
                     "preco_unitario": item.preco_unitario
                 }
-            )
-
+                    )
         resultado.append(
             {
                 "pedido_id": pedido.id,
                 "status": pedido.status,
                 "total": pedido.total,
+                "prazo_entrega": pedido.prazo_entrega,
+                "data_pedido": pedido.data_pedido,
+                "data_entrega_prevista": pedido.data_entrega_prevista,
                 "itens": itens_resultado
             }
         )

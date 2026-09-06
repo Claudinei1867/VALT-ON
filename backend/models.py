@@ -76,11 +76,20 @@ class Pedido(Base):
         Integer,
         nullable=False
     )
+    data_pedido = Column(
+        String,
+        nullable=True
+    )
 
+    data_entrega_prevista = Column(
+        String,
+        nullable=True
+    )
 
 # =========================================================
 # ITENS DO PEDIDO
 # =========================================================
+
 
 class ItemPedido(Base):
     __tablename__ = "itens_pedido"
