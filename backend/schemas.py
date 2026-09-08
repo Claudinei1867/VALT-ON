@@ -61,7 +61,17 @@ class ItemCompra(BaseModel):
 
 class CompraCreate(BaseModel):
     cliente_id: int | None = None
+    espaco_id: int | None = None
     itens: list[ItemCompra]
+
+
+# =========================================================
+# CASAS / ESPAÇOS
+# =========================================================
+
+class CasaCompra(BaseModel):
+    cliente_id: int
+    tipo: str
 
 
 # =========================================================
