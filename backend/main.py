@@ -14,6 +14,8 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
 import os
+import smtplib
+from email.message import EmailMessage
 from dotenv import load_dotenv
 
 from database import engine, Base, SessionLocal
@@ -22,6 +24,17 @@ import schemas
 
 load_dotenv()
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+from supabase import create_client
+
+supabase = create_client(
+    SUPABASE_URL,
+    SUPABASE_KEY
+)
+
+
 # =========================================================
 # CONFIGURAÇÃO DA API
 # =========================================================
@@ -29,6 +42,33 @@ app = FastAPI(title="VALT-ON API")
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+# =========================================================
+# CONFIGURAÇÃO DAS CASAS
+# =========================================================
+
+CASAS_CONFIG = {
+    "pequena": {
+        "nome": "Casa Pequena",
+        "valor": 0.0,
+        "capacidade": 30
+    },
+    "media": {
+        "nome": "Casa Média",
+        "valor": 3000.0,
+        "capacidade": 100
+    },
+    "grande": {
+        "nome": "Casa Grande",
+        "valor": 5000.0,
+        "capacidade": 200
+    },
+    "mansao": {
+        "nome": "Mansão",
+        "valor": 10000.0,
+        "capacidade": 500
+    }
+}
 
 
 # =========================================================
@@ -81,12 +121,12 @@ def get_db():
     finally:
         db.close()
 
-
 # =========================================================
 # CRÉDITO SEMANAL CVT
 # =========================================================
 
 def conceder_credito_semanal(db: Session):
+
     agora = datetime.now()
 
     # Domingo = 6
@@ -139,7 +179,189 @@ def conceder_credito_semanal(db: Session):
 
 
 # =========================================================
-# FUNÇÃO AUTOMÁTICA DO AGENDADOR
+# ATUALIZAR STATUS DOS PEDIDOS AUTOMATICAMENTE
+# =========================================================
+
+# =========================================================
+# ENVIO DE E-MAIL
+# =========================================================
+
+def enviar_email(destinatario: str, assunto: str, mensagem: str):
+
+    try:
+
+        email = EmailMessage()
+
+        email["From"] = os.getenv("SMTP_USER")
+        email["To"] = destinatario
+        email["Subject"] = assunto
+
+        email.set_content(mensagem)
+
+        servidor = smtplib.SMTP(
+            os.getenv("SMTP_HOST"),
+            int(os.getenv("SMTP_PORT"))
+        )
+
+        servidor.starttls()
+
+        servidor.login(
+            os.getenv("SMTP_USER"),
+            os.getenv("SMTP_PASSWORD")
+        )
+
+        servidor.send_message(email)
+
+        servidor.quit()
+
+        print(
+            f"E-mail enviado com sucesso para {destinatario}"
+        )
+
+    except Exception as erro:
+
+        print(
+            f"Erro ao enviar e-mail para {destinatario}: {erro}"
+        )
+
+def atualizar_status_pedidos_automaticamente(db):
+
+    agora = datetime.now()
+
+    pedidos = (
+        db.query(models.Pedido)
+        .filter(
+            models.Pedido.status.in_([
+                "Pago",
+                "Preparando",
+                "Enviado",
+                "A caminho"
+            ])
+        )
+        .all()
+    )
+
+    for pedido in pedidos:
+
+        if not pedido.data_pedido:
+            continue
+
+        try:
+
+            data_pedido = datetime.strptime(
+                pedido.data_pedido,
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+        except ValueError:
+
+            continue
+
+        # Prazo 0 dias = 2 horas
+        if pedido.prazo_entrega == 0:
+            tempo_total = 2 * 60 * 60
+        else:
+            tempo_total = (
+                pedido.prazo_entrega
+                * 24
+                * 60
+                * 60
+            )
+
+        # Tempo decorrido desde a compra
+        tempo_decorrido = (
+            agora - data_pedido
+        ).total_seconds()
+
+        percentual = (
+            tempo_decorrido /
+            tempo_total
+        ) * 100
+
+        # -------------------------------------------------
+        # DEFINIR NOVO STATUS
+        # -------------------------------------------------
+
+        if percentual >= 80:
+
+            novo_status = "Entregue"
+
+        elif percentual >= 60:
+
+            novo_status = "A caminho"
+
+        elif percentual >= 40:
+
+            novo_status = "Enviado"
+
+        elif percentual >= 20:
+
+            novo_status = "Preparando"
+
+        else:
+
+            novo_status = "Pago"
+
+        # -------------------------------------------------
+        # NÃO FAZER NADA SE O STATUS JÁ ESTIVER CORRETO
+        # -------------------------------------------------
+
+        if pedido.status == novo_status:
+            continue
+
+        status_anterior = pedido.status
+
+        pedido.status = novo_status
+
+        print(
+            f"Pedido #{pedido.id}: "
+            f"{status_anterior} -> {novo_status}"
+        )
+
+        # -------------------------------------------------
+        # BUSCAR CLIENTE
+        # -------------------------------------------------
+
+        cliente = (
+            db.query(models.Cliente)
+            .filter(
+                models.Cliente.id ==
+                pedido.cliente_id
+            )
+            .first()
+        )
+
+        # -------------------------------------------------
+        # ENVIAR E-MAIL
+        # SOMENTE QUANDO O STATUS MUDAR
+        # -------------------------------------------------
+
+        if cliente and cliente.email:
+
+            enviar_email(
+                cliente.email,
+                f"Atualização do pedido #{pedido.id} - VALT-ON",
+                (
+                    f"Olá, {cliente.nome}!\n\n"
+                    f"Seu pedido #{pedido.id} "
+                    "teve uma atualização.\n\n"
+                    f"Status anterior: "
+                    f"{status_anterior}\n"
+                    f"Novo status: "
+                    f"{novo_status}\n"
+                    f"Total do pedido: "
+                    f"{pedido.total:.2f} CVT\n\n"
+                    "Acompanhe seu pedido pela "
+                    "sua conta na VALT-ON.\n\n"
+                    "VALT-ON"
+                )
+            )
+
+    db.commit()
+
+
+# =========================================================
+# FUNÇÃO AUTOMÁTICA DO CRÉDITO
 # =========================================================
 
 def executar_credito_automatico():
@@ -147,6 +369,7 @@ def executar_credito_automatico():
     db = SessionLocal()
 
     try:
+
         conceder_credito_semanal(db)
 
     except Exception as erro:
@@ -158,14 +381,49 @@ def executar_credito_automatico():
         )
 
     finally:
+
         db.close()
 
 
 # =========================================================
-# AGENDADOR DO CRÉDITO CVT
+# FUNÇÃO AUTOMÁTICA DOS PEDIDOS
+# =========================================================
+
+def executar_status_pedidos_automatico():
+
+    db = SessionLocal()
+
+    try:
+
+        atualizar_status_pedidos_automaticamente(
+            db
+        )
+
+    except Exception as erro:
+
+        db.rollback()
+
+        print(
+            "Erro na atualização automática "
+            f"dos pedidos: {erro}"
+        )
+
+    finally:
+
+        db.close()
+
+
+# =========================================================
+# AGENDADOR
 # =========================================================
 
 scheduler = BackgroundScheduler()
+
+
+# ---------------------------------------------------------
+# CRÉDITO SEMANAL
+# DOMINGO ÀS 00:00
+# ---------------------------------------------------------
 
 scheduler.add_job(
     executar_credito_automatico,
@@ -175,6 +433,19 @@ scheduler.add_job(
     minute=0,
     second=0
 )
+
+
+# ---------------------------------------------------------
+# ATUALIZAÇÃO DOS PEDIDOS
+# A CADA 1 MINUTO
+# ---------------------------------------------------------
+
+scheduler.add_job(
+    executar_status_pedidos_automatico,
+    "interval",
+    minutes=1
+)
+
 
 scheduler.start()
 
@@ -399,21 +670,36 @@ async def upload_imagem(
         file.filename or "imagem"
     ).name
 
-    caminho = UPLOAD_DIR / nome_arquivo
+    try:
 
-    with caminho.open("wb") as arquivo:
+        conteudo = await file.read()
 
-        shutil.copyfileobj(
-            file.file,
-            arquivo
+        supabase.storage.from_("produtos").upload(
+            nome_arquivo,
+            conteudo,
+            {
+                "content-type": file.content_type or "application/octet-stream",
+                "upsert": "true"
+            }
         )
 
-    return {
-        "mensagem": "Imagem enviada com sucesso!",
-        "arquivo": nome_arquivo,
-        "url": f"/uploads/{nome_arquivo}"
-    }
+        url_publica = (
+            f"{SUPABASE_URL}/storage/v1/object/public/"
+            f"produtos/{nome_arquivo}"
+        )
 
+        return {
+            "mensagem": "Imagem enviada com sucesso!",
+            "arquivo": nome_arquivo,
+            "url": url_publica
+        }
+
+    except Exception as erro:
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao enviar imagem: {str(erro)}"
+        )
 
 # =========================================================
 # CLIENTES
@@ -473,23 +759,22 @@ def cadastrar_cliente(
     db.refresh(novo_cliente)
 
     # -----------------------------------------------------
-    # CRIAR ESPAÇO SIMPLES AUTOMATICAMENTE
+    # CRIAR CASA PEQUENA AUTOMATICAMENTE
     # -----------------------------------------------------
 
-    espaco_simples = models.EspacoCliente(
+    espaco_pequena = models.EspacoCliente(
         cliente_id=novo_cliente.id,
-        tipo="simples",
-        nome="Espaço Simples",
+        tipo="pequena",
+        nome="Casa Pequena",
         valor=0.0,
         adquirido="Sim"
     )
 
-    db.add(espaco_simples)
+    db.add(espaco_pequena)
 
     db.commit()
 
     return novo_cliente
-
 
 # =========================================================
 # LOGIN
@@ -609,6 +894,31 @@ def finalizar_compra(
         )
 
     # -----------------------------------------------------
+    # VERIFICAR ESPAÇO DO CLIENTE
+    # -----------------------------------------------------
+
+    if compra.espaco_id is None:
+        raise HTTPException(
+            status_code=400,
+            detail="É necessário selecionar um espaço para realizar a compra."
+        )
+
+    espaco = (
+        db.query(models.EspacoCliente)
+        .filter(
+            models.EspacoCliente.id == compra.espaco_id,
+            models.EspacoCliente.cliente_id == compra.cliente_id
+        )
+        .first()
+    )
+
+    if espaco is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Espaço inválido ou não pertence ao cliente."
+        )
+
+    # -----------------------------------------------------
     # CALCULAR TOTAL
     # -----------------------------------------------------
 
@@ -718,6 +1028,7 @@ def finalizar_compra(
 
     pedido = models.Pedido(
         cliente_id=compra.cliente_id,
+        espaco_id=compra.espaco_id,
         status="Pago",
         total=total,
         prazo_entrega=prazo_entrega,
@@ -863,8 +1174,8 @@ def listar_pedidos_cliente(
                     ),
                     "quantidade": item.quantidade,
                     "preco_unitario": item.preco_unitario
-                }
-                    )
+                    }
+                )
         resultado.append(
             {
                 "pedido_id": pedido.id,
@@ -949,12 +1260,44 @@ def alterar_status_pedido(
     # ALTERAR STATUS
     # -----------------------------------------------------
 
+    status_anterior = pedido.status
+
     pedido.status = novo_status
 
     db.commit()
 
     db.refresh(pedido)
 
+    # -----------------------------------------------------
+    # ENVIAR E-MAIL AO CLIENTE
+    # SOMENTE SE O STATUS REALMENTE MUDOU
+    # -----------------------------------------------------
+
+    if status_anterior != novo_status:
+
+        cliente = (
+            db.query(models.Cliente)
+            .filter(
+                models.Cliente.id == pedido.cliente_id
+            )
+            .first()
+        )
+
+        if cliente and cliente.email:
+
+            enviar_email(
+                cliente.email,
+                f"Atualização do pedido #{pedido.id} - VALT-ON",
+                (
+                    f"Olá, {cliente.nome}!\n\n"
+                    f"Seu pedido #{pedido.id} teve uma atualização.\n\n"
+                    f"Status anterior: {status_anterior}\n"
+                    f"Novo status: {novo_status}\n"
+                    f"Total do pedido: {pedido.total:.2f} CVT\n\n"
+                    "Acompanhe seu pedido pela sua conta na VALT-ON.\n\n"
+                    "VALT-ON"
+                )
+            )
     # -----------------------------------------------------
     # RESPOSTA
     # -----------------------------------------------------
@@ -1014,6 +1357,110 @@ def listar_todos_pedidos(
         )
 
     return resultado
+
+
+# =========================================================
+# ESPAÇOS DO CLIENTE
+# =========================================================
+
+@app.post(
+    "/clientes/{cliente_id}/espacos/comprar"
+)
+def comprar_casa(
+    cliente_id: int,
+    casa: schemas.CasaCompra,
+    db: Session = Depends(get_db)
+):
+
+    # -----------------------------------------------------
+    # VERIFICAR CLIENTE
+    # -----------------------------------------------------
+
+    cliente = (
+        db.query(models.Cliente)
+        .filter(
+            models.Cliente.id == cliente_id
+        )
+        .first()
+    )
+
+    if cliente is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Cliente não encontrado."
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR CLIENTE INFORMADO
+    # -----------------------------------------------------
+
+    if casa.cliente_id != cliente_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Cliente informado não corresponde ao cliente da rota."
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR TIPO DA CASA
+    # -----------------------------------------------------
+
+    config = CASAS_CONFIG.get(casa.tipo)
+
+    if config is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Tipo de casa inválido."
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR SALDO
+    # -----------------------------------------------------
+
+    valor = config["valor"]
+
+    if cliente.saldo_cvt < valor:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Saldo CVT insuficiente. "
+                f"Saldo disponível: {cliente.saldo_cvt:.2f} CVT. "
+                f"Valor da casa: {valor:.2f} CVT."
+            )
+        )
+
+    # -----------------------------------------------------
+    # DESCONTAR VALOR
+    # -----------------------------------------------------
+
+    cliente.saldo_cvt -= valor
+
+    # -----------------------------------------------------
+    # CRIAR CASA
+    # -----------------------------------------------------
+
+    espaco = models.EspacoCliente(
+        cliente_id=cliente_id,
+        tipo=casa.tipo,
+        nome=config["nome"],
+        valor=valor,
+        adquirido="Sim"
+    )
+
+    db.add(espaco)
+    db.commit()
+    db.refresh(espaco)
+
+    return {
+        "mensagem": "Casa adquirida com sucesso!",
+        "id": espaco.id,
+        "cliente_id": espaco.cliente_id,
+        "tipo": espaco.tipo,
+        "nome": espaco.nome,
+        "valor": espaco.valor,
+        "capacidade": config["capacidade"],
+        "adquirido": espaco.adquirido,
+        "saldo_cvt": cliente.saldo_cvt
+    }
 
 
 # =========================================================
