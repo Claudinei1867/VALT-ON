@@ -606,7 +606,7 @@ function Admin({ onVoltar }) {
 
           <input
             type="number"
-            min="1"
+            min="0"
             value={prazoEntregaDias}
             onChange={(evento) =>
               setPrazoEntregaDias(evento.target.value)

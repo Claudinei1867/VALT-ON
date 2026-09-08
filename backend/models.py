@@ -1,10 +1,10 @@
-from sqlalchemy import (
+from sqlalchemy import (  # type: ignore[import-not-found]
     Column,
     Integer,
     String,
     Float,
     ForeignKey,
-)   # type: ignore[import-not-found]
+)
 
 from database import Base
 
@@ -86,6 +86,12 @@ class Pedido(Base):
         nullable=True
     )
 
+    espaco_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=True
+    )
+
 # =========================================================
 # ITENS DO PEDIDO
 # =========================================================
@@ -152,4 +158,35 @@ class EspacoCliente(Base):
     adquirido = Column(
         String,
         default="Não"
+    )
+
+    # =========================================================
+# ITENS DOS ESPAÇOS DO CLIENTE
+# =========================================================
+
+
+class ItemEspacoCliente(Base):
+    __tablename__ = "itens_espacos_clientes"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    espaco_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=False
+    )
+
+    produto_id = Column(
+        Integer,
+        ForeignKey("produtos.id"),
+        nullable=False
+    )
+
+    data_entrada = Column(
+        String,
+        nullable=True
     )

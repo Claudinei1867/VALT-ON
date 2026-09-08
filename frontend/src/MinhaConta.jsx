@@ -585,7 +585,7 @@ function MinhaConta({
             ) : (
               pedidos.map((pedido) => {
                 const aberto =
-                  pedidoAberto === pedido.id;
+                  pedidoAberto === pedido.pedido_id;
 
                 const etapaAtual =
                   obterEtapaPedido(
@@ -594,7 +594,7 @@ function MinhaConta({
 
                 return (
                   <div
-                    key={pedido.id}
+                    key={pedido.pedido_id}
                     style={{
                       border:
                         "1px solid #ddd",
@@ -628,7 +628,7 @@ function MinhaConta({
                             margin: 0,
                           }}
                         >
-                          📦 Pedido #{pedido.id}
+                          📦 Pedido #{pedido.pedido_id}
                         </h3>
 
                         <span
@@ -863,7 +863,7 @@ function MinhaConta({
                         <button
                           onClick={() =>
                             alternarPedido(
-                              pedido.id
+                              pedido.pedido_id
                             )
                           }
                           style={{
