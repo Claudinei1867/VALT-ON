@@ -37,13 +37,30 @@ class Produto(Base):
 
 class Cliente(Base):
     __tablename__ = "clientes"
-
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True, index=True)
     senha = Column(String, nullable=False)
     saldo_cvt = Column(Float, nullable=False, default=1000.0)
     ultimo_credito_cvt = Column(String, nullable=True)
+
+    email_confirmado = Column(
+        Integer,
+        nullable=False,
+        default=0
+    )
+
+    token_confirmacao_email = Column(
+        String,
+        nullable=True,
+        unique=True,
+        index=True
+    )
+
+    token_confirmacao_expira_em = Column(
+        String,
+        nullable=True
+    )
 
 
 # =========================================================

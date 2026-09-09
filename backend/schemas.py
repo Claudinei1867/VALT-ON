@@ -45,6 +45,7 @@ class ClienteResponse(BaseModel):
     id: int
     nome: str
     email: str
+    email_confirmado: int
 
     class Config:
         from_attributes = True

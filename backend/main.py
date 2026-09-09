@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
 import os
+import secrets
 import smtplib
 import bcrypt
 from email.message import EmailMessage
@@ -746,11 +747,18 @@ def cadastrar_cliente(
     domingo = agora - timedelta(days=dias_desde_domingo)
     data_domingo = domingo.strftime("%Y-%m-%d")
 
+    token_confirmacao = secrets.token_urlsafe(32)
+    token_expira_em = (
+        agora + timedelta(hours=24)
+    ).isoformat()
+
     novo_cliente = models.Cliente(
         nome=cliente.nome,
         email=cliente.email,
         senha=cliente.senha,
-        ultimo_credito_cvt=data_domingo
+        ultimo_credito_cvt=data_domingo,
+        token_confirmacao_email=token_confirmacao,
+        token_confirmacao_expira_em=token_expira_em
     )
 
     db.add(novo_cliente)
@@ -772,21 +780,110 @@ def cadastrar_cliente(
     )
 
     db.add(espaco_pequena)
-
     db.commit()
+
+    # -----------------------------------------------------
+    # ENVIAR E-MAIL DE CONFIRMAÇÃO
+    # -----------------------------------------------------
+
+    link_confirmacao = (
+        "https://valt-on.onrender.com/confirmar-email?token="
+        + token_confirmacao
+    )
+
+    mensagem_confirmacao = (
+        f"Olá, {novo_cliente.nome}!\n\n"
+        "Sua conta no VALT-ON foi criada com sucesso.\n\n"
+        "Para confirmar seu endereço de e-mail, "
+        "acesse o link abaixo:\n\n"
+        f"{link_confirmacao}\n\n"
+        "Este link é válido por 24 horas.\n\n"
+        "Se você não criou esta conta, ignore este e-mail.\n\n"
+        "VALT-ON"
+    )
+
+    enviar_email(
+        novo_cliente.email,
+        "Confirme seu e-mail - VALT-ON",
+        mensagem_confirmacao
+    )
 
     return novo_cliente
 
 # =========================================================
+# CONFIRMAÇÃO DE E-MAIL
+# =========================================================
+
+@app.get("/confirmar-email")
+def confirmar_email(
+    token: str,
+    db: Session = Depends(get_db)
+):
+    cliente = (
+        db.query(models.Cliente)
+        .filter(
+            models.Cliente.token_confirmacao_email == token
+        )
+        .first()
+    )
+
+    if cliente is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Token de confirmação inválido."
+        )
+
+    if cliente.email_confirmado == 1:
+        return {
+            "mensagem": "E-mail já confirmado."
+        }
+
+    if (
+        cliente.token_confirmacao_expira_em
+        is None
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Token de confirmação inválido."
+        )
+
+    try:
+        expiracao = datetime.fromisoformat(
+            cliente.token_confirmacao_expira_em
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Token de confirmação inválido."
+        )
+
+    if datetime.now() > expiracao:
+        raise HTTPException(
+            status_code=400,
+            detail="Token de confirmação expirado."
+        )
+
+    cliente.email_confirmado = 1
+    cliente.token_confirmacao_email = None
+    cliente.token_confirmacao_expira_em = None
+
+    db.commit()
+
+    return {
+        "mensagem": "E-mail confirmado com sucesso!"
+    }
+
+
+# =========================================================
 # LOGIN
 # =========================================================
+
 
 @app.post("/login")
 def login(
     dados: schemas.ClienteLogin,
     db: Session = Depends(get_db)
 ):
-
     cliente = (
         db.query(models.Cliente)
         .filter(
@@ -796,14 +893,18 @@ def login(
     )
 
     if cliente is None:
-
         raise HTTPException(
             status_code=401,
             detail="E-mail ou senha inválidos."
         )
 
-    if cliente.senha != dados.senha:
+    if cliente.email_confirmado != 1:
+        raise HTTPException(
+            status_code=403,
+            detail="Confirme seu e-mail antes de fazer login."
+        )
 
+    if cliente.senha != dados.senha:
         raise HTTPException(
             status_code=401,
             detail="E-mail ou senha inválidos."
@@ -830,10 +931,10 @@ def login(
         }
     }
 
-
 # =========================================================
 # LOGIN DO ADMINISTRADOR
 # =========================================================
+
 
 @app.post("/login-admin")
 def login_admin(
