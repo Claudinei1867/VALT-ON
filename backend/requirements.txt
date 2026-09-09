@@ -21,3 +21,4 @@ tzdata==2026.3
 tzlocal==5.4.4
 uvicorn==0.52.4
 supabase==2.31.0
+bcrypt==5.0.0

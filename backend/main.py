@@ -15,6 +15,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
 import os
 import smtplib
+import bcrypt
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
@@ -835,12 +836,44 @@ def login(
 # =========================================================
 
 @app.post("/login-admin")
-def login_admin(dados: schemas.ClienteLogin):
+def login_admin(
+    dados: schemas.ClienteLogin,
+    db: Session = Depends(get_db)
+):
 
+    # ADMINISTRADOR PRINCIPAL
     if (
-        dados.email != ADMIN_EMAIL
-        or dados.senha != ADMIN_PASSWORD
+        dados.email == ADMIN_EMAIL
+        and dados.senha == ADMIN_PASSWORD
     ):
+        return {
+            "mensagem": "Login de administrador realizado com sucesso!",
+            "admin": True,
+            "email": dados.email
+        }
+
+    # DEMAIS ADMINISTRADORES
+    administrador = (
+        db.query(models.Administrador)
+        .filter(
+            models.Administrador.email == dados.email,
+            models.Administrador.ativo == 1
+        )
+        .first()
+    )
+
+    if administrador is None:
+        raise HTTPException(
+            status_code=401,
+            detail="E-mail ou senha de administrador inválidos."
+        )
+
+    senha_correta = bcrypt.checkpw(
+        dados.senha.encode("utf-8"),
+        administrador.senha_hash.encode("utf-8")
+    )
+
+    if not senha_correta:
         raise HTTPException(
             status_code=401,
             detail="E-mail ou senha de administrador inválidos."
@@ -849,7 +882,9 @@ def login_admin(dados: schemas.ClienteLogin):
     return {
         "mensagem": "Login de administrador realizado com sucesso!",
         "admin": True,
-        "email": dados.email
+        "email": administrador.email,
+        "nome": administrador.nome,
+        "admin_id": administrador.id
     }
 
 

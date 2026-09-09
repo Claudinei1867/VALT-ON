@@ -190,3 +190,36 @@ class ItemEspacoCliente(Base):
         String,
         nullable=True
     )
+
+# =========================================================
+# ADMINISTRADORES
+# =========================================================
+
+
+class Administrador(Base):
+    __tablename__ = "administradores"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    email = Column(
+        String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    senha_hash = Column(
+        String,
+        nullable=False
+    )
+
+    nome = Column(
+        String,
+        nullable=False
+    )
+
+    ativo = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )
