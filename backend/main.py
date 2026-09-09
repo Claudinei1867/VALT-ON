@@ -226,6 +226,76 @@ def enviar_email(destinatario: str, assunto: str, mensagem: str):
             f"Erro ao enviar e-mail para {destinatario}: {erro}"
         )
 
+# =========================================================
+# REENVIO TEMPORARIO DE CONFIRMACAO DE E-MAIL
+# =========================================================
+
+@app.post("/reenviar-confirmacao-email/{cliente_id}")
+def reenviar_confirmacao_email(
+    cliente_id: int,
+    db: Session = Depends(get_db)
+):
+    if cliente_id != 10:
+        raise HTTPException(
+            status_code=403,
+            detail="Endpoint temporário disponível somente para o cliente 10."
+        )
+
+    cliente = (
+        db.query(models.Cliente)
+        .filter(models.Cliente.id == cliente_id)
+        .first()
+    )
+
+    if cliente is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Cliente não encontrado."
+        )
+
+    agora = datetime.now()
+
+    token_confirmacao = secrets.token_urlsafe(32)
+
+    token_expira_em = (
+        agora + timedelta(hours=24)
+    ).isoformat()
+
+    cliente.email_confirmado = 0
+    cliente.token_confirmacao_email = token_confirmacao
+    cliente.token_confirmacao_expira_em = token_expira_em
+
+    db.commit()
+
+    link_confirmacao = (
+        "https://valt-on.onrender.com/confirmar-email?token="
+        + token_confirmacao
+    )
+
+    mensagem_confirmacao = (
+        f"Olá, {cliente.nome}!\n\n"
+        "Estamos reenviando a confirmação do seu e-mail "
+        "da conta VALT-ON.\n\n"
+        "Para confirmar seu endereço de e-mail, "
+        "acesse o link abaixo:\n\n"
+        f"{link_confirmacao}\n\n"
+        "Este link é válido por 24 horas.\n\n"
+        "VALT-ON"
+    )
+
+    enviar_email(
+        cliente.email,
+        "Confirme seu e-mail - VALT-ON",
+        mensagem_confirmacao
+    )
+
+    return {
+        "mensagem": "Novo e-mail de confirmação enviado.",
+        "cliente_id": cliente.id,
+        "email": cliente.email,
+        "email_confirmado": cliente.email_confirmado
+    }
+
 def atualizar_status_pedidos_automaticamente(db):
 
     agora = datetime.now()
