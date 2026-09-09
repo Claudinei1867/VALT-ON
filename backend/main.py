@@ -1665,3 +1665,18 @@ def listar_espacos_cliente(
 
         )
     return resultado
+
+# =========================================================
+# DIAGNOSTICO TEMPORARIO
+# =========================================================
+
+@app.get("/diagnostico-versao")
+def diagnostico_versao():
+    return {
+        "arquivo": __file__,
+        "confirmar_email": any(
+            rota.path == "/confirmar-email"
+            for rota in app.routes
+        )
+    }
+
