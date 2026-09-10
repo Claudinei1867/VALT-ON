@@ -907,6 +907,70 @@ def cadastrar_cliente(
     return novo_cliente
 
 # =========================================================
+# RECUPERAÇÃO DE SENHA
+# =========================================================
+
+@app.post('/solicitar-recuperacao-senha')
+def solicitar_recuperacao_senha(
+    dados: schemas.RecuperacaoSenhaSolicitacao,
+    db: Session = Depends(get_db)
+):
+
+    cliente = (
+        db.query(models.Cliente)
+        .filter(models.Cliente.email == dados.email)
+        .first()
+    )
+
+    # Por segurança, não informamos se o e-mail existe ou não.
+    mensagem_padrao = {
+        'mensagem': 'Se o e-mail estiver cadastrado, enviaremos um link para recuperação da senha.'
+    }
+
+    if cliente is None:
+        return mensagem_padrao
+
+    token_recuperacao = secrets.token_urlsafe(32)
+    token_expira_em = (
+        datetime.now() + timedelta(hours=1)
+    ).isoformat()
+
+    cliente.token_recuperacao_senha = token_recuperacao
+    cliente.token_recuperacao_expira_em = token_expira_em
+
+    db.commit()
+
+    link_recuperacao = (
+        'https://valt-on.onrender.com/recuperar-senha?token='
+        + token_recuperacao
+    )
+
+    mensagem_recuperacao = (
+        f'Olá, {cliente.nome}!\\n\\n'
+        'Recebemos uma solicitação para redefinir sua senha no VALT-ON.\\n\\n'
+        'Para criar uma nova senha, acesse o link abaixo:\\n\\n'
+        f'{link_recuperacao}\\n\\n'
+        'Este link é válido por 1 hora.\\n\\n'
+        'Se você não solicitou a recuperação da senha, ignore este e-mail.\\n\\n'
+        'VALT-ON'
+    )
+
+    enviado = enviar_email(
+        cliente.email,
+        'Recuperação de senha - VALT-ON',
+        mensagem_recuperacao
+    )
+
+    if not enviado:
+        raise HTTPException(
+            status_code=500,
+            detail='Não foi possível enviar o e-mail de recuperação.'
+        )
+
+    return mensagem_padrao
+
+
+# =========================================================
 # CONFIRMAÇÃO DE E-MAIL
 # =========================================================
 

@@ -62,6 +62,18 @@ class Cliente(Base):
         nullable=True
     )
 
+    token_recuperacao_senha = Column(
+        String,
+        nullable=True,
+        unique=True,
+        index=True
+    )
+
+    token_recuperacao_expira_em = Column(
+        String,
+        nullable=True
+    )
+
 
 # =========================================================
 # PEDIDOS

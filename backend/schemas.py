@@ -41,6 +41,15 @@ class ClienteLogin(BaseModel):
     senha: str
 
 
+class RecuperacaoSenhaSolicitacao(BaseModel):
+    email: str
+
+
+class RecuperacaoSenhaRedefinir(BaseModel):
+    token: str
+    nova_senha: str
+
+
 class ClienteResponse(BaseModel):
     id: int
     nome: str
