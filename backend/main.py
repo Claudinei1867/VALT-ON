@@ -189,7 +189,12 @@ def conceder_credito_semanal(db: Session):
 # =========================================================
 
 
-def enviar_email(destinatario: str, assunto: str, mensagem: str):
+def enviar_email(
+    destinatario: str,
+    assunto: str,
+    mensagem: str,
+    html_mensagem: str = None
+):
 
     try:
 
@@ -206,7 +211,12 @@ def enviar_email(destinatario: str, assunto: str, mensagem: str):
                 }
             ],
             "subject": assunto,
-            "textContent": mensagem
+            "textContent": mensagem,
+            "htmlContent": (
+                html_mensagem
+                if html_mensagem is not None
+                else mensagem.replace("\n", "<br>")
+            )
         }
 
         dados_json = json.dumps(dados).encode("utf-8")
@@ -908,7 +918,9 @@ def cadastrar_cliente(
 
 # =========================================================
 # RECUPERAÇÃO DE SENHA
-# =========================================================
+# ========================================================
+
+
 
 @app.post('/solicitar-recuperacao-senha')
 def solicitar_recuperacao_senha(
@@ -931,6 +943,7 @@ def solicitar_recuperacao_senha(
         return mensagem_padrao
 
     token_recuperacao = secrets.token_urlsafe(32)
+
     token_expira_em = (
         datetime.now() + timedelta(hours=1)
     ).isoformat()
@@ -946,19 +959,65 @@ def solicitar_recuperacao_senha(
     )
 
     mensagem_recuperacao = (
-        f'Olá, {cliente.nome}!\\n\\n'
-        'Recebemos uma solicitação para redefinir sua senha no VALT-ON.\\n\\n'
-        'Para criar uma nova senha, acesse o link abaixo:\\n\\n'
-        f'{link_recuperacao}\\n\\n'
-        'Este link é válido por 1 hora.\\n\\n'
-        'Se você não solicitou a recuperação da senha, ignore este e-mail.\\n\\n'
+        f'Olá, {cliente.nome}!\n\n'
+        'Recebemos uma solicitação para redefinir sua senha no VALT-ON.\n\n'
+        'Para criar uma nova senha, acesse o link abaixo:\n\n'
+        f'{link_recuperacao}\n\n'
+        'Este link é válido por 1 hora.\n\n'
+        'Se você não solicitou a recuperação da senha, ignore este e-mail.\n\n'
         'VALT-ON'
     )
+
+    html_recuperacao = f"""
+<html>
+<body>
+    <h2>Recuperação de senha - VALT-ON</h2>
+
+    <p>Olá, {cliente.nome}!</p>
+
+    <p>
+        Recebemos uma solicitação para redefinir sua senha no VALT-ON.
+    </p>
+
+    <p>
+        Para criar uma nova senha, clique no botão abaixo:
+    </p>
+
+    <p>
+        <a href="{link_recuperacao}"
+           style="
+               display: inline-block;
+               padding: 12px 24px;
+               background-color: #000000;
+               color: #ffffff;
+               text-decoration: none;
+               border-radius: 6px;
+               font-weight: bold;
+           ">
+            Redefinir minha senha
+        </a>
+    </p>
+
+    <p>
+        Este link é válido por 1 hora.
+    </p>
+
+    <p>
+        Se você não solicitou a recuperação da senha, ignore este e-mail.
+    </p>
+
+    <p>
+        VALT-ON
+    </p>
+</body>
+</html>
+"""
 
     enviado = enviar_email(
         cliente.email,
         'Recuperação de senha - VALT-ON',
-        mensagem_recuperacao
+        mensagem_recuperacao,
+        html_recuperacao
     )
 
     if not enviado:
