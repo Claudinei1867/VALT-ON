@@ -15,11 +15,11 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
 import os
 import secrets
-import smtplib
+import urllib.request
+import urllib.error
+import json
 import bcrypt
-from email.message import EmailMessage
 from dotenv import load_dotenv
-
 from database import engine, Base, SessionLocal
 import models
 import schemas
@@ -188,37 +188,53 @@ def conceder_credito_semanal(db: Session):
 # ENVIO DE E-MAIL
 # =========================================================
 
+
 def enviar_email(destinatario: str, assunto: str, mensagem: str):
 
     try:
 
-        email = EmailMessage()
+        api_key = os.getenv("BREVO_API_KEY")
 
-        email["From"] = os.getenv("SMTP_USER")
-        email["To"] = destinatario
-        email["Subject"] = assunto
+        dados = {
+            "sender": {
+                "name": "Valt-on",
+                "email": os.getenv("SMTP_USER")
+            },
+            "to": [
+                {
+                    "email": destinatario
+                }
+            ],
+            "subject": assunto,
+            "textContent": mensagem
+        }
 
-        email.set_content(mensagem)
+        dados_json = json.dumps(dados).encode("utf-8")
 
-        servidor = smtplib.SMTP(
-            os.getenv("SMTP_HOST"),
-            int(os.getenv("SMTP_PORT"))
+        requisicao = urllib.request.Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=dados_json,
+            headers={
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            },
+            method="POST"
         )
 
-        servidor.starttls()
+        with urllib.request.urlopen(requisicao) as resposta:
 
-        servidor.login(
-            os.getenv("SMTP_USER"),
-            os.getenv("SMTP_PASSWORD")
-        )
+            resultado = resposta.read().decode("utf-8")
 
-        servidor.send_message(email)
+            print(
+                f"E-mail enviado com sucesso para {destinatario}"
+            )
 
-        servidor.quit()
+            print(
+                f"Resposta Brevo: {resultado}"
+            )
 
-        print(
-            f"E-mail enviado com sucesso para {destinatario}"
-        )
+            return True
 
     except Exception as erro:
 
@@ -226,9 +242,12 @@ def enviar_email(destinatario: str, assunto: str, mensagem: str):
             f"Erro ao enviar e-mail para {destinatario}: {erro}"
         )
 
+        return False
+
 # =========================================================
 # REENVIO TEMPORARIO DE CONFIRMACAO DE E-MAIL
 # =========================================================
+
 
 @app.post("/reenviar-confirmacao-email/{cliente_id}")
 def reenviar_confirmacao_email(
@@ -283,11 +302,17 @@ def reenviar_confirmacao_email(
         "VALT-ON"
     )
 
-    enviar_email(
+    enviado = enviar_email(
         cliente.email,
         "Confirme seu e-mail - VALT-ON",
         mensagem_confirmacao
     )
+
+    if not enviado:
+        raise HTTPException(
+            status_code=500,
+            detail="Não foi possível enviar o e-mail de confirmação."
+        )
 
     return {
         "mensagem": "Novo e-mail de confirmação enviado.",
@@ -295,6 +320,7 @@ def reenviar_confirmacao_email(
         "email": cliente.email,
         "email_confirmado": cliente.email_confirmado
     }
+
 
 def atualizar_status_pedidos_automaticamente(db):
 
