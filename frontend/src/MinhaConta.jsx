@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -34,9 +34,11 @@ function MinhaConta({
   onVoltar,
   onLogout,
 }) {
+
   // =====================================================
   // PEDIDOS
   // =====================================================
+
 
   const [pedidos, setPedidos] = useState([]);
   const [carregandoPedidos, setCarregandoPedidos] =
@@ -44,9 +46,17 @@ function MinhaConta({
   const [mostrarPedidos, setMostrarPedidos] =
     useState(false);
 
+      // =====================================================
+  // MONITORAMENTO DE ALTERAÇÃO DE STATUS
+  // =====================================================
+
+
+  const statusPedidosAnterior = useRef({});
+
   // =====================================================
   // ESPAÇOS
   // =====================================================
+
 
   const [espacos, setEspacos] = useState([]);
   const [carregandoEspacos, setCarregandoEspacos] =
@@ -59,6 +69,7 @@ function MinhaConta({
   // =====================================================
   // ERRO GERAL
   // =====================================================
+
 
   const [erro, setErro] = useState("");
 
@@ -98,6 +109,84 @@ function MinhaConta({
         "PEDIDOS DO CLIENTE:",
         dados
       );
+
+      // Verificar alteração de status
+      if (Object.keys(statusPedidosAnterior.current).length > 0) {
+
+        dados.forEach((pedido) => {
+
+          const statusAnterior =
+            statusPedidosAnterior.current[pedido.pedido_id];
+
+          if (
+            statusAnterior !== undefined &&
+            statusAnterior !== pedido.status
+          ) {
+
+            console.log(
+              "ALTERAÇÃO DE STATUS DETECTADA:",
+              pedido.pedido_id,
+              statusAnterior,
+              "->",
+              pedido.status
+            );
+
+            try {
+
+              const contextoAudio =
+                new (window.AudioContext ||
+                  window.webkitAudioContext)();
+
+              const oscilador =
+                contextoAudio.createOscillator();
+
+              const ganho =
+                contextoAudio.createGain();
+
+              oscilador.connect(ganho);
+              ganho.connect(contextoAudio.destination);
+
+              oscilador.frequency.value = 880;
+              oscilador.type = "sine";
+
+              ganho.gain.setValueAtTime(
+                0.3,
+                contextoAudio.currentTime
+              );
+
+              ganho.gain.exponentialRampToValueAtTime(
+                0.01,
+                contextoAudio.currentTime + 0.5
+              );
+
+              oscilador.start();
+
+              oscilador.stop(
+                contextoAudio.currentTime + 0.5
+              );
+
+            } catch (erroAudio) {
+
+              console.error(
+                "Não foi possível reproduzir o som:",
+                erroAudio
+              );
+
+            }
+          }
+        });
+      }
+
+      // Guardar os status atuais
+      const novosStatus = {};
+
+      dados.forEach((pedido) => {
+        novosStatus[pedido.pedido_id] =
+          pedido.status;
+      });
+
+      statusPedidosAnterior.current =
+        novosStatus;
 
       setPedidos(dados);
       setMostrarPedidos(true);

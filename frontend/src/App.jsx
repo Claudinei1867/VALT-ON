@@ -836,6 +836,7 @@ function App() {
             (produto) => (
               <div
                 key={produto.id}
+                onClick={() => abrirDetalhesProduto(produto)}
                 style={{
                   border:
                     "1px solid #ddd",
@@ -843,6 +844,7 @@ function App() {
                     "10px",
                   padding: "20px",
                   background: "#fff",
+                  cursor: "pointer",
                 }}
               >
                 {/* IMAGEM */}
@@ -898,50 +900,51 @@ function App() {
                   )}
                 </div>
 
-                {/* INFORMAÇÕES */}
+                {/* NOME */}
 
                 <h3
-                  onClick={() =>
-                    abrirDetalhesProduto(produto)
-                  }
                   style={{
-                    cursor: "pointer",
+                    fontSize: "14px",
+                    margin: "8px 0",
                   }}
                 >
                   {produto.nome}
                 </h3>
 
-                <p style={{ fontSize: "8px" }}>
-                  {produto.descricao}
-                </p>
+                {/* PREÇO */}
 
-                <p style={{ fontSize: "8px" }}>
-                  Categoria:{" "}
-                  {produto.categoria}
-                </p>
-
-                <p style={{ fontSize: "8px" }}>
-                  Estoque:{" "}
-                  {produto.estoque}
-                </p>
-
-                <h3>
+                <h3
+                  style={{
+                    fontSize: "14px",
+                    margin: "8px 0 12px 0",
+                  }}
+                >
                   CVT{" "}
                   {Number(
                     produto.preco
                   ).toFixed(2)}
                 </h3>
 
+                {/* COMPRAR */}
+
                 <button
-                  onClick={() =>
+                  onClick={(evento) => {
+                    evento.stopPropagation();
+
                     adicionarCarrinho(
                       produto
-                    )
-                  }
+                    );
+                  }}
                   disabled={
                     produto.estoque <=
                     0
                   }
+                  style={{
+                    cursor:
+                      produto.estoque > 0
+                        ? "pointer"
+                        : "not-allowed",
+                  }}
                 >
                   {produto.estoque >
                     0
