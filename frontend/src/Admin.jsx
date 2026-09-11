@@ -7,6 +7,8 @@ function Admin({ onVoltar }) {
   const [buscaProduto, setBuscaProduto] = useState("");
   const [pedidos, setPedidos] = useState([]);
   const [buscaPedido, setBuscaPedido] = useState("");
+  const [quantidadeClientes, setQuantidadeClientes] = useState(0);
+  const [quantidadeProdutos, setQuantidadeProdutos] = useState(0);
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -64,6 +66,25 @@ function Admin({ onVoltar }) {
       });
   };
 
+  const carregarEstatisticas = () => {
+    fetch(`${API_URL}/admin/estatisticas`)
+      .then((resposta) => {
+        if (!resposta.ok) {
+          throw new Error("Erro ao carregar estatísticas");
+        }
+
+        return resposta.json();
+      })
+      .then((dados) => {
+        setQuantidadeClientes(dados.clientes);
+        setQuantidadeProdutos(dados.produtos);
+      })
+      .catch((erro) => {
+        console.error(erro);
+        setMensagem("Erro ao carregar estatísticas.");
+      });
+  };
+
   const alterarStatusPedido = async (pedidoId, novoStatus) => {
     try {
       const resposta = await fetch(
@@ -105,6 +126,7 @@ function Admin({ onVoltar }) {
   useEffect(() => {
     carregarProdutos();
     carregarPedidos();
+    carregarEstatisticas();
   }, []);
 
   // =====================================================
@@ -410,6 +432,51 @@ function Admin({ onVoltar }) {
       </button>
 
       <h1>⚙️ Administrador</h1>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "30px",
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            flex: "1",
+            minWidth: "220px",
+            padding: "20px",
+            borderRadius: "12px",
+            background: "#f5f5f5",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "32px", fontWeight: "bold" }}>
+            {quantidadeClientes}
+          </div>
+          <div style={{ fontSize: "18px" }}>
+            Clientes cadastrados
+          </div>
+        </div>
+
+        <div
+          style={{
+            flex: "1",
+            minWidth: "220px",
+            padding: "20px",
+            borderRadius: "12px",
+            background: "#f5f5f5",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "32px", fontWeight: "bold" }}>
+            {quantidadeProdutos}
+          </div>
+          <div style={{ fontSize: "18px" }}>
+            Produtos cadastrados
+          </div>
+        </div>
+      </div>
 
       <div style={{ marginBottom: "25px" }}>
         <input
