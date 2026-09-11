@@ -13,7 +13,7 @@ html {
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background-color: yellow;
+  background-color: #E9ECEF;
   color: #222;
 }
 
@@ -87,11 +87,7 @@ nav button:hover {
    ========================================================= */
 
 section {
-  background: linear-gradient(
-    135deg,
-    #f8f9fa,
-    #e9edf2
-  );
+  background: #FFF4CC;
   border-bottom: 1px solid #ddd;
 }
 
@@ -132,7 +128,7 @@ main {
   margin: 0 auto;
 }
 
-main > h2 {
+main>h2 {
   font-size: 28px;
   margin-bottom: 25px;
 }
@@ -141,11 +137,11 @@ main > h2 {
    CARDS DOS PRODUTOS
    ========================================================= */
 
-main > div {
+main>div {
   align-items: stretch;
 }
 
-main > div > div {
+main>div>div {
   background: #ffffff;
   border: none !important;
   border-radius: 14px !important;
@@ -155,7 +151,7 @@ main > div > div {
   overflow: hidden;
 }
 
-main > div > div:hover {
+main>div>div:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.13);
 }
@@ -173,7 +169,7 @@ main img {
   transition: transform 0.3s ease;
 }
 
-main > div > div:hover img {
+main>div>div:hover img {
   transform: scale(1.04);
 }
 
@@ -207,7 +203,7 @@ main h3:last-of-type {
    BOTÃO COMPRAR
    ========================================================= */
 
-main > div > div button {
+main>div>div button {
   width: 100%;
   border: none;
   background: #111827;
@@ -220,12 +216,12 @@ main > div > div button {
   transition: all 0.2s ease;
 }
 
-main > div > div button:hover {
+main>div>div button:hover {
   background: #000000;
   transform: translateY(-1px);
 }
 
-main > div > div button:disabled {
+main>div>div button:disabled {
   background: #aaa;
   cursor: not-allowed;
   transform: none;
@@ -314,7 +310,7 @@ div[style*="position: fixed"] button:hover {
     font-size: 24px;
   }
 
-  header > div {
+  header>div {
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -348,7 +344,7 @@ div[style*="position: fixed"] button:hover {
     padding: 15px !important;
   }
 
-  main > h2 {
+  main>h2 {
     font-size: 24px;
   }
 
@@ -379,7 +375,7 @@ div[style*="position: fixed"] button:hover {
   }
 }
 
-main > div > div {
+main>div>div {
   animation: aparecerProduto 0.4s ease;
 }
 
