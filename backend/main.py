@@ -954,7 +954,7 @@ def solicitar_recuperacao_senha(
     db.commit()
 
     link_recuperacao = (
-        'https://valt-on.onrender.com/recuperar-senha?token='
+        'https://valt-on.vercel.app/recuperar-senha?token='
         + token_recuperacao
     )
 
@@ -1027,6 +1027,61 @@ def solicitar_recuperacao_senha(
         )
 
     return mensagem_padrao
+
+
+@app.post('/redefinir-senha')
+def redefinir_senha(
+    dados: schemas.RecuperacaoSenhaRedefinir,
+    db: Session = Depends(get_db)
+):
+
+    cliente = (
+        db.query(models.Cliente)
+        .filter(
+            models.Cliente.token_recuperacao_senha == dados.token
+        )
+        .first()
+    )
+
+    if cliente is None:
+        raise HTTPException(
+            status_code=400,
+            detail='Token de recuperação inválido.'
+        )
+
+    if not cliente.token_recuperacao_expira_em:
+        raise HTTPException(
+            status_code=400,
+            detail='Token de recuperação inválido.'
+        )
+
+    try:
+        expiracao = datetime.fromisoformat(
+            cliente.token_recuperacao_expira_em
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail='Token de recuperação inválido.'
+        )
+
+    if datetime.now() > expiracao:
+        raise HTTPException(
+            status_code=400,
+            detail='O link de recuperação expirou.'
+        )
+
+    cliente.senha = dados.nova_senha
+
+    # Invalida o token depois que a senha foi alterada.
+    cliente.token_recuperacao_senha = None
+    cliente.token_recuperacao_expira_em = None
+
+    db.commit()
+
+    return {
+        'mensagem': 'Senha redefinida com sucesso.'
+    }
 
 
 # =========================================================
