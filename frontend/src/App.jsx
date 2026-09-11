@@ -67,6 +67,11 @@ function App() {
 
   const [usuario, setUsuario] = useState(null);
 
+  const [espacos, setEspacos] = useState([]);
+
+  const [espacoSelecionado, setEspacoSelecionado] =
+    useState("");
+
   const [produtoSelecionado, setProdutoSelecionado] =
     useState(null);
 
@@ -102,6 +107,54 @@ function App() {
       }
     }
   }, []);
+
+  // =====================================================
+  // CARREGAR ESPAÇOS DO USUÁRIO
+  // =====================================================
+
+  useEffect(() => {
+    const carregarEspacos = async () => {
+      if (!usuario || !usuario.id) {
+        return;
+      }
+
+      try {
+        const resposta = await fetch(
+          `${API_URL}/clientes/${usuario.id}/espacos`
+        );
+
+        if (!resposta.ok) {
+          throw new Error(
+            "Não foi possível carregar os espaços."
+          );
+        }
+
+        const dados = await resposta.json();
+
+        console.log(
+          "ESPAÇOS PARA COMPRA:",
+          dados
+        );
+
+        setEspacos(dados);
+
+        // Selecionar automaticamente o primeiro espaço
+        if (dados.length > 0) {
+          setEspacoSelecionado(String(dados[0].id));
+        }
+      } catch (error) {
+        console.error(
+          "ERRO AO CARREGAR ESPAÇOS:",
+          error
+        );
+
+        setEspacos([]);
+        setEspacoSelecionado("");
+      }
+    };
+
+    carregarEspacos();
+  }, [usuario]);
 
   // =====================================================
   // CARREGAR PRODUTOS
@@ -394,6 +447,12 @@ function App() {
       return;
     }
 
+    // Verificar espaço selecionado
+    if (!espacoSelecionado) {
+      alert("❌ Selecione um espaço para realizar a compra.");
+      return;
+    }
+
     try {
       // ---------------------------------------------------
       // PREPARAR ITENS DA COMPRA
@@ -406,8 +465,11 @@ function App() {
       // ---------------------------------------------------
       // ENVIAR CLIENTE + ITENS PARA O BACKEND
       // ---------------------------------------------------
+
+
       const dadosCompra = {
         cliente_id: usuario.id,
+        espaco_id: espacoSelecionado,
         itens: itensCompra,
       };
 
@@ -1066,8 +1128,50 @@ function App() {
                 )
               )}
 
-              {/* TOTAL */}
+              {/* ESPAÇO DA COMPRA */}
+              <div
+                style={{
+                  marginTop: "15px",
+                  marginBottom: "15px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "block",
+                    fontWeight: "bold",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Escolha o espaço para esta compra:
+                </label>
 
+                <select
+                  value={espacoSelecionado}
+                  onChange={(e) =>
+                    setEspacoSelecionado(e.target.value)
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    fontSize: "16px",
+                  }}
+                >
+                  <option value="">
+                    Selecione um espaço
+                  </option>
+
+                  {espacos.map((espaco) => (
+                    <option
+                      key={espaco.id}
+                      value={espaco.id}
+                    >
+                      {espaco.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* TOTAL */}
               <h3>
                 Total: CVT{" "}
                 {totalCarrinho.toFixed(
