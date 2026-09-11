@@ -7,6 +7,7 @@ import Login from "./Login";
 import Cadastro from "./Cadastro";
 import MinhaConta from "./MinhaConta";
 import ProdutoDetalhes from "./ProdutoDetalhes";
+import RedefinirSenha from "./RedefinirSenha";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -567,6 +568,23 @@ function App() {
           </button>
         </div>
       </div>
+    );
+  }
+
+  // =====================================================
+  // TELA DE RECUPERAÇÃO DE SENHA
+  // =====================================================
+
+  if (
+    window.location.pathname ===
+    "/recuperar-senha"
+  ) {
+    return (
+      <RedefinirSenha
+        onVoltar={() => {
+          window.location.href = "/";
+        }}
+      />
     );
   }
 

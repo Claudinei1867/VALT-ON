@@ -8,6 +8,12 @@ function Login({ onLogin, onVoltar }) {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState("");
 
+  const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false);
+  const [emailRecuperacao, setEmailRecuperacao] = useState("");
+  const [mensagemRecuperacao, setMensagemRecuperacao] = useState("");
+  const [carregandoRecuperacao, setCarregandoRecuperacao] =
+    useState(false);
+
   const fazerLogin = async (evento) => {
     evento.preventDefault();
 
@@ -47,6 +53,7 @@ function Login({ onLogin, onVoltar }) {
         });
 
         dados = await resposta.json();
+
         if (!resposta.ok) {
           throw new Error(
             dados.detail || "E-mail ou senha inválidos."
@@ -72,12 +79,211 @@ function Login({ onLogin, onVoltar }) {
 
       setErro(
         error.message ||
-        "Não foi possível realizar o login."
+          "Não foi possível realizar o login."
       );
     } finally {
       setCarregando(false);
     }
   };
+
+  const solicitarRecuperacao = async (evento) => {
+    evento.preventDefault();
+
+    setMensagemRecuperacao("");
+    setErro("");
+
+    if (!emailRecuperacao) {
+      setErro("Digite seu e-mail.");
+      return;
+    }
+
+    setCarregandoRecuperacao(true);
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/solicitar-recuperacao-senha`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: emailRecuperacao,
+          }),
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail ||
+            "Não foi possível solicitar a recuperação da senha."
+        );
+      }
+
+      setMensagemRecuperacao(
+        dados.mensagem ||
+          "Se o e-mail estiver cadastrado, enviaremos um link para recuperação da senha."
+      );
+    } catch (error) {
+      console.error(
+        "ERRO NA RECUPERAÇÃO DE SENHA:",
+        error
+      );
+
+      setErro(
+        error.message ||
+          "Não foi possível solicitar a recuperação da senha."
+      );
+    } finally {
+      setCarregandoRecuperacao(false);
+    }
+  };
+
+  if (mostrarRecuperacao) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f5f5f5",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            background: "#fff",
+            padding: "30px",
+            borderRadius: "12px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+          }}
+        >
+          <h1
+            style={{
+              textAlign: "center",
+              marginBottom: "10px",
+            }}
+          >
+            🛍️ VALT-ON
+          </h1>
+
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: "25px",
+            }}
+          >
+            Recuperar senha
+          </h2>
+
+          {erro && (
+            <div
+              style={{
+                background: "#ffe5e5",
+                color: "#c00",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "15px",
+                textAlign: "center",
+              }}
+            >
+              {erro}
+            </div>
+          )}
+
+          {mensagemRecuperacao && (
+            <div
+              style={{
+                background: "#e5ffe5",
+                color: "#176b17",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "15px",
+                textAlign: "center",
+              }}
+            >
+              {mensagemRecuperacao}
+            </div>
+          )}
+
+          <form onSubmit={solicitarRecuperacao}>
+            <div style={{ marginBottom: "20px" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "5px",
+                  fontWeight: "bold",
+                }}
+              >
+                E-mail
+              </label>
+
+              <input
+                type="email"
+                placeholder="Digite seu e-mail"
+                value={emailRecuperacao}
+                onChange={(evento) =>
+                  setEmailRecuperacao(evento.target.value)
+                }
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "12px",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={carregandoRecuperacao}
+              style={{
+                width: "100%",
+                padding: "13px",
+                border: "none",
+                borderRadius: "8px",
+                cursor: carregandoRecuperacao
+                  ? "not-allowed"
+                  : "pointer",
+                fontSize: "16px",
+                fontWeight: "bold",
+                marginBottom: "10px",
+              }}
+            >
+              {carregandoRecuperacao
+                ? "Enviando..."
+                : "📧 Enviar link de recuperação"}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMostrarRecuperacao(false);
+              setMensagemRecuperacao("");
+              setErro("");
+            }}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "15px",
+            }}
+          >
+            ← Voltar para o login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -190,6 +396,34 @@ function Login({ onLogin, onVoltar }) {
                 fontSize: "16px",
               }}
             />
+          </div>
+
+          <div
+            style={{
+              textAlign: "right",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setMostrarRecuperacao(true);
+                setMensagemRecuperacao("");
+                setErro("");
+                setEmailRecuperacao(email);
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#555",
+                textDecoration: "underline",
+                cursor: "pointer",
+                fontSize: "14px",
+                padding: "0",
+              }}
+            >
+              Esqueci minha senha
+            </button>
           </div>
 
           <button
