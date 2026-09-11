@@ -1262,6 +1262,27 @@ def login_admin(
         "admin_id": administrador.id
     }
 
+# =========================================================
+# ESTATÍSTICAS DO ADMINISTRADOR
+# =========================================================
+
+@app.get("/admin/estatisticas")
+def estatisticas_admin(
+    db: Session = Depends(get_db)
+):
+    quantidade_clientes = db.query(
+        models.Cliente
+    ).count()
+
+    quantidade_produtos = db.query(
+        models.Produto
+    ).count()
+
+    return {
+        "clientes": quantidade_clientes,
+        "produtos": quantidade_produtos
+    }
+
 
 # =========================================================
 # FINALIZAR COMPRA
