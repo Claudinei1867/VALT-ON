@@ -1,10 +1,4 @@
-﻿from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    UploadFile,
-    File
-)
+﻿from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -31,10 +25,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 from supabase import create_client
 
-supabase = create_client(
-    SUPABASE_URL,
-    SUPABASE_KEY
-)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # =========================================================
@@ -50,26 +41,10 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 # =========================================================
 
 CASAS_CONFIG = {
-    "pequena": {
-        "nome": "Casa Pequena",
-        "valor": 0.0,
-        "capacidade": 30
-    },
-    "media": {
-        "nome": "Casa Média",
-        "valor": 3000.0,
-        "capacidade": 80
-    },
-    "grande": {
-        "nome": "Casa Grande",
-        "valor": 5000.0,
-        "capacidade": 150
-    },
-    "mansao": {
-        "nome": "Mansão Pro",
-        "valor": 10000.0,
-        "capacidade": 500
-    }
+    "pequena": {"nome": "Casa Pequena", "valor": 0.0, "capacidade": 30},
+    "media": {"nome": "Casa Média", "valor": 3000.0, "capacidade": 80},
+    "grande": {"nome": "Casa Grande", "valor": 5000.0, "capacidade": 150},
+    "mansao": {"nome": "Mansão Pro", "valor": 10000.0, "capacidade": 500},
 }
 
 # =========================================================
@@ -79,11 +54,7 @@ CASAS_CONFIG = {
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-app.mount(
-    "/uploads",
-    StaticFiles(directory="uploads"),
-    name="uploads"
-)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 # =========================================================
@@ -95,7 +66,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://valt-on.vercel.app"
+        "https://valt-on.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -114,6 +85,7 @@ Base.metadata.create_all(bind=engine)
 # CONEXÃO COM O BANCO
 # =========================================================
 
+
 def get_db():
     db = SessionLocal()
 
@@ -122,34 +94,24 @@ def get_db():
     finally:
         db.close()
 
+
 # =========================================================
 # CRÉDITO SEMANAL CVT
 # =========================================================
+
 
 def conceder_credito_semanal(db: Session):
 
     agora = datetime.now()
 
     # Domingo = 6
-    dias_desde_domingo = (
-        agora.weekday() + 1
-    ) % 7
+    dias_desde_domingo = (agora.weekday() + 1) % 7
 
-    domingo = (
-        agora -
-        timedelta(
-            days=dias_desde_domingo
-        )
-    )
+    domingo = agora - timedelta(days=dias_desde_domingo)
 
-    data_domingo = domingo.strftime(
-        "%Y-%m-%d"
-    )
+    data_domingo = domingo.strftime("%Y-%m-%d")
 
-    clientes = (
-        db.query(models.Cliente)
-        .all()
-    )
+    clientes = db.query(models.Cliente).all()
 
     creditos = 0
 
@@ -157,16 +119,11 @@ def conceder_credito_semanal(db: Session):
 
         # Evita receber duas vezes
         # no mesmo domingo
-        if (
-            cliente.ultimo_credito_cvt
-            != data_domingo
-        ):
+        if cliente.ultimo_credito_cvt != data_domingo:
 
             cliente.saldo_cvt += 1000.0
 
-            cliente.ultimo_credito_cvt = (
-                data_domingo
-            )
+            cliente.ultimo_credito_cvt = data_domingo
 
             creditos += 1
 
@@ -189,10 +146,7 @@ def conceder_credito_semanal(db: Session):
 
 
 def enviar_email(
-    destinatario: str,
-    assunto: str,
-    mensagem: str,
-    html_mensagem: str = None
+    destinatario: str, assunto: str, mensagem: str, html_mensagem: str = None
 ):
 
     try:
@@ -200,22 +154,15 @@ def enviar_email(
         api_key = os.getenv("BREVO_API_KEY")
 
         dados = {
-            "sender": {
-                "name": "Valt-on",
-                "email": os.getenv("SMTP_USER")
-            },
-            "to": [
-                {
-                    "email": destinatario
-                }
-            ],
+            "sender": {"name": "Valt-on", "email": os.getenv("SMTP_USER")},
+            "to": [{"email": destinatario}],
             "subject": assunto,
             "textContent": mensagem,
             "htmlContent": (
                 html_mensagem
                 if html_mensagem is not None
                 else mensagem.replace("\n", "<br>")
-            )
+            ),
         }
 
         dados_json = json.dumps(dados).encode("utf-8")
@@ -226,32 +173,27 @@ def enviar_email(
             headers={
                 "accept": "application/json",
                 "api-key": api_key,
-                "content-type": "application/json"
+                "content-type": "application/json",
             },
-            method="POST"
+            method="POST",
         )
 
         with urllib.request.urlopen(requisicao) as resposta:
 
             resultado = resposta.read().decode("utf-8")
 
-            print(
-                f"E-mail enviado com sucesso para {destinatario}"
-            )
+            print(f"E-mail enviado com sucesso para {destinatario}")
 
-            print(
-                f"Resposta Brevo: {resultado}"
-            )
+            print(f"Resposta Brevo: {resultado}")
 
             return True
 
     except Exception as erro:
 
-        print(
-            f"Erro ao enviar e-mail para {destinatario}: {erro}"
-        )
+        print(f"Erro ao enviar e-mail para {destinatario}: {erro}")
 
         return False
+
 
 # =========================================================
 # REENVIO TEMPORARIO DE CONFIRMACAO DE E-MAIL
@@ -259,35 +201,23 @@ def enviar_email(
 
 
 @app.post("/reenviar-confirmacao-email/{cliente_id}")
-def reenviar_confirmacao_email(
-    cliente_id: int,
-    db: Session = Depends(get_db)
-):
+def reenviar_confirmacao_email(cliente_id: int, db: Session = Depends(get_db)):
     if cliente_id != 10:
         raise HTTPException(
             status_code=403,
-            detail="Endpoint temporário disponível somente para o cliente 10."
+            detail="Endpoint temporário disponível somente para o cliente 10.",
         )
 
-    cliente = (
-        db.query(models.Cliente)
-        .filter(models.Cliente.id == cliente_id)
-        .first()
-    )
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
     if cliente is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Cliente não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
 
     agora = datetime.now()
 
     token_confirmacao = secrets.token_urlsafe(32)
 
-    token_expira_em = (
-        agora + timedelta(hours=24)
-    ).isoformat()
+    token_expira_em = (agora + timedelta(hours=24)).isoformat()
 
     cliente.email_confirmado = 0
     cliente.token_confirmacao_email = token_confirmacao
@@ -296,8 +226,7 @@ def reenviar_confirmacao_email(
     db.commit()
 
     link_confirmacao = (
-        "https://valt-on.onrender.com/confirmar-email?token="
-        + token_confirmacao
+        "https://valt-on.onrender.com/confirmar-email?token=" + token_confirmacao
     )
 
     mensagem_confirmacao = (
@@ -312,22 +241,19 @@ def reenviar_confirmacao_email(
     )
 
     enviado = enviar_email(
-        cliente.email,
-        "Confirme seu e-mail - VALT-ON",
-        mensagem_confirmacao
+        cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao
     )
 
     if not enviado:
         raise HTTPException(
-            status_code=500,
-            detail="Não foi possível enviar o e-mail de confirmação."
+            status_code=500, detail="Não foi possível enviar o e-mail de confirmação."
         )
 
     return {
         "mensagem": "Novo e-mail de confirmação enviado.",
         "cliente_id": cliente.id,
         "email": cliente.email,
-        "email_confirmado": cliente.email_confirmado
+        "email_confirmado": cliente.email_confirmado,
     }
 
 
@@ -338,12 +264,7 @@ def atualizar_status_pedidos_automaticamente(db):
     pedidos = (
         db.query(models.Pedido)
         .filter(
-            models.Pedido.status.in_([
-                "Pago",
-                "Preparando",
-                "Enviado",
-                "A caminho"
-            ])
+            models.Pedido.status.in_(["Pago", "Preparando", "Enviado", "A caminho"])
         )
         .all()
     )
@@ -355,10 +276,7 @@ def atualizar_status_pedidos_automaticamente(db):
 
         try:
 
-            data_pedido = datetime.strptime(
-                pedido.data_pedido,
-                "%Y-%m-%d %H:%M:%S"
-            )
+            data_pedido = datetime.strptime(pedido.data_pedido, "%Y-%m-%d %H:%M:%S")
 
         except ValueError:
 
@@ -368,22 +286,12 @@ def atualizar_status_pedidos_automaticamente(db):
         if pedido.prazo_entrega == 0:
             tempo_total = 2 * 60 * 60
         else:
-            tempo_total = (
-                pedido.prazo_entrega
-                * 24
-                * 60
-                * 60
-            )
+            tempo_total = pedido.prazo_entrega * 24 * 60 * 60
 
         # Tempo decorrido desde a compra
-        tempo_decorrido = (
-            agora - data_pedido
-        ).total_seconds()
+        tempo_decorrido = (agora - data_pedido).total_seconds()
 
-        percentual = (
-            tempo_decorrido /
-            tempo_total
-        ) * 100
+        percentual = (tempo_decorrido / tempo_total) * 100
 
         # -------------------------------------------------
         # DEFINIR NOVO STATUS
@@ -420,10 +328,37 @@ def atualizar_status_pedidos_automaticamente(db):
 
         pedido.status = novo_status
 
-        print(
-            f"Pedido #{pedido.id}: "
-            f"{status_anterior} -> {novo_status}"
-        )
+        print(f"Pedido #{pedido.id}: " f"{status_anterior} -> {novo_status}")
+
+        # -------------------------------------------------
+        # CRIAR FIGURINHAS DOS PRODUTOS ENTREGUES
+        # -------------------------------------------------
+
+        if novo_status == "Entregue" and pedido.espaco_id:
+
+            itens = (
+                db.query(models.ItemPedido)
+                .filter(models.ItemPedido.pedido_id == pedido.id)
+                .all()
+            )
+
+            for item in itens:
+
+                for _ in range(item.quantidade):
+
+                    figurinha = models.ItemEspacoCliente(
+                        espaco_id=pedido.espaco_id,
+                        produto_id=item.produto_id,
+                        data_entrada=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    )
+
+                    db.add(figurinha)
+
+        # -------------------------------------------------
+        # SALVAR ALTERAÇÃO DO PEDIDO
+        # -------------------------------------------------
+
+        db.commit()
 
         # -------------------------------------------------
         # BUSCAR CLIENTE
@@ -431,10 +366,7 @@ def atualizar_status_pedidos_automaticamente(db):
 
         cliente = (
             db.query(models.Cliente)
-            .filter(
-                models.Cliente.id ==
-                pedido.cliente_id
-            )
+            .filter(models.Cliente.id == pedido.cliente_id)
             .first()
         )
 
@@ -461,12 +393,14 @@ def atualizar_status_pedidos_automaticamente(db):
                     "Acompanhe seu pedido pela "
                     "sua conta na VALT-ON.\n\n"
                     "VALT-ON"
-                )
+                ),
             )
+
 
 # =========================================================
 # FUNÇÃO AUTOMÁTICA DO CRÉDITO
 # =========================================================
+
 
 def executar_credito_automatico():
 
@@ -480,9 +414,7 @@ def executar_credito_automatico():
 
         db.rollback()
 
-        print(
-            f"Erro no crédito semanal CVT: {erro}"
-        )
+        print(f"Erro no crédito semanal CVT: {erro}")
 
     finally:
 
@@ -493,24 +425,20 @@ def executar_credito_automatico():
 # FUNÇÃO AUTOMÁTICA DOS PEDIDOS
 # =========================================================
 
+
 def executar_status_pedidos_automatico():
 
     db = SessionLocal()
 
     try:
 
-        atualizar_status_pedidos_automaticamente(
-            db
-        )
+        atualizar_status_pedidos_automaticamente(db)
 
     except Exception as erro:
 
         db.rollback()
 
-        print(
-            "Erro na atualização automática "
-            f"dos pedidos: {erro}"
-        )
+        print("Erro na atualização automática " f"dos pedidos: {erro}")
 
     finally:
 
@@ -530,12 +458,7 @@ scheduler = BackgroundScheduler()
 # ---------------------------------------------------------
 
 scheduler.add_job(
-    executar_credito_automatico,
-    "cron",
-    day_of_week="sun",
-    hour=0,
-    minute=0,
-    second=0
+    executar_credito_automatico, "cron", day_of_week="sun", hour=0, minute=0, second=0
 )
 
 
@@ -544,11 +467,7 @@ scheduler.add_job(
 # A CADA 1 MINUTO
 # ---------------------------------------------------------
 
-scheduler.add_job(
-    executar_status_pedidos_automatico,
-    "interval",
-    minutes=1
-)
+scheduler.add_job(executar_status_pedidos_automatico, "interval", minutes=1)
 
 
 scheduler.start()
@@ -558,43 +477,33 @@ scheduler.start()
 # PÁGINA INICIAL
 # =========================================================
 
+
 @app.get("/")
 def inicio():
 
-    return {
-        "mensagem": "Backend do VALT-ON funcionando!"
-    }
+    return {"mensagem": "Backend do VALT-ON funcionando!"}
 
 
 # =========================================================
 # TESTE
 # =========================================================
 
+
 @app.get("/teste")
 def teste():
 
-    return {
-        "status": "ok",
-        "projeto": "VALT-ON"
-    }
+    return {"status": "ok", "projeto": "VALT-ON"}
 
 
 # =========================================================
 # PRODUTOS
 # =========================================================
 
-@app.get(
-    "/produtos",
-    response_model=list[schemas.ProdutoResponse]
-)
-def listar_produtos(
-    db: Session = Depends(get_db)
-):
 
-    produtos = (
-        db.query(models.Produto)
-        .all()
-    )
+@app.get("/produtos", response_model=list[schemas.ProdutoResponse])
+def listar_produtos(db: Session = Depends(get_db)):
+
+    produtos = db.query(models.Produto).all()
 
     return produtos
 
@@ -603,29 +512,15 @@ def listar_produtos(
 # BUSCAR PRODUTO
 # =========================================================
 
-@app.get(
-    "/produtos/{produto_id}",
-    response_model=schemas.ProdutoResponse
-)
-def buscar_produto(
-    produto_id: int,
-    db: Session = Depends(get_db)
-):
 
-    produto = (
-        db.query(models.Produto)
-        .filter(
-            models.Produto.id == produto_id
-        )
-        .first()
-    )
+@app.get("/produtos/{produto_id}", response_model=schemas.ProdutoResponse)
+def buscar_produto(produto_id: int, db: Session = Depends(get_db)):
+
+    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
 
     if produto is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
 
     return produto
 
@@ -634,14 +529,9 @@ def buscar_produto(
 # CADASTRAR PRODUTO
 # =========================================================
 
-@app.post(
-    "/produtos",
-    response_model=schemas.ProdutoResponse
-)
-def cadastrar_produto(
-    produto: schemas.ProdutoCreate,
-    db: Session = Depends(get_db)
-):
+
+@app.post("/produtos", response_model=schemas.ProdutoResponse)
+def cadastrar_produto(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
 
     novo_produto = models.Produto(
         nome=produto.nome,
@@ -650,7 +540,7 @@ def cadastrar_produto(
         categoria=produto.categoria,
         estoque=produto.estoque,
         prazo_entrega_dias=produto.prazo_entrega_dias,
-        imagem=produto.imagem
+        imagem=produto.imagem,
     )
 
     db.add(novo_produto)
@@ -666,39 +556,24 @@ def cadastrar_produto(
 # ALTERAR PRODUTO
 # =========================================================
 
-@app.put(
-    "/produtos/{produto_id}",
-    response_model=schemas.ProdutoResponse
-)
+
+@app.put("/produtos/{produto_id}", response_model=schemas.ProdutoResponse)
 def alterar_produto(
-    produto_id: int,
-    dados: schemas.ProdutoCreate,
-    db: Session = Depends(get_db)
+    produto_id: int, dados: schemas.ProdutoCreate, db: Session = Depends(get_db)
 ):
 
-    produto = (
-        db.query(models.Produto)
-        .filter(
-            models.Produto.id == produto_id
-        )
-        .first()
-    )
+    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
 
     if produto is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
 
     produto.nome = dados.nome
     produto.descricao = dados.descricao
     produto.preco = dados.preco
     produto.categoria = dados.categoria
     produto.estoque = dados.estoque
-    produto.prazo_entrega_dias = (
-        dados.prazo_entrega_dias
-    )
+    produto.prazo_entrega_dias = dados.prazo_entrega_dias
     produto.imagem = dados.imagem
 
     db.commit()
@@ -712,67 +587,40 @@ def alterar_produto(
 # EXCLUIR PRODUTO
 # =========================================================
 
-@app.delete("/produtos/{produto_id}")
-def excluir_produto(
-    produto_id: int,
-    db: Session = Depends(get_db)
-):
 
-    produto = (
-        db.query(models.Produto)
-        .filter(
-            models.Produto.id == produto_id
-        )
-        .first()
-    )
+@app.delete("/produtos/{produto_id}")
+def excluir_produto(produto_id: int, db: Session = Depends(get_db)):
+
+    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
 
     if produto is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Produto não encontrado"
-        )
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
 
     db.delete(produto)
 
     db.commit()
 
-    return {
-        "mensagem": "Produto excluído com sucesso"
-    }
+    return {"mensagem": "Produto excluído com sucesso"}
 
 
 # =========================================================
 # UPLOAD DE IMAGEM
 # =========================================================
 
+
 @app.post("/upload-imagem")
-async def upload_imagem(
-    file: UploadFile = File(...)
-):
+async def upload_imagem(file: UploadFile = File(...)):
 
-    extensoes_permitidas = {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".gif"
-    }
+    extensoes_permitidas = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
-    extensao = Path(
-        file.filename or ""
-    ).suffix.lower()
+    extensao = Path(file.filename or "").suffix.lower()
 
     if extensao not in extensoes_permitidas:
 
-        raise HTTPException(
-            status_code=400,
-            detail="Formato de imagem não permitido."
-        )
+        raise HTTPException(status_code=400, detail="Formato de imagem não permitido.")
 
-    nome_arquivo = Path(
-        file.filename or "imagem"
-    ).name
+    nome_arquivo = Path(file.filename or "imagem").name
 
     try:
 
@@ -783,59 +631,46 @@ async def upload_imagem(
             conteudo,
             {
                 "content-type": file.content_type or "application/octet-stream",
-                "upsert": "true"
-            }
+                "upsert": "true",
+            },
         )
 
         url_publica = (
-            f"{SUPABASE_URL}/storage/v1/object/public/"
-            f"produtos/{nome_arquivo}"
+            f"{SUPABASE_URL}/storage/v1/object/public/" f"produtos/{nome_arquivo}"
         )
 
         return {
             "mensagem": "Imagem enviada com sucesso!",
             "arquivo": nome_arquivo,
-            "url": url_publica
+            "url": url_publica,
         }
 
     except Exception as erro:
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Erro ao enviar imagem: {str(erro)}"
+            status_code=500, detail=f"Erro ao enviar imagem: {str(erro)}"
         )
+
 
 # =========================================================
 # CLIENTES
 # =========================================================
 
-@app.post(
-    "/clientes",
-    response_model=schemas.ClienteResponse
-)
-def cadastrar_cliente(
-    cliente: schemas.ClienteCreate,
-    db: Session = Depends(get_db)
-):
+
+@app.post("/clientes", response_model=schemas.ClienteResponse)
+def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_db)):
 
     # -----------------------------------------------------
     # VERIFICAR E-MAIL
     # -----------------------------------------------------
 
     cliente_existente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.email == cliente.email
-        )
-        .first()
+        db.query(models.Cliente).filter(models.Cliente.email == cliente.email).first()
     )
 
     if cliente_existente:
 
-        raise HTTPException(
-            status_code=400,
-            detail="E-mail já cadastrado."
-        )
+        raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
 
     # -----------------------------------------------------
     # CRIAR CLIENTE
@@ -850,9 +685,7 @@ def cadastrar_cliente(
     data_domingo = domingo.strftime("%Y-%m-%d")
 
     token_confirmacao = secrets.token_urlsafe(32)
-    token_expira_em = (
-        agora + timedelta(hours=24)
-    ).isoformat()
+    token_expira_em = (agora + timedelta(hours=24)).isoformat()
 
     novo_cliente = models.Cliente(
         nome=cliente.nome,
@@ -860,7 +693,7 @@ def cadastrar_cliente(
         senha=cliente.senha,
         ultimo_credito_cvt=data_domingo,
         token_confirmacao_email=token_confirmacao,
-        token_confirmacao_expira_em=token_expira_em
+        token_confirmacao_expira_em=token_expira_em,
     )
 
     db.add(novo_cliente)
@@ -878,7 +711,7 @@ def cadastrar_cliente(
         tipo="pequena",
         nome="Casa Pequena",
         valor=0.0,
-        adquirido="Sim"
+        adquirido="Sim",
     )
 
     db.add(espaco_pequena)
@@ -889,8 +722,7 @@ def cadastrar_cliente(
     # -----------------------------------------------------
 
     link_confirmacao = (
-        "https://valt-on.onrender.com/confirmar-email?token="
-        + token_confirmacao
+        "https://valt-on.onrender.com/confirmar-email?token=" + token_confirmacao
     )
 
     mensagem_confirmacao = (
@@ -905,34 +737,29 @@ def cadastrar_cliente(
     )
 
     enviar_email(
-        novo_cliente.email,
-        "Confirme seu e-mail - VALT-ON",
-        mensagem_confirmacao
+        novo_cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao
     )
 
     return novo_cliente
+
 
 # =========================================================
 # RECUPERAÇÃO DE SENHA
 # ========================================================
 
 
-
-@app.post('/solicitar-recuperacao-senha')
+@app.post("/solicitar-recuperacao-senha")
 def solicitar_recuperacao_senha(
-    dados: schemas.RecuperacaoSenhaSolicitacao,
-    db: Session = Depends(get_db)
+    dados: schemas.RecuperacaoSenhaSolicitacao, db: Session = Depends(get_db)
 ):
 
     cliente = (
-        db.query(models.Cliente)
-        .filter(models.Cliente.email == dados.email)
-        .first()
+        db.query(models.Cliente).filter(models.Cliente.email == dados.email).first()
     )
 
     # Por segurança, não informamos se o e-mail existe ou não.
     mensagem_padrao = {
-        'mensagem': 'Se o e-mail estiver cadastrado, enviaremos um link para recuperação da senha.'
+        "mensagem": "Se o e-mail estiver cadastrado, enviaremos um link para recuperação da senha."
     }
 
     if cliente is None:
@@ -940,9 +767,7 @@ def solicitar_recuperacao_senha(
 
     token_recuperacao = secrets.token_urlsafe(32)
 
-    token_expira_em = (
-        datetime.now() + timedelta(hours=1)
-    ).isoformat()
+    token_expira_em = (datetime.now() + timedelta(hours=1)).isoformat()
 
     cliente.token_recuperacao_senha = token_recuperacao
     cliente.token_recuperacao_expira_em = token_expira_em
@@ -950,18 +775,17 @@ def solicitar_recuperacao_senha(
     db.commit()
 
     link_recuperacao = (
-        'https://valt-on.vercel.app/recuperar-senha?token='
-        + token_recuperacao
+        "https://valt-on.vercel.app/recuperar-senha?token=" + token_recuperacao
     )
 
     mensagem_recuperacao = (
-        f'Olá, {cliente.nome}!\n\n'
-        'Recebemos uma solicitação para redefinir sua senha no VALT-ON.\n\n'
-        'Para criar uma nova senha, acesse o link abaixo:\n\n'
-        f'{link_recuperacao}\n\n'
-        'Este link é válido por 1 hora.\n\n'
-        'Se você não solicitou a recuperação da senha, ignore este e-mail.\n\n'
-        'VALT-ON'
+        f"Olá, {cliente.nome}!\n\n"
+        "Recebemos uma solicitação para redefinir sua senha no VALT-ON.\n\n"
+        "Para criar uma nova senha, acesse o link abaixo:\n\n"
+        f"{link_recuperacao}\n\n"
+        "Este link é válido por 1 hora.\n\n"
+        "Se você não solicitou a recuperação da senha, ignore este e-mail.\n\n"
+        "VALT-ON"
     )
 
     html_recuperacao = f"""
@@ -1011,61 +835,43 @@ def solicitar_recuperacao_senha(
 
     enviado = enviar_email(
         cliente.email,
-        'Recuperação de senha - VALT-ON',
+        "Recuperação de senha - VALT-ON",
         mensagem_recuperacao,
-        html_recuperacao
+        html_recuperacao,
     )
 
     if not enviado:
         raise HTTPException(
-            status_code=500,
-            detail='Não foi possível enviar o e-mail de recuperação.'
+            status_code=500, detail="Não foi possível enviar o e-mail de recuperação."
         )
 
     return mensagem_padrao
 
 
-@app.post('/redefinir-senha')
+@app.post("/redefinir-senha")
 def redefinir_senha(
-    dados: schemas.RecuperacaoSenhaRedefinir,
-    db: Session = Depends(get_db)
+    dados: schemas.RecuperacaoSenhaRedefinir, db: Session = Depends(get_db)
 ):
 
     cliente = (
         db.query(models.Cliente)
-        .filter(
-            models.Cliente.token_recuperacao_senha == dados.token
-        )
+        .filter(models.Cliente.token_recuperacao_senha == dados.token)
         .first()
     )
 
     if cliente is None:
-        raise HTTPException(
-            status_code=400,
-            detail='Token de recuperação inválido.'
-        )
+        raise HTTPException(status_code=400, detail="Token de recuperação inválido.")
 
     if not cliente.token_recuperacao_expira_em:
-        raise HTTPException(
-            status_code=400,
-            detail='Token de recuperação inválido.'
-        )
+        raise HTTPException(status_code=400, detail="Token de recuperação inválido.")
 
     try:
-        expiracao = datetime.fromisoformat(
-            cliente.token_recuperacao_expira_em
-        )
+        expiracao = datetime.fromisoformat(cliente.token_recuperacao_expira_em)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail='Token de recuperação inválido.'
-        )
+        raise HTTPException(status_code=400, detail="Token de recuperação inválido.")
 
     if datetime.now() > expiracao:
-        raise HTTPException(
-            status_code=400,
-            detail='O link de recuperação expirou.'
-        )
+        raise HTTPException(status_code=400, detail="O link de recuperação expirou.")
 
     cliente.senha = dados.nova_senha
 
@@ -1075,63 +881,38 @@ def redefinir_senha(
 
     db.commit()
 
-    return {
-        'mensagem': 'Senha redefinida com sucesso.'
-    }
+    return {"mensagem": "Senha redefinida com sucesso."}
 
 
 # =========================================================
 # CONFIRMAÇÃO DE E-MAIL
 # =========================================================
 
+
 @app.get("/confirmar-email")
-def confirmar_email(
-    token: str,
-    db: Session = Depends(get_db)
-):
+def confirmar_email(token: str, db: Session = Depends(get_db)):
     cliente = (
         db.query(models.Cliente)
-        .filter(
-            models.Cliente.token_confirmacao_email == token
-        )
+        .filter(models.Cliente.token_confirmacao_email == token)
         .first()
     )
 
     if cliente is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Token de confirmação inválido."
-        )
+        raise HTTPException(status_code=400, detail="Token de confirmação inválido.")
 
     if cliente.email_confirmado == 1:
-        return {
-            "mensagem": "E-mail já confirmado."
-        }
+        return {"mensagem": "E-mail já confirmado."}
 
-    if (
-        cliente.token_confirmacao_expira_em
-        is None
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="Token de confirmação inválido."
-        )
+    if cliente.token_confirmacao_expira_em is None:
+        raise HTTPException(status_code=400, detail="Token de confirmação inválido.")
 
     try:
-        expiracao = datetime.fromisoformat(
-            cliente.token_confirmacao_expira_em
-        )
+        expiracao = datetime.fromisoformat(cliente.token_confirmacao_expira_em)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail="Token de confirmação inválido."
-        )
+        raise HTTPException(status_code=400, detail="Token de confirmação inválido.")
 
     if datetime.now() > expiracao:
-        raise HTTPException(
-            status_code=400,
-            detail="Token de confirmação expirado."
-        )
+        raise HTTPException(status_code=400, detail="Token de confirmação expirado.")
 
     cliente.email_confirmado = 1
     cliente.token_confirmacao_email = None
@@ -1139,9 +920,7 @@ def confirmar_email(
 
     db.commit()
 
-    return {
-        "mensagem": "E-mail confirmado com sucesso!"
-    }
+    return {"mensagem": "E-mail confirmado com sucesso!"}
 
 
 # =========================================================
@@ -1150,35 +929,21 @@ def confirmar_email(
 
 
 @app.post("/login")
-def login(
-    dados: schemas.ClienteLogin,
-    db: Session = Depends(get_db)
-):
+def login(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
     cliente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.email == dados.email
-        )
-        .first()
+        db.query(models.Cliente).filter(models.Cliente.email == dados.email).first()
     )
 
     if cliente is None:
-        raise HTTPException(
-            status_code=401,
-            detail="E-mail ou senha inválidos."
-        )
+        raise HTTPException(status_code=401, detail="E-mail ou senha inválidos.")
 
     if cliente.email_confirmado != 1:
         raise HTTPException(
-            status_code=403,
-            detail="Confirme seu e-mail antes de fazer login."
+            status_code=403, detail="Confirme seu e-mail antes de fazer login."
         )
 
     if cliente.senha != dados.senha:
-        raise HTTPException(
-            status_code=401,
-            detail="E-mail ou senha inválidos."
-        )
+        raise HTTPException(status_code=401, detail="E-mail ou senha inválidos.")
 
     # =====================================================
     # VERIFICAR CRÉDITO SEMANAL
@@ -1197,9 +962,10 @@ def login(
             "id": cliente.id,
             "nome": cliente.nome,
             "email": cliente.email,
-            "saldo_cvt": cliente.saldo_cvt
-        }
+            "saldo_cvt": cliente.saldo_cvt,
+        },
     }
+
 
 # =========================================================
 # LOGIN DO ADMINISTRADOR
@@ -1207,47 +973,37 @@ def login(
 
 
 @app.post("/login-admin")
-def login_admin(
-    dados: schemas.ClienteLogin,
-    db: Session = Depends(get_db)
-):
+def login_admin(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
 
     # ADMINISTRADOR PRINCIPAL
-    if (
-        dados.email == ADMIN_EMAIL
-        and dados.senha == ADMIN_PASSWORD
-    ):
+    if dados.email == ADMIN_EMAIL and dados.senha == ADMIN_PASSWORD:
         return {
             "mensagem": "Login de administrador realizado com sucesso!",
             "admin": True,
-            "email": dados.email
+            "email": dados.email,
         }
 
     # DEMAIS ADMINISTRADORES
     administrador = (
         db.query(models.Administrador)
         .filter(
-            models.Administrador.email == dados.email,
-            models.Administrador.ativo == 1
+            models.Administrador.email == dados.email, models.Administrador.ativo == 1
         )
         .first()
     )
 
     if administrador is None:
         raise HTTPException(
-            status_code=401,
-            detail="E-mail ou senha de administrador inválidos."
+            status_code=401, detail="E-mail ou senha de administrador inválidos."
         )
 
     senha_correta = bcrypt.checkpw(
-        dados.senha.encode("utf-8"),
-        administrador.senha_hash.encode("utf-8")
+        dados.senha.encode("utf-8"), administrador.senha_hash.encode("utf-8")
     )
 
     if not senha_correta:
         raise HTTPException(
-            status_code=401,
-            detail="E-mail ou senha de administrador inválidos."
+            status_code=401, detail="E-mail ou senha de administrador inválidos."
         )
 
     return {
@@ -1255,40 +1011,31 @@ def login_admin(
         "admin": True,
         "email": administrador.email,
         "nome": administrador.nome,
-        "admin_id": administrador.id
+        "admin_id": administrador.id,
     }
+
 
 # =========================================================
 # ESTATÍSTICAS DO ADMINISTRADOR
 # =========================================================
 
+
 @app.get("/admin/estatisticas")
-def estatisticas_admin(
-    db: Session = Depends(get_db)
-):
-    quantidade_clientes = db.query(
-        models.Cliente
-    ).count()
+def estatisticas_admin(db: Session = Depends(get_db)):
+    quantidade_clientes = db.query(models.Cliente).count()
 
-    quantidade_produtos = db.query(
-        models.Produto
-    ).count()
+    quantidade_produtos = db.query(models.Produto).count()
 
-    return {
-        "clientes": quantidade_clientes,
-        "produtos": quantidade_produtos
-    }
+    return {"clientes": quantidade_clientes, "produtos": quantidade_produtos}
 
 
 # =========================================================
 # FINALIZAR COMPRA
 # =========================================================
 
+
 @app.post("/finalizar-compra")
-def finalizar_compra(
-    compra: schemas.CompraCreate,
-    db: Session = Depends(get_db)
-):
+def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)):
 
     # -----------------------------------------------------
     # VERIFICAR CARRINHO
@@ -1296,29 +1043,19 @@ def finalizar_compra(
 
     if not compra.itens:
 
-        raise HTTPException(
-            status_code=400,
-            detail="Carrinho vazio."
-        )
+        raise HTTPException(status_code=400, detail="Carrinho vazio.")
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE
     # -----------------------------------------------------
 
     cliente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.id == compra.cliente_id
-        )
-        .first()
+        db.query(models.Cliente).filter(models.Cliente.id == compra.cliente_id).first()
     )
 
     if cliente is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Cliente não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
 
     # -----------------------------------------------------
     # VERIFICAR ESPAÇO DO CLIENTE
@@ -1327,22 +1064,21 @@ def finalizar_compra(
     if compra.espaco_id is None:
         raise HTTPException(
             status_code=400,
-            detail="É necessário selecionar um espaço para realizar a compra."
+            detail="É necessário selecionar um espaço para realizar a compra.",
         )
 
     espaco = (
         db.query(models.EspacoCliente)
         .filter(
             models.EspacoCliente.id == compra.espaco_id,
-            models.EspacoCliente.cliente_id == compra.cliente_id
+            models.EspacoCliente.cliente_id == compra.cliente_id,
         )
         .first()
     )
 
     if espaco is None:
         raise HTTPException(
-            status_code=400,
-            detail="Espaço inválido ou não pertence ao cliente."
+            status_code=400, detail="Espaço inválido ou não pertence ao cliente."
         )
 
     # -----------------------------------------------------
@@ -1365,27 +1101,16 @@ def finalizar_compra(
 
         if quantidade <= 0:
 
-            raise HTTPException(
-                status_code=400,
-                detail="Quantidade inválida."
-            )
+            raise HTTPException(status_code=400, detail="Quantidade inválida.")
 
         produto = (
-            db.query(models.Produto)
-            .filter(
-                models.Produto.id == produto_id
-            )
-            .first()
+            db.query(models.Produto).filter(models.Produto.id == produto_id).first()
         )
 
         if produto is None:
 
             raise HTTPException(
-                status_code=404,
-                detail=(
-                    f"Produto {produto_id} "
-                    "não encontrado."
-                )
+                status_code=404, detail=(f"Produto {produto_id} " "não encontrado.")
             )
 
         # -------------------------------------------------
@@ -1401,25 +1126,14 @@ def finalizar_compra(
                     f"{produto.nome}. "
                     f"Disponível: "
                     f"{produto.estoque}"
-                )
+                ),
             )
 
-        prazo_entrega = max(
-                prazo_entrega,
-                produto.prazo_entrega_dias
-        )
+        prazo_entrega = max(prazo_entrega, produto.prazo_entrega_dias)
 
-        produtos_compra.append(
-            (
-                produto,
-                quantidade
-            )
-        )
+        produtos_compra.append((produto, quantidade))
 
-        total += (
-            produto.preco *
-            quantidade
-        )
+        total += produto.preco * quantidade
 
     # -----------------------------------------------------
     # VERIFICAR SALDO CVT
@@ -1435,7 +1149,7 @@ def finalizar_compra(
                 f"{cliente.saldo_cvt:.2f} CVT. "
                 f"Total da compra: "
                 f"{total:.2f} CVT."
-            )
+            ),
         )
 
     # -----------------------------------------------------
@@ -1449,9 +1163,7 @@ def finalizar_compra(
     # -----------------------------------------------------
 
     data_pedido = datetime.now()
-    data_entrega_prevista = (
-        data_pedido + timedelta(days=prazo_entrega)
-    )
+    data_entrega_prevista = data_pedido + timedelta(days=prazo_entrega)
 
     pedido = models.Pedido(
         cliente_id=compra.cliente_id,
@@ -1460,9 +1172,7 @@ def finalizar_compra(
         total=total,
         prazo_entrega=prazo_entrega,
         data_pedido=data_pedido.strftime("%Y-%m-%d %H:%M:%S"),
-        data_entrega_prevista=data_entrega_prevista.strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        data_entrega_prevista=data_entrega_prevista.strftime("%Y-%m-%d %H:%M:%S"),
     )
 
     db.add(pedido)
@@ -1479,7 +1189,7 @@ def finalizar_compra(
             pedido_id=pedido.id,
             produto_id=produto.id,
             quantidade=quantidade,
-            preco_unitario=produto.preco
+            preco_unitario=produto.preco,
         )
 
         db.add(item_pedido)
@@ -1508,7 +1218,7 @@ def finalizar_compra(
         "cliente_id": pedido.cliente_id,
         "total": total,
         "status": pedido.status,
-        "saldo_cvt": cliente.saldo_cvt
+        "saldo_cvt": cliente.saldo_cvt,
     }
 
 
@@ -1516,32 +1226,19 @@ def finalizar_compra(
 # PEDIDOS DO CLIENTE
 # =========================================================
 
-@app.get(
-    "/clientes/{cliente_id}/pedidos"
-)
-def listar_pedidos_cliente(
-    cliente_id: int,
-    db: Session = Depends(get_db)
-):
+
+@app.get("/clientes/{cliente_id}/pedidos")
+def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE
     # -----------------------------------------------------
 
-    cliente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.id == cliente_id
-        )
-        .first()
-    )
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
     if cliente is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Cliente não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
 
     # -----------------------------------------------------
     # BUSCAR PEDIDOS
@@ -1549,12 +1246,8 @@ def listar_pedidos_cliente(
 
     pedidos = (
         db.query(models.Pedido)
-        .filter(
-            models.Pedido.cliente_id == cliente_id
-        )
-        .order_by(
-            models.Pedido.id.desc()
-        )
+        .filter(models.Pedido.cliente_id == cliente_id)
+        .order_by(models.Pedido.id.desc())
         .all()
     )
 
@@ -1568,9 +1261,7 @@ def listar_pedidos_cliente(
 
         itens = (
             db.query(models.ItemPedido)
-            .filter(
-                models.ItemPedido.pedido_id == pedido.id
-            )
+            .filter(models.ItemPedido.pedido_id == pedido.id)
             .all()
         )
 
@@ -1580,29 +1271,19 @@ def listar_pedidos_cliente(
 
             produto = (
                 db.query(models.Produto)
-                .filter(
-                    models.Produto.id == item.produto_id
-                )
+                .filter(models.Produto.id == item.produto_id)
                 .first()
             )
 
             itens_resultado.append(
                 {
                     "produto_id": item.produto_id,
-                    "nome": (
-                        produto.nome
-                        if produto
-                        else "Produto não encontrado"
-                    ),
-                    "imagem": (
-                        produto.imagem
-                        if produto
-                        else None
-                    ),
+                    "nome": (produto.nome if produto else "Produto não encontrado"),
+                    "imagem": (produto.imagem if produto else None),
                     "quantidade": item.quantidade,
-                    "preco_unitario": item.preco_unitario
-                    }
-                )
+                    "preco_unitario": item.preco_unitario,
+                }
+            )
         resultado.append(
             {
                 "pedido_id": pedido.id,
@@ -1611,7 +1292,7 @@ def listar_pedidos_cliente(
                 "prazo_entrega": pedido.prazo_entrega,
                 "data_pedido": pedido.data_pedido,
                 "data_entrega_prevista": pedido.data_entrega_prevista,
-                "itens": itens_resultado
+                "itens": itens_resultado,
             }
         )
 
@@ -1622,33 +1303,18 @@ def listar_pedidos_cliente(
 # ALTERAR STATUS DO PEDIDO
 # ADMINISTRADOR
 # =========================================================
-@app.put(
-    "/pedidos/{pedido_id}/status"
-)
-def alterar_status_pedido(
-    pedido_id: int,
-    dados: dict,
-    db: Session = Depends(get_db)
-):
+@app.put("/pedidos/{pedido_id}/status")
+def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get_db)):
 
     # -----------------------------------------------------
     # BUSCAR PEDIDO
     # -----------------------------------------------------
 
-    pedido = (
-        db.query(models.Pedido)
-        .filter(
-            models.Pedido.id == pedido_id
-        )
-        .first()
-    )
+    pedido = db.query(models.Pedido).filter(models.Pedido.id == pedido_id).first()
 
     if pedido is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Pedido não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Pedido não encontrado.")
 
     # -----------------------------------------------------
     # PEGAR NOVO STATUS
@@ -1658,10 +1324,7 @@ def alterar_status_pedido(
 
     if not novo_status:
 
-        raise HTTPException(
-            status_code=400,
-            detail="O status do pedido é obrigatório."
-        )
+        raise HTTPException(status_code=400, detail="O status do pedido é obrigatório.")
 
     # -----------------------------------------------------
     # STATUS PERMITIDOS
@@ -1673,15 +1336,12 @@ def alterar_status_pedido(
         "Enviado",
         "A caminho",
         "Entregue",
-        "Cancelado"
+        "Cancelado",
     ]
 
     if novo_status not in status_permitidos:
 
-        raise HTTPException(
-            status_code=400,
-            detail="Status inválido."
-        )
+        raise HTTPException(status_code=400, detail="Status inválido.")
 
     # -----------------------------------------------------
     # ALTERAR STATUS
@@ -1704,9 +1364,7 @@ def alterar_status_pedido(
 
         cliente = (
             db.query(models.Cliente)
-            .filter(
-                models.Cliente.id == pedido.cliente_id
-            )
+            .filter(models.Cliente.id == pedido.cliente_id)
             .first()
         )
 
@@ -1723,19 +1381,16 @@ def alterar_status_pedido(
                     f"Total do pedido: {pedido.total:.2f} CVT\n\n"
                     "Acompanhe seu pedido pela sua conta na VALT-ON.\n\n"
                     "VALT-ON"
-                )
+                ),
             )
     # -----------------------------------------------------
     # RESPOSTA
     # -----------------------------------------------------
 
     return {
-        "mensagem":
-            "Status do pedido atualizado com sucesso!",
-        "pedido_id":
-            pedido.id,
-        "status":
-            pedido.status
+        "mensagem": "Status do pedido atualizado com sucesso!",
+        "pedido_id": pedido.id,
+        "status": pedido.status,
     }
 
 
@@ -1744,18 +1399,11 @@ def alterar_status_pedido(
 # ADMINISTRADOR
 # =========================================================
 
-@app.get("/pedidos")
-def listar_todos_pedidos(
-    db: Session = Depends(get_db)
-):
 
-    pedidos = (
-        db.query(models.Pedido)
-        .order_by(
-            models.Pedido.id.desc()
-        )
-        .all()
-    )
+@app.get("/pedidos")
+def listar_todos_pedidos(db: Session = Depends(get_db)):
+
+    pedidos = db.query(models.Pedido).order_by(models.Pedido.id.desc()).all()
 
     resultado = []
 
@@ -1763,9 +1411,7 @@ def listar_todos_pedidos(
 
         cliente = (
             db.query(models.Cliente)
-            .filter(
-                models.Cliente.id == pedido.cliente_id
-            )
+            .filter(models.Cliente.id == pedido.cliente_id)
             .first()
         )
 
@@ -1773,13 +1419,11 @@ def listar_todos_pedidos(
             {
                 "pedido_id": pedido.id,
                 "cliente_id": pedido.cliente_id,
-                "cliente_nome": (
-                    cliente.nome if cliente else "Cliente não encontrado"
-                ),
+                "cliente_nome": (cliente.nome if cliente else "Cliente não encontrado"),
                 "cliente_email": cliente.email if cliente else "",
                 "status": pedido.status,
                 "total": pedido.total,
-                "prazo_entrega": pedido.prazo_entrega
+                "prazo_entrega": pedido.prazo_entrega,
             }
         )
 
@@ -1790,32 +1434,20 @@ def listar_todos_pedidos(
 # ESPAÇOS DO CLIENTE
 # =========================================================
 
-@app.post(
-    "/clientes/{cliente_id}/espacos/comprar"
-)
+
+@app.post("/clientes/{cliente_id}/espacos/comprar")
 def comprar_casa(
-    cliente_id: int,
-    casa: schemas.CasaCompra,
-    db: Session = Depends(get_db)
+    cliente_id: int, casa: schemas.CasaCompra, db: Session = Depends(get_db)
 ):
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE
     # -----------------------------------------------------
 
-    cliente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.id == cliente_id
-        )
-        .first()
-    )
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
     if cliente is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Cliente não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE INFORMADO
@@ -1824,7 +1456,7 @@ def comprar_casa(
     if casa.cliente_id != cliente_id:
         raise HTTPException(
             status_code=400,
-            detail="Cliente informado não corresponde ao cliente da rota."
+            detail="Cliente informado não corresponde ao cliente da rota.",
         )
 
     # -----------------------------------------------------
@@ -1834,10 +1466,7 @@ def comprar_casa(
     config = CASAS_CONFIG.get(casa.tipo)
 
     if config is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Tipo de casa inválido."
-        )
+        raise HTTPException(status_code=400, detail="Tipo de casa inválido.")
 
     # -----------------------------------------------------
     # VERIFICAR SALDO
@@ -1852,7 +1481,7 @@ def comprar_casa(
                 "Saldo CVT insuficiente. "
                 f"Saldo disponível: {cliente.saldo_cvt:.2f} CVT. "
                 f"Valor da casa: {valor:.2f} CVT."
-            )
+            ),
         )
 
     # -----------------------------------------------------
@@ -1870,7 +1499,7 @@ def comprar_casa(
         tipo=casa.tipo,
         nome=config["nome"],
         valor=valor,
-        adquirido="Sim"
+        adquirido="Sim",
     )
 
     db.add(espaco)
@@ -1886,7 +1515,7 @@ def comprar_casa(
         "valor": espaco.valor,
         "capacidade": config["capacidade"],
         "adquirido": espaco.adquirido,
-        "saldo_cvt": cliente.saldo_cvt
+        "saldo_cvt": cliente.saldo_cvt,
     }
 
 
@@ -1894,32 +1523,19 @@ def comprar_casa(
 # ESPAÇOS DO CLIENTE
 # =========================================================
 
-@app.get(
-    "/clientes/{cliente_id}/espacos"
-)
-def listar_espacos_cliente(
-    cliente_id: int,
-    db: Session = Depends(get_db)
-):
+
+@app.get("/clientes/{cliente_id}/espacos")
+def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE
     # -----------------------------------------------------
 
-    cliente = (
-        db.query(models.Cliente)
-        .filter(
-            models.Cliente.id == cliente_id
-        )
-        .first()
-    )
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
     if cliente is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Cliente não encontrado."
-        )
+        raise HTTPException(status_code=404, detail="Cliente não encontrado.")
 
     # -----------------------------------------------------
     # BUSCAR ESPAÇOS DO CLIENTE
@@ -1927,12 +1543,8 @@ def listar_espacos_cliente(
 
     espacos = (
         db.query(models.EspacoCliente)
-        .filter(
-            models.EspacoCliente.cliente_id == cliente_id
-        )
-        .order_by(
-            models.EspacoCliente.id
-        )
+        .filter(models.EspacoCliente.cliente_id == cliente_id)
+        .order_by(models.EspacoCliente.id)
         .all()
     )
 
@@ -1944,6 +1556,29 @@ def listar_espacos_cliente(
 
     for espaco in espacos:
 
+        itens = (
+            db.query(models.ItemEspacoCliente, models.Produto)
+            .join(
+                models.Produto, models.Produto.id == models.ItemEspacoCliente.produto_id
+            )
+            .filter(models.ItemEspacoCliente.espaco_id == espaco.id)
+            .all()
+        )
+
+        figurinhas = []
+
+        for item_espaco, produto in itens:
+
+            figurinhas.append(
+                {
+                    "id": item_espaco.id,
+                    "produto_id": produto.id,
+                    "nome": produto.nome,
+                    "imagem": produto.imagem,
+                    "data_entrada": item_espaco.data_entrada,
+                }
+            )
+
         resultado.append(
             {
                 "id": espaco.id,
@@ -1951,23 +1586,22 @@ def listar_espacos_cliente(
                 "tipo": espaco.tipo,
                 "nome": espaco.nome,
                 "valor": espaco.valor,
-                "adquirido": espaco.adquirido
+                "adquirido": espaco.adquirido,
+                "figurinhas": figurinhas,
             }
-
         )
+
     return resultado
+
 
 # =========================================================
 # DIAGNOSTICO TEMPORARIO
 # =========================================================
 
+
 @app.get("/diagnostico-versao")
 def diagnostico_versao():
     return {
         "arquivo": __file__,
-        "confirmar_email": any(
-            rota.path == "/confirmar-email"
-            for rota in app.routes
-        )
+        "confirmar_email": any(rota.path == "/confirmar-email" for rota in app.routes),
     }
-

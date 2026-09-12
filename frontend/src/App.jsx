@@ -322,6 +322,8 @@ function App() {
         ];
       }
     );
+
+    alert("✅ Produto adicionado ao carrinho!");
   };
 
   // =====================================================
@@ -502,11 +504,9 @@ function App() {
       }
 
       // ATUALIZAR SALDO DO USUÁRIO APÓS A COMPRA
-      const novoSaldo =
-        Number(usuario.saldo_cvt) - Number(dados.total);
       const usuarioAtualizado = {
         ...usuario,
-        saldo_cvt: novoSaldo,
+        saldo_cvt: Number(dados.saldo_cvt),
       };
 
       setUsuario(usuarioAtualizado);

@@ -46,7 +46,7 @@ function MinhaConta({
   const [mostrarPedidos, setMostrarPedidos] =
     useState(false);
 
-      // =====================================================
+  // =====================================================
   // MONITORAMENTO DE ALTERAÇÃO DE STATUS
   // =====================================================
 
@@ -202,7 +202,7 @@ function MinhaConta({
     } finally {
       setCarregandoPedidos(false);
     }
-   };
+  };
 
   // =====================================================
   // VERIFICAR AUTOMATICAMENTE ALTERAÇÕES NOS PEDIDOS
@@ -629,6 +629,29 @@ function MinhaConta({
                     🏠 {espaco.nome}
                   </h3>
 
+                  <img
+                    src={
+                      espaco.tipo === "pequena"
+                        ? "/casas/casa-pequena.png"
+                        : espaco.tipo === "media"
+                          ? "/casas/casa-media.png"
+                          : espaco.tipo === "grande"
+                            ? "/casas/casa-grande.png"
+                            : espaco.tipo === "mansao"
+                              ? "/casas/mansao.png"
+                              : ""
+                    }
+                    alt={espaco.nome}
+                    style={{
+                      width: "100%",
+                      maxWidth: "500px",
+                      height: "250px",
+                      objectFit: "cover",
+                      borderRadius: "10px",
+                      marginBottom: "15px",
+                    }}
+                  />
+
                   <p>
                     <strong>
                       Tipo:
@@ -659,6 +682,62 @@ function MinhaConta({
                     </strong>{" "}
                     {espaco.id}
                   </p>
+                  {espaco.figurinhas &&
+                    espaco.figurinhas.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "20px",
+                        }}
+                      >
+                        <h4
+                          style={{
+                            marginBottom: "15px",
+                          }}
+                        >
+                          🎁 Figurinhas
+                        </h4>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "15px",
+                          }}
+                        >
+                          {espaco.figurinhas.map((figurinha) => (
+                            <div
+                              key={figurinha.id}
+                              style={{
+                                width: "160px",
+                                border: "1px solid #ddd",
+                                borderRadius: "10px",
+                                padding: "10px",
+                                background: "white",
+                                textAlign: "center",
+                              }}
+                            >
+                              {figurinha.imagem && (
+                                <img
+                                  src={figurinha.imagem}
+                                  alt={figurinha.nome}
+                                  style={{
+                                    width: "100%",
+                                    height: "140px",
+                                    objectFit: "cover",
+                                    borderRadius: "8px",
+                                    marginBottom: "8px",
+                                  }}
+                                />
+                              )}
+
+                              <strong>
+                                {figurinha.nome}
+                              </strong>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                 </div>
               ))
             )}
