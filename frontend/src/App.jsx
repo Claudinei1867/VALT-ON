@@ -501,6 +501,22 @@ function App() {
         );
       }
 
+      // ATUALIZAR SALDO DO USUÁRIO APÓS A COMPRA
+      const novoSaldo =
+        Number(usuario.saldo_cvt) - Number(dados.total);
+
+      const usuarioAtualizado = {
+        ...usuario,
+        saldo_cvt: novoSaldo,
+      };
+
+      setUsuario(usuarioAtualizado);
+
+      localStorage.setItem(
+        "usuario",
+        JSON.stringify(usuarioAtualizado)
+      );
+
       // ---------------------------------------------------
       // COMPRA REALIZADA
       // ---------------------------------------------------
