@@ -202,11 +202,32 @@ function MinhaConta({
     } finally {
       setCarregandoPedidos(false);
     }
-  };
+   };
+
+  // =====================================================
+  // VERIFICAR AUTOMATICAMENTE ALTERAÇÕES NOS PEDIDOS
+  // =====================================================
+
+  useEffect(() => {
+
+    if (!mostrarPedidos || !usuario || !usuario.id) {
+      return;
+    }
+
+    const intervalo = setInterval(() => {
+      carregarPedidos();
+    }, 15000);
+
+    return () => {
+      clearInterval(intervalo);
+    };
+
+  }, [mostrarPedidos, usuario]);
 
   // =====================================================
   // BUSCAR ESPAÇOS DO CLIENTE
   // =====================================================
+
 
   const carregarEspacos = async () => {
     if (!usuario || !usuario.id) {

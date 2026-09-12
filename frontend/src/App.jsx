@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 
 import "./App.css";
 
@@ -504,7 +504,6 @@ function App() {
       // ATUALIZAR SALDO DO USUÁRIO APÓS A COMPRA
       const novoSaldo =
         Number(usuario.saldo_cvt) - Number(dados.total);
-
       const usuarioAtualizado = {
         ...usuario,
         saldo_cvt: novoSaldo,

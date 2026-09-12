@@ -58,20 +58,19 @@ CASAS_CONFIG = {
     "media": {
         "nome": "Casa Média",
         "valor": 3000.0,
-        "capacidade": 100
+        "capacidade": 80
     },
     "grande": {
         "nome": "Casa Grande",
         "valor": 5000.0,
-        "capacidade": 200
+        "capacidade": 150
     },
     "mansao": {
-        "nome": "Mansão",
+        "nome": "Mansão Pro",
         "valor": 10000.0,
         "capacidade": 500
     }
 }
-
 
 # =========================================================
 # CONFIGURAÇÃO DAS IMAGENS
@@ -171,13 +170,13 @@ def conceder_credito_semanal(db: Session):
 
             creditos += 1
 
-    db.commit()
-
     print(
         f"Crédito semanal CVT processado: "
         f"{data_domingo} | "
         f"Clientes creditados: {creditos}"
     )
+
+    db.commit()
 
 
 # =========================================================
@@ -464,9 +463,6 @@ def atualizar_status_pedidos_automaticamente(db):
                     "VALT-ON"
                 )
             )
-
-    db.commit()
-
 
 # =========================================================
 # FUNÇÃO AUTOMÁTICA DO CRÉDITO
