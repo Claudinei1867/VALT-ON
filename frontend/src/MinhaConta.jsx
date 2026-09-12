@@ -66,6 +66,12 @@ function MinhaConta({
   const [erroEspacos, setErroEspacos] =
     useState("");
 
+  const [mostrarCompraCasa, setMostrarCompraCasa] =
+    useState(false);
+
+  const [comprandoCasa, setComprandoCasa] =
+    useState(false);
+
   // =====================================================
   // ERRO GERAL
   // =====================================================
@@ -268,6 +274,60 @@ function MinhaConta({
       );
     } finally {
       setCarregandoEspacos(false);
+    }
+  };
+
+  const comprarCasa = async (tipo) => {
+    if (!usuario || !usuario.id) {
+      return;
+    }
+
+    setComprandoCasa(true);
+    setErroEspacos("");
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/clientes/${usuario.id}/espacos/comprar`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tipo: tipo,
+          }),
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail || "Não foi possível comprar a casa."
+        );
+      }
+
+      alert(
+        `${dados.mensagem}\nSaldo restante: ${Number(
+          dados.saldo_cvt
+        ).toFixed(2)} CVT`
+      );
+
+      setMostrarCompraCasa(false);
+
+      await carregarEspacos();
+    } catch (error) {
+      console.error(
+        "ERRO AO COMPRAR CASA:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Não foi possível comprar a casa."
+      );
+    } finally {
+      setComprandoCasa(false);
     }
   };
 
@@ -603,6 +663,125 @@ function MinhaConta({
             >
               🏠 Meus Espaços
             </h2>
+
+            <button
+              onClick={() => setMostrarCompraCasa(true)}
+              style={{
+                padding: "12px 20px",
+                marginBottom: "20px",
+                cursor: "pointer",
+                borderRadius: "8px",
+                border: "none",
+                background: "#198754",
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              🏠 Comprar nova casa
+            </button>
+
+            {mostrarCompraCasa && (
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  marginBottom: "20px",
+                  background: "#f8f9fa",
+                }}
+              >
+                <h3 style={{ marginTop: 0 }}>
+                  🏠 Escolha sua nova casa
+                </h3>
+
+                <p>
+                  Selecione uma casa para comprar:
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                  }}
+                >
+                  <button
+                    onClick={() => comprarCasa("media")}
+                    disabled={comprandoCasa}
+                    style={{
+                      padding: "12px 18px",
+                      cursor: comprandoCasa
+                        ? "not-allowed"
+                        : "pointer",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                      background: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    🏠 Casa Média
+                    <br />
+                    3.000,00 CVT
+                  </button>
+
+                  <button
+                    onClick={() => comprarCasa("grande")}
+                    disabled={comprandoCasa}
+                    style={{
+                      padding: "12px 18px",
+                      cursor: comprandoCasa
+                        ? "not-allowed"
+                        : "pointer",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                      background: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    🏠 Casa Grande
+                    <br />
+                    5.000,00 CVT
+                  </button>
+
+                  <button
+                    onClick={() => comprarCasa("mansao")}
+                    disabled={comprandoCasa}
+                    style={{
+                      padding: "12px 18px",
+                      cursor: comprandoCasa
+                        ? "not-allowed"
+                        : "pointer",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                      background: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    🏰 Mansão
+                    <br />
+                    10.000,00 CVT
+                  </button>
+
+                  <button
+                    onClick={() => setMostrarCompraCasa(false)}
+                    disabled={comprandoCasa}
+                    style={{
+                      padding: "12px 18px",
+                      cursor: comprandoCasa
+                        ? "not-allowed"
+                        : "pointer",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: "#6c757d",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
 
             {espacos.length === 0 ? (
               <p>
