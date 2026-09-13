@@ -835,6 +835,15 @@ function App() {
               onClick={() =>
                 setMostrarAdmin(true)
               }
+              style={{
+                padding: "10px 14px",
+                fontSize: "16px",
+                backgroundColor: "#000",
+                color: "#fff",
+                border: "1px solid #000",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
             >
               ⚙️ Administrador
             </button>
