@@ -760,6 +760,15 @@ function App() {
                 "Sistema de busca da VALT-ON em desenvolvimento."
               );
             }}
+            style={{
+              padding: "10px 14px",
+              fontSize: "16px",
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "1px solid #000",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
           >
             🔎
           </button>
@@ -771,6 +780,15 @@ function App() {
               onClick={() =>
                 setMostrarConta(true)
               }
+              style={{
+                padding: "10px 14px",
+                fontSize: "16px",
+                backgroundColor: "#000",
+                color: "#fff",
+                border: "1px solid #000",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
             >
               👤 {usuario.nome}
             </button>
@@ -779,6 +797,15 @@ function App() {
               onClick={() =>
                 setMostrarLogin(true)
               }
+              style={{
+                padding: "10px 14px",
+                fontSize: "16px",
+                backgroundColor: "#000",
+                color: "#fff",
+                border: "1px solid #000",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
             >
               👤 Entrar
             </button>
@@ -788,6 +815,15 @@ function App() {
             onClick={() =>
               setMostrarCadastro(true)
             }
+            style={{
+              padding: "10px 14px",
+              fontSize: "16px",
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "1px solid #000",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
           >
             📝 Cadastro
           </button>
