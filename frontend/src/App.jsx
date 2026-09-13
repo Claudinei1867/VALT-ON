@@ -909,6 +909,8 @@ function App() {
                     nomeCategoria
                     ? "bold"
                     : "normal",
+                backgroundColor: "#6c757d",
+                color: "white",
               }}
             >
               {nomeCategoria}
