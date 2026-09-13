@@ -770,7 +770,7 @@ function App() {
               cursor: "pointer",
             }}
           >
-            🔎
+            🔎 Pesquisa
           </button>
 
           {/* LOGIN / MINHA CONTA */}
