@@ -1033,11 +1033,12 @@ function App() {
                       }}
                       style={{
                         width: "100%",
-                        height: "60px",
+                        height: "90px",
                         objectFit:
                           "contain",
                         borderRadius:
                           "8px",
+                        transform: "scale(1.5)",
                       }}
                     />
                   ) : (
@@ -1106,6 +1107,7 @@ function App() {
                       produto.estoque > 0
                         ? "pointer"
                         : "not-allowed",
+                    fontSize: "24px",
                   }}
                 >
                   {produto.estoque >
