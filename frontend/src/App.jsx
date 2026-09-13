@@ -1040,7 +1040,7 @@ function App() {
                           "contain",
                         borderRadius:
                           "8px",
-                        transform: "scale(1.5)",
+                        transform: "scale(1.4)",
                       }}
                     />
                   ) : (
