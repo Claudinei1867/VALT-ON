@@ -713,16 +713,25 @@ function MinhaConta({
                     onClick={() => comprarCasa("media")}
                     disabled={comprandoCasa}
                     style={{
-                      padding: "12px 18px",
-                      cursor: comprandoCasa
-                        ? "not-allowed"
-                        : "pointer",
+                      padding: "19px 18px",
+                      cursor: comprandoCasa ? "not-allowed" : "pointer",
                       borderRadius: "8px",
                       border: "1px solid #ccc",
                       background: "white",
                       fontWeight: "bold",
                     }}
                   >
+                    <img
+                      src="/casas/casa-media.png"
+                      alt="Casa Média"
+                      style={{
+                        width: "110px",
+                        height: "110px",
+                        objectFit: "contain",
+                        display: "block",
+                        margin: "0 auto 6px",
+                      }}
+                    />
                     🏠 Casa Média
                     <br />
                     3.000,00 CVT
@@ -732,16 +741,25 @@ function MinhaConta({
                     onClick={() => comprarCasa("grande")}
                     disabled={comprandoCasa}
                     style={{
-                      padding: "12px 18px",
-                      cursor: comprandoCasa
-                        ? "not-allowed"
-                        : "pointer",
+                      padding: "19px 18px",
+                      cursor: comprandoCasa ? "not-allowed" : "pointer",
                       borderRadius: "8px",
                       border: "1px solid #ccc",
                       background: "white",
                       fontWeight: "bold",
                     }}
                   >
+                    <img
+                      src="/casas/casa-grande.png"
+                      alt="Casa Grande"
+                      style={{
+                        width: "110px",
+                        height: "110px",
+                        objectFit: "contain",
+                        display: "block",
+                        margin: "0 auto 6px",
+                      }}
+                    />
                     🏠 Casa Grande
                     <br />
                     5.000,00 CVT
@@ -751,7 +769,7 @@ function MinhaConta({
                     onClick={() => comprarCasa("mansao")}
                     disabled={comprandoCasa}
                     style={{
-                      padding: "12px 18px",
+                      padding: "19px 18px",
                       cursor: comprandoCasa
                         ? "not-allowed"
                         : "pointer",
@@ -761,6 +779,17 @@ function MinhaConta({
                       fontWeight: "bold",
                     }}
                   >
+                    <img
+                      src="/casas/mansao.png"
+                      alt="Mansão"
+                      style={{
+                        width: "110px",
+                        height: "110px",
+                        objectFit: "contain",
+                        display: "block",
+                        margin: "0 auto 6px",
+                      }}
+                    />
                     🏰 Mansão
                     <br />
                     10.000,00 CVT
