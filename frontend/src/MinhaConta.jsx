@@ -31,6 +31,7 @@ const obterUrlImagem = (url) => {
 
 function MinhaConta({
   usuario,
+  onAtualizarUsuario,
   onVoltar,
   onLogout,
 }) {
@@ -294,6 +295,7 @@ function MinhaConta({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            cliente_id: usuario.id,
             tipo: tipo,
           }),
         }
@@ -314,6 +316,8 @@ function MinhaConta({
       );
 
       setMostrarCompraCasa(false);
+
+      onAtualizarUsuario(dados.saldo_cvt);
 
       await carregarEspacos();
     } catch (error) {

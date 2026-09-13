@@ -640,6 +640,19 @@ function App() {
     return (
       <MinhaConta
         usuario={usuario}
+        onAtualizarUsuario={(novoSaldo) => {
+          const usuarioAtualizado = {
+            ...usuario,
+            saldo_cvt: Number(novoSaldo),
+          };
+
+          setUsuario(usuarioAtualizado);
+
+          localStorage.setItem(
+            "usuario",
+            JSON.stringify(usuarioAtualizado)
+          );
+        }}
         onVoltar={() => {
           setMostrarConta(false);
         }}
