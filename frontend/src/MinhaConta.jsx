@@ -939,12 +939,13 @@ function MinhaConta({
                             <div
                               key={figurinha.id}
                               style={{
-                                width: "160px",
+                                width: "180px",
                                 border: "1px solid #ddd",
-                                borderRadius: "10px",
+                                borderRadius: "14px",
                                 padding: "10px",
                                 background: "white",
                                 textAlign: "center",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
                               }}
                             >
                               {figurinha.imagem && (
@@ -953,8 +954,8 @@ function MinhaConta({
                                   alt={figurinha.nome}
                                   style={{
                                     width: "100%",
-                                    height: "140px",
-                                    objectFit: "cover",
+                                    height: "160px",
+                                    objectFit: "contain",
                                     borderRadius: "8px",
                                     marginBottom: "8px",
                                   }}
@@ -1022,7 +1023,7 @@ function MinhaConta({
                 width: "100%",
                 maxWidth: "700px",
                 height: "380px",
-                objectFit: "cover",
+                objectFit: "contain",
                 borderRadius: "15px",
                 display: "block",
                 margin: "0 auto 25px",
@@ -1055,7 +1056,7 @@ function MinhaConta({
                         <div
                           key={figurinha.id}
                           style={{
-                            width: "160px",
+                            width: "180px",
                             border: "1px solid #ddd",
                             borderRadius: "10px",
                             padding: "10px",
@@ -1070,7 +1071,7 @@ function MinhaConta({
                               style={{
                                 width: "100%",
                                 height: "140px",
-                                objectFit: "cover",
+                                objectFit: "contain",
                                 borderRadius: "8px",
                                 marginBottom: "8px",
                               }}
@@ -1743,3 +1744,4 @@ function MinhaConta({
 }
 
 export default MinhaConta;
+
