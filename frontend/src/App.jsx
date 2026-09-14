@@ -51,6 +51,8 @@ function App() {
 
   const [categoria, setCategoria] = useState("Todos");
 
+  const [pesquisa, setPesquisa] = useState("");
+
   const [carrinho, setCarrinho] = useState([]);
 
   const [mostrarCarrinho, setMostrarCarrinho] =
@@ -259,14 +261,25 @@ function App() {
   // FILTRO POR CATEGORIA
   // =====================================================
 
-  const produtosFiltrados =
-    categoria === "Todos"
-      ? produtos
-      : produtos.filter(
-        (produto) =>
-          produto.categoria ===
-          categoria
+  const produtosFiltrados = produtos.filter(
+    (produto) => {
+      const correspondeCategoria =
+        categoria === "Todos" ||
+        produto.categoria === categoria;
+
+      const correspondePesquisa =
+        produto.nome
+          .toLowerCase()
+          .includes(
+            pesquisa.trim().toLowerCase()
+          );
+
+      return (
+        correspondeCategoria &&
+        correspondePesquisa
       );
+    }
+  );
 
   // =====================================================
   // ADICIONAR AO CARRINHO
@@ -754,24 +767,22 @@ function App() {
         >
           {/* BUSCA */}
 
-          <button
-            onClick={() => {
-              alert(
-                "Sistema de busca da VALT-ON em desenvolvimento."
-              );
-            }}
+          <input
+            type="text"
+            placeholder="🔎 Pesquisar produto..."
+            value={pesquisa}
+            onChange={(e) =>
+              setPesquisa(e.target.value)
+            }
             style={{
               padding: "10px 14px",
               fontSize: "16px",
-              backgroundColor: "#000",
-              color: "#fff",
+              backgroundColor: "#e0e0e0",
               border: "1px solid #000",
               borderRadius: "6px",
-              cursor: "pointer",
+              width: "220px",
             }}
-          >
-            🔎 Pesquisa
-          </button>
+          />
 
           {/* LOGIN / MINHA CONTA */}
 

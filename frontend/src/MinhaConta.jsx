@@ -67,6 +67,9 @@ function MinhaConta({
   const [erroEspacos, setErroEspacos] =
     useState("");
 
+  const [espacoAberto, setEspacoAberto] =
+    useState(null);
+
   const [mostrarCompraCasa, setMostrarCompraCasa] =
     useState(false);
 
@@ -451,7 +454,7 @@ function MinhaConta({
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f5f5",
+        background: "#e0e0e0",
         padding: "30px 20px",
       }}
     >
@@ -649,7 +652,7 @@ function MinhaConta({
             MEUS ESPAÇOS
         ================================================= */}
 
-        {mostrarEspacos && (
+        {mostrarEspacos && !espacoAberto && (
           <div
             style={{
               background: "white",
@@ -840,7 +843,23 @@ function MinhaConta({
                   >
                     🏠 {espaco.nome}
                   </h3>
-
+                  <button
+                    onClick={() => {
+                      setEspacoAberto(espaco);
+                    }}
+                    style={{
+                      padding: "10px 16px",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: "#343a40",
+                      color: "white",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      marginBottom: "15px",
+                    }}
+                  >
+                    🏠 Entrar na casa
+                  </button>
                   <img
                     src={
                       espaco.tipo === "pequena"
@@ -894,7 +913,7 @@ function MinhaConta({
                     </strong>{" "}
                     {espaco.id}
                   </p>
-                  {espaco.figurinhas &&
+                  {false && espaco.figurinhas &&
                     espaco.figurinhas.length > 0 && (
                       <div
                         style={{
@@ -953,6 +972,120 @@ function MinhaConta({
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {espacoAberto && (
+          <div
+            style={{
+              background: "white",
+              padding: "25px",
+              borderRadius: "12px",
+              marginBottom: "20px",
+              boxShadow:
+                "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <button
+              onClick={() => setEspacoAberto(null)}
+              style={{
+                padding: "10px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: "#6c757d",
+                color: "white",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginBottom: "20px",
+              }}
+            >
+              ← Voltar para Meus Espaços
+            </button>
+
+            <h2>
+              🏠 {espacoAberto.nome}
+            </h2>
+            <img
+              src={
+                espacoAberto.tipo === "pequena"
+                  ? "/casas/casa-pequena.png"
+                  : espacoAberto.tipo === "media"
+                    ? "/casas/casa-media.png"
+                    : espacoAberto.tipo === "grande"
+                      ? "/casas/casa-grande.png"
+                      : espacoAberto.tipo === "mansao"
+                        ? "/casas/mansao.png"
+                        : ""
+              }
+              alt={espacoAberto.nome}
+              style={{
+                width: "100%",
+                maxWidth: "700px",
+                height: "380px",
+                objectFit: "cover",
+                borderRadius: "15px",
+                display: "block",
+                margin: "0 auto 25px",
+              }}
+            />
+            {espacoAberto.figurinhas &&
+              espacoAberto.figurinhas.length > 0 && (
+                <div
+                  style={{
+                    marginTop: "20px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      marginBottom: "15px",
+                    }}
+                  >
+                    🎁 Figurinhas das compras
+                  </h4>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "15px",
+                    }}
+                  >
+                    {espacoAberto.figurinhas.map(
+                      (figurinha) => (
+                        <div
+                          key={figurinha.id}
+                          style={{
+                            width: "160px",
+                            border: "1px solid #ddd",
+                            borderRadius: "10px",
+                            padding: "10px",
+                            background: "white",
+                            textAlign: "center",
+                          }}
+                        >
+                          {figurinha.imagem && (
+                            <img
+                              src={figurinha.imagem}
+                              alt={figurinha.nome}
+                              style={{
+                                width: "100%",
+                                height: "140px",
+                                objectFit: "cover",
+                                borderRadius: "8px",
+                                marginBottom: "8px",
+                              }}
+                            />
+                          )}
+
+                          <strong>
+                            {figurinha.nome}
+                          </strong>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
           </div>
         )}
 
