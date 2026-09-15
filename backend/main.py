@@ -1579,6 +1579,7 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
                     "produto_id": produto.id,
                     "nome": produto.nome,
                     "imagem": produto.imagem,
+                    "preco": produto.preco,
                     "data_entrada": item_espaco.data_entrada,
                 }
             )

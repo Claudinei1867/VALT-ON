@@ -60,14 +60,20 @@ function MinhaConta({
 
 
   const [espacos, setEspacos] = useState([]);
+
   const [carregandoEspacos, setCarregandoEspacos] =
     useState(false);
+
   const [mostrarEspacos, setMostrarEspacos] =
     useState(false);
+
   const [erroEspacos, setErroEspacos] =
     useState("");
 
   const [espacoAberto, setEspacoAberto] =
+    useState(null);
+
+  const [figurinhaSelecionada, setFigurinhaSelecionada] =
     useState(null);
 
   const [mostrarCompraCasa, setMostrarCompraCasa] =
@@ -238,6 +244,155 @@ function MinhaConta({
   // BUSCAR ESPAÇOS DO CLIENTE
   // =====================================================
 
+  const excluirFigurinha = async () => {
+    if (!usuario || !usuario.id || !figurinhaSelecionada) {
+      return;
+    }
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/clientes/${usuario.id}/espacos/itens/${figurinhaSelecionada.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail || "Não foi possível excluir a figurinha."
+        );
+      }
+
+      alert("Figurinha excluída com sucesso.");
+
+      setFigurinhaSelecionada(null);
+      await carregarEspacos();
+
+      setEspacoAberto((atual) => {
+        if (!atual) {
+          return atual;
+        }
+
+        return {
+          ...atual,
+          figurinhas: atual.figurinhas.filter(
+            (figurinha) =>
+              figurinha.id !== figurinhaSelecionada.id
+          ),
+        };
+      });
+
+    } catch (error) {
+      console.error(
+        "ERRO AO EXCLUIR FIGURINHA:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Não foi possível excluir a figurinha."
+      );
+    }
+  };
+
+  const colocarFigurinhaAVenda = async () => {
+    if (!usuario || !usuario.id || !figurinhaSelecionada) {
+      return;
+    }
+
+    const precoOriginal = Number(
+      figurinhaSelecionada.preco || 0
+    );
+
+    const precoMaximo = Number(
+      (precoOriginal * 0.8).toFixed(2)
+    );
+
+    const preco = window.prompt(
+      `Preço original: ${precoOriginal.toFixed(2)} CVT\n` +
+      `Preço máximo para venda: ${precoMaximo.toFixed(2)} CVT\n\n` +
+      "Digite o preço de venda da figurinha em CVT:"
+    );
+
+    if (preco === null) {
+      return;
+    }
+
+    const precoVenda = Number(
+      preco.replace(",", ".")
+    );
+
+    if (!Number.isFinite(precoVenda) || precoVenda <= 0) {
+      alert("Informe um preço de venda válido.");
+      return;
+    }
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/clientes/${usuario.id}/espacos/itens/${figurinhaSelecionada.id}/vender`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cliente_id: usuario.id,
+            item_id: figurinhaSelecionada.id,
+            preco_venda: precoVenda,
+          }),
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail ||
+          "Não foi possível colocar a figurinha à venda."
+        );
+      }
+
+      alert(
+        "Figurinha colocada à venda com sucesso."
+      );
+
+      setFigurinhaSelecionada(null);
+      await carregarEspacos();
+
+      setEspacoAberto((atual) => {
+        if (!atual) {
+          return atual;
+        }
+
+        return {
+          ...atual,
+          figurinhas: atual.figurinhas.map(
+            (figurinha) =>
+              figurinha.id ===
+                figurinhaSelecionada.id
+                ? {
+                  ...figurinha,
+                  status: "VENDA",
+                  preco_venda: precoVenda,
+                }
+                : figurinha
+          ),
+        };
+      });
+    } catch (error) {
+      console.error(
+        "ERRO AO COLOCAR FIGURINHA À VENDA:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Não foi possível colocar a figurinha à venda."
+      );
+    }
+  };
 
   const carregarEspacos = async () => {
     if (!usuario || !usuario.id) {
@@ -418,7 +573,7 @@ function MinhaConta({
   };
 
   // =====================================================
-  // VERIFICAR USUÃRIO
+  // VERIFICAR USUÁRIO
   // =====================================================
 
   if (!usuario) {
@@ -576,7 +731,7 @@ function MinhaConta({
               }}
             >
               {carregandoPedidos
-                ? "â³ Carregando..."
+                ? "⏳ Carregando..."
                 : "📦 Ver meus pedidos"}
             </button>
 
@@ -594,8 +749,8 @@ function MinhaConta({
               }}
             >
               {carregandoEspacos
-                ? "â³ Carregando..."
-                : "🏠 Meus Espaços"}
+                ? "? ⏳ Carregando..."
+                : ": 🏠 Meus Espaços"}
             </button>
 
             {/* SAIR */}
@@ -793,7 +948,7 @@ function MinhaConta({
                         margin: "0 auto 6px",
                       }}
                     />
-                    🏰 Mansão
+                    🏠 Mansão
                     <br />
                     10.000,00 CVT
                   </button>
@@ -1055,13 +1210,15 @@ function MinhaConta({
                       (figurinha) => (
                         <div
                           key={figurinha.id}
+                          onClick={() => setFigurinhaSelecionada(figurinha)}
                           style={{
                             width: "180px",
                             border: "1px solid #ddd",
                             borderRadius: "10px",
                             padding: "10px",
                             background: "white",
-                            textAlign: "center",
+                            cursor: "pointer",
+                            transition: "0.2s",
                           }}
                         >
                           {figurinha.imagem && (
@@ -1087,6 +1244,73 @@ function MinhaConta({
                   </div>
                 </div>
               )}
+
+            {figurinhaSelecionada && (
+              <div
+                style={{
+                  marginTop: "25px",
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "12px",
+                  background: "#f5f5f5",
+                  textAlign: "center",
+                }}
+              >
+                <h3>
+                  {figurinhaSelecionada.nome}
+                </h3>
+
+                <button
+                  onClick={excluirFigurinha}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    maxWidth: "300px",
+                    margin: "10px auto",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  🗑️ Excluir
+                </button>
+
+                <button
+                  onClick={colocarFigurinhaAVenda}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    maxWidth: "300px",
+                    margin: "10px auto",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  🏷️ Colocar à venda
+                </button>
+
+                <button
+                  onClick={() =>
+                    setFigurinhaSelecionada(null)
+                  }
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    maxWidth: "300px",
+                    margin: "10px auto",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  ❌ Cancelar
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -1277,7 +1501,7 @@ function MinhaConta({
                                       />
                                     )}
 
-                                  {/* CÃRCULO */}
+                                  {/* CÍRCULO */}
 
                                   <div
                                     style={{
