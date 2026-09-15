@@ -58,6 +58,21 @@ function App() {
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
 
+  const [mostrarProdutosUsados, setMostrarProdutosUsados] =
+    useState(false);
+
+  const [produtosUsados, setProdutosUsados] =
+    useState([]);
+
+  const [carregandoProdutosUsados, setCarregandoProdutosUsados] =
+    useState(false);
+
+  const [produtoUsadoSelecionado, setProdutoUsadoSelecionado] =
+    useState(null);
+
+  const [espacoUsadoSelecionado, setEspacoUsadoSelecionado] =
+    useState("");
+
   const [mostrarAdmin, setMostrarAdmin] =
     useState(false);
 
@@ -198,6 +213,45 @@ function App() {
       );
     } finally {
       setCarregando(false);
+    }
+  };
+
+  // =====================================================
+  // CARREGAR PRODUTOS USADOS
+  // =====================================================
+
+  const carregarProdutosUsados = async () => {
+    setCarregandoProdutosUsados(true);
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/produtos-usados`
+      );
+
+      if (!resposta.ok) {
+        throw new Error(
+          "Erro ao carregar produtos usados"
+        );
+      }
+
+      const dados =
+        await resposta.json();
+
+      console.log(
+        "PRODUTOS USADOS RECEBIDOS:",
+        dados
+      );
+
+      setProdutosUsados(dados);
+    } catch (error) {
+      console.error(
+        "ERRO AO CARREGAR PRODUTOS USADOS:",
+        error
+      );
+
+      setProdutosUsados([]);
+    } finally {
+      setCarregandoProdutosUsados(false);
     }
   };
 
@@ -646,6 +700,278 @@ function App() {
   }
 
   // =====================================================
+  // TELA PRODUTOS USADOS
+  // =====================================================
+
+  if (mostrarProdutosUsados) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#e0e0e0",
+          padding: "20px",
+        }}
+      >
+        <h1>🛍️ Produtos Usados</h1>
+
+        <button
+          onClick={() =>
+            setMostrarProdutosUsados(false)
+          }
+          style={{
+            padding: "10px 14px",
+            fontSize: "16px",
+            backgroundColor: "#000",
+            color: "#fff",
+            border: "1px solid #000",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginBottom: "20px",
+          }}
+        >
+          ← Voltar para a loja
+        </button>
+
+        {produtoUsadoSelecionado && (
+          <div
+            style={{
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <h2>🏠 Escolha a casa de destino</h2>
+
+            <p>
+              Produto:{" "}
+              <strong>
+                {produtoUsadoSelecionado.nome}
+              </strong>
+            </p>
+
+            <p>
+              Preço:{" "}
+              <strong>
+                {Number(
+                  produtoUsadoSelecionado.preco_venda
+                ).toFixed(2)}{" "}
+                CVT
+              </strong>
+            </p>
+
+            {espacos.length === 0 ? (
+              <p>
+                Você ainda não possui nenhuma casa disponível.
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  maxWidth: "500px",
+                }}
+              >
+                {espacos.map((espaco) => (
+                  <button
+                    key={espaco.id}
+                    onClick={() =>
+                      setEspacoUsadoSelecionado(
+                        String(espaco.id)
+                      )
+                    }
+                    style={{
+                      padding: "12px",
+                      fontSize: "16px",
+                      textAlign: "left",
+                      backgroundColor:
+                        String(espaco.id) ===
+                          String(espacoUsadoSelecionado)
+                          ? "#d0ffd0"
+                          : "#f5f5f5",
+                      border:
+                        String(espaco.id) ===
+                          String(espacoUsadoSelecionado)
+                          ? "2px solid #008000"
+                          : "1px solid #ccc",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🏠 {espaco.nome}
+                  </button>
+                ))}
+              </div>
+            )}
+            {espacoUsadoSelecionado && (
+              <button
+                onClick={async () => {
+                  try {
+                    const resposta = await fetch(
+                      `${API_URL}/produtos-usados/comprar`,
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          cliente_id: usuario.id,
+                          venda_id:
+                            produtoUsadoSelecionado.venda_id,
+                          espaco_id: Number(
+                            espacoUsadoSelecionado
+                          ),
+                        }),
+                      }
+                    );
+
+                    const dados = await resposta.json();
+
+                    if (!resposta.ok) {
+                      throw new Error(
+                        dados.detail ||
+                        "Erro ao comprar produto usado."
+                      );
+                    }
+
+                    alert(
+                      "Produto usado comprado com sucesso!"
+                    );
+
+                    setProdutoUsadoSelecionado(null);
+                    setEspacoUsadoSelecionado("");
+
+                    await carregarProdutosUsados();
+                  } catch (error) {
+                    console.error(
+                      "ERRO AO COMPRAR PRODUTO USADO:",
+                      error
+                    );
+
+                    alert(
+                      error.message ||
+                      "Não foi possível concluir a compra."
+                    );
+                  }
+                }}
+                style={{
+                  marginTop: "15px",
+                  padding: "12px 18px",
+                  fontSize: "16px",
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  border: "1px solid #000",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                ✅ Confirmar compra
+              </button>
+            )}
+          </div>
+        )}
+
+        {carregandoProdutosUsados ? (
+          <p>Carregando produtos usados...</p>
+        ) : produtosUsados.length === 0 ? (
+          <p>
+            Nenhum produto usado está disponível para venda no momento.
+          </p>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(220px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {produtosUsados.map((produto) => (
+              <div
+                key={produto.venda_id}
+                style={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  padding: "15px",
+                }}
+              >
+                <h2>{produto.nome}</h2>
+
+                {produto.imagem && (
+                  <img
+                    src={obterUrlImagem(
+                      produto.imagem
+                    )}
+                    alt={produto.nome}
+                    style={{
+                      width: "100%",
+                      height: "180px",
+                      objectFit: "contain",
+                    }}
+                  />
+                )}
+
+                <p>
+                  Preço original:{" "}
+                  {Number(
+                    produto.preco_original
+                  ).toFixed(2)}{" "}
+                  CVT
+                </p>
+
+                <p>
+                  <strong>
+                    Preço usado:{" "}
+                    {Number(
+                      produto.preco_venda
+                    ).toFixed(2)}{" "}
+                    CVT
+                  </strong>
+                </p>
+
+                <p>
+                  Vendedor:{" "}
+                  {produto.vendedor_nome}
+                </p>
+
+                <button
+                  onClick={() => {
+                    if (!usuario) {
+                      alert(
+                        "Você precisa estar logado para comprar um produto usado."
+                      );
+                      return;
+                    }
+
+                    setProdutoUsadoSelecionado(produto);
+                    setEspacoUsadoSelecionado("");
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    marginTop: "10px",
+                    fontSize: "16px",
+                    backgroundColor: "#000",
+                    color: "#fff",
+                    border: "1px solid #000",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                  }}
+                >
+                  🛒 Comprar produto
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // =====================================================
   // TELA MINHA CONTA
   // =====================================================
 
@@ -860,6 +1186,33 @@ function App() {
             </button>
           )}
 
+          {/* PRODUTOS USADOS */}
+
+          <button
+            onClick={() => {
+              const novoEstado = !mostrarProdutosUsados;
+
+              setMostrarProdutosUsados(
+                novoEstado
+              );
+
+              if (novoEstado) {
+                carregarProdutosUsados();
+              }
+            }}
+            style={{
+              padding: "10px 14px",
+              fontSize: "16px",
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "1px solid #000",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            🛍️ Produtos Usados
+          </button>
+
           {/* CARRINHO */}
 
           <button
@@ -882,13 +1235,13 @@ function App() {
             {quantidadeCarrinho})
           </button>
         </div>
-      </header>
+      </header >
 
       {/* =================================================
           CATEGORIAS
       ================================================= */}
 
-      <nav
+      < nav
         style={{
           display: "flex",
           gap: "10px",
@@ -896,45 +1249,48 @@ function App() {
           borderBottom:
             "1px solid #ddd",
           flexWrap: "wrap",
-        }}
+        }
+        }
       >
-        {[
-          "Todos",
-          "Celulares",
-          "Informática",
-          "Casa",
-          "Moda",
-          "Esportes",
-        ].map(
-          (nomeCategoria) => (
-            <button
-              key={nomeCategoria}
-              onClick={() =>
-                setCategoria(
-                  nomeCategoria
-                )
-              }
-              style={{
-                fontWeight:
-                  categoria ===
+        {
+          [
+            "Todos",
+            "Celulares",
+            "Informática",
+            "Casa",
+            "Moda",
+            "Esportes",
+          ].map(
+            (nomeCategoria) => (
+              <button
+                key={nomeCategoria}
+                onClick={() =>
+                  setCategoria(
                     nomeCategoria
-                    ? "bold"
-                    : "normal",
-                backgroundColor: "#6c757d",
-                color: "white",
-              }}
-            >
-              {nomeCategoria}
-            </button>
+                  )
+                }
+                style={{
+                  fontWeight:
+                    categoria ===
+                      nomeCategoria
+                      ? "bold"
+                      : "normal",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                }}
+              >
+                {nomeCategoria}
+              </button>
+            )
           )
-        )}
-      </nav>
+        }
+      </nav >
 
       {/* =================================================
           BANNER
       ================================================= */}
 
-      <section
+      < section
         style={{
           padding: "40px 20px",
           textAlign: "center",
@@ -959,13 +1315,13 @@ function App() {
         >
           Comprar agora
         </button>
-      </section>
+      </section >
 
       {/* =================================================
           PRODUTOS
       ================================================= */}
 
-      <main
+      < main
         style={{
           padding: "20px",
         }}
@@ -974,23 +1330,28 @@ function App() {
           Produtos em destaque
         </h2>
 
-        {carregando && (
-          <p>
-            Carregando produtos...
-          </p>
-        )}
+        {
+          carregando && (
+            <p>
+              Carregando produtos...
+            </p>
+          )
+        }
 
-        {erro && (
-          <p
-            style={{
-              color: "red",
-            }}
-          >
-            {erro}
-          </p>
-        )}
+        {
+          erro && (
+            <p
+              style={{
+                color: "red",
+              }}
+            >
+              {erro}
+            </p>
+          )
+        }
 
-        {!carregando &&
+        {
+          !carregando &&
           !erro &&
           produtosFiltrados.length ===
           0 && (
@@ -998,7 +1359,8 @@ function App() {
               Nenhum produto encontrado
               nesta categoria.
             </p>
-          )}
+          )
+        }
 
         <div
           className="produtos-grid"
@@ -1132,209 +1494,211 @@ function App() {
             )
           )}
         </div>
-      </main>
+      </main >
 
       {/* =================================================
           CARRINHO
       ================================================= */}
 
-      {mostrarCarrinho && (
-        <div
-          style={{
-            position: "fixed",
-            right: "20px",
-            top: "80px",
-            width: "350px",
-            maxWidth: "90%",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            background: "white",
-            border:
-              "1px solid #ccc",
-            borderRadius:
-              "10px",
-            padding: "20px",
-            boxShadow:
-              "0 4px 15px rgba(0,0,0,0.2)",
-            zIndex: 1000,
-          }}
-        >
-          <h2>
-            🛒 Meu Carrinho
-          </h2>
-
-          {carrinho.length ===
-            0 ? (
-            <p>
-              Seu carrinho está
-              vazio.
-            </p>
-          ) : (
-            <>
-              {carrinho.map(
-                (item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      borderBottom:
-                        "1px solid #ddd",
-                      padding:
-                        "10px 0",
-                    }}
-                  >
-                    <strong>
-                      {item.nome}
-                    </strong>
-
-                    <p>
-                      CVT{" "}
-                      {Number(
-                        item.preco
-                      ).toFixed(2)}
-                    </p>
-
-                    <div>
-                      <button
-                        onClick={() =>
-                          diminuirQuantidade(
-                            item.id
-                          )
-                        }
-                      >
-                        −
-                      </button>
-
-                      <span
-                        style={{
-                          margin:
-                            "0 10px",
-                        }}
-                      >
-                        {
-                          item.quantidade
-                        }
-                      </span>
-
-                      <button
-                        onClick={() =>
-                          aumentarQuantidade(
-                            item.id
-                          )
-                        }
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        removerCarrinho(
-                          item.id
-                        )
-                      }
-                      style={{
-                        marginTop:
-                          "8px",
-                      }}
-                    >
-                      🗑️ Remover
-                    </button>
-                  </div>
-                )
-              )}
-
-              {/* ESPAÇO DA COMPRA */}
-              <div
-                style={{
-                  marginTop: "15px",
-                  marginBottom: "15px",
-                }}
-              >
-                <label
-                  style={{
-                    display: "block",
-                    fontWeight: "bold",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Escolha o espaço para esta compra:
-                </label>
-
-                <select
-                  value={espacoSelecionado}
-                  onChange={(e) =>
-                    setEspacoSelecionado(e.target.value)
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    fontSize: "16px",
-                  }}
-                >
-                  <option value="">
-                    Selecione um espaço
-                  </option>
-
-                  {espacos.map((espaco) => (
-                    <option
-                      key={espaco.id}
-                      value={espaco.id}
-                    >
-                      {espaco.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* TOTAL */}
-              <h3>
-                Total: CVT{" "}
-                {totalCarrinho.toFixed(
-                  2
-                )}
-              </h3>
-
-              {/* FINALIZAR */}
-
-              <button
-                onClick={
-                  finalizarCompra
-                }
-                style={{
-                  padding:
-                    "12px 20px",
-                  cursor:
-                    "pointer",
-                  marginTop:
-                    "10px",
-                  fontWeight:
-                    "bold",
-                  width: "100%",
-                }}
-              >
-                💳 Finalizar compra
-              </button>
-            </>
-          )}
-
-          {/* FECHAR */}
-
-          <button
-            onClick={() =>
-              setMostrarCarrinho(
-                false
-              )
-            }
+      {
+        mostrarCarrinho && (
+          <div
             style={{
-              marginTop: "10px",
-              width: "100%",
+              position: "fixed",
+              right: "20px",
+              top: "80px",
+              width: "350px",
+              maxWidth: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              background: "white",
+              border:
+                "1px solid #ccc",
+              borderRadius:
+                "10px",
+              padding: "20px",
+              boxShadow:
+                "0 4px 15px rgba(0,0,0,0.2)",
+              zIndex: 1000,
             }}
           >
-            Fechar
-          </button>
-        </div>
-      )}
-    </div>
+            <h2>
+              🛒 Meu Carrinho
+            </h2>
+
+            {carrinho.length ===
+              0 ? (
+              <p>
+                Seu carrinho está
+                vazio.
+              </p>
+            ) : (
+              <>
+                {carrinho.map(
+                  (item) => (
+                    <div
+                      key={item.id}
+                      style={{
+                        borderBottom:
+                          "1px solid #ddd",
+                        padding:
+                          "10px 0",
+                      }}
+                    >
+                      <strong>
+                        {item.nome}
+                      </strong>
+
+                      <p>
+                        CVT{" "}
+                        {Number(
+                          item.preco
+                        ).toFixed(2)}
+                      </p>
+
+                      <div>
+                        <button
+                          onClick={() =>
+                            diminuirQuantidade(
+                              item.id
+                            )
+                          }
+                        >
+                          −
+                        </button>
+
+                        <span
+                          style={{
+                            margin:
+                              "0 10px",
+                          }}
+                        >
+                          {
+                            item.quantidade
+                          }
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            aumentarQuantidade(
+                              item.id
+                            )
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          removerCarrinho(
+                            item.id
+                          )
+                        }
+                        style={{
+                          marginTop:
+                            "8px",
+                        }}
+                      >
+                        🗑️ Remover
+                      </button>
+                    </div>
+                  )
+                )}
+
+                {/* ESPAÇO DA COMPRA */}
+                <div
+                  style={{
+                    marginTop: "15px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "block",
+                      fontWeight: "bold",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Escolha o espaço para esta compra:
+                  </label>
+
+                  <select
+                    value={espacoSelecionado}
+                    onChange={(e) =>
+                      setEspacoSelecionado(e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      fontSize: "16px",
+                    }}
+                  >
+                    <option value="">
+                      Selecione um espaço
+                    </option>
+
+                    {espacos.map((espaco) => (
+                      <option
+                        key={espaco.id}
+                        value={espaco.id}
+                      >
+                        {espaco.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* TOTAL */}
+                <h3>
+                  Total: CVT{" "}
+                  {totalCarrinho.toFixed(
+                    2
+                  )}
+                </h3>
+
+                {/* FINALIZAR */}
+
+                <button
+                  onClick={
+                    finalizarCompra
+                  }
+                  style={{
+                    padding:
+                      "12px 20px",
+                    cursor:
+                      "pointer",
+                    marginTop:
+                      "10px",
+                    fontWeight:
+                      "bold",
+                    width: "100%",
+                  }}
+                >
+                  💳 Finalizar compra
+                </button>
+              </>
+            )}
+
+            {/* FECHAR */}
+
+            <button
+              onClick={() =>
+                setMostrarCarrinho(
+                  false
+                )
+              }
+              style={{
+                marginTop: "10px",
+                width: "100%",
+              }}
+            >
+              Fechar
+            </button>
+          </div>
+        )
+      }
+    </div >
   );
 }
 
