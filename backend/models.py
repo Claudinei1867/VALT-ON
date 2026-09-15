@@ -189,7 +189,7 @@ class EspacoCliente(Base):
         default="Não"
     )
 
-    # =========================================================
+# =========================================================
 # ITENS DOS ESPAÇOS DO CLIENTE
 # =========================================================
 
@@ -219,6 +219,94 @@ class ItemEspacoCliente(Base):
         String,
         nullable=True
     )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="ATIVO"
+    )
+
+    preco_venda = Column(
+        Float,
+        nullable=True
+    )
+
+
+# =========================================================
+# VENDAS DE PRODUTOS USADOS
+# =========================================================
+
+
+class VendaUsado(Base):
+    __tablename__ = "vendas_usados"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    item_espaco_id = Column(
+        Integer,
+        ForeignKey("itens_espacos_clientes.id"),
+        nullable=False
+    )
+
+    vendedor_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    comprador_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=True
+    )
+
+    espaco_comprador_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=True
+    )
+
+    produto_id = Column(
+        Integer,
+        ForeignKey("produtos.id"),
+        nullable=False
+    )
+
+    preco_venda = Column(
+        Float,
+        nullable=False
+    )
+
+    valor_vendedor = Column(
+        Float,
+        nullable=True
+    )
+
+    valor_valt_on = Column(
+        Float,
+        nullable=True
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="DISPONIVEL"
+    )
+
+    data_venda = Column(
+        String,
+        nullable=True
+    )
+
+    data_entrega_prevista = Column(
+        String,
+        nullable=True
+    )
+
 
 # =========================================================
 # ADMINISTRADORES

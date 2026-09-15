@@ -433,6 +433,7 @@ def executar_status_pedidos_automatico():
     try:
 
         atualizar_status_pedidos_automaticamente(db)
+        atualizar_vendas_usados_automaticamente(db)
 
     except Exception as erro:
 
@@ -1561,7 +1562,10 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
             .join(
                 models.Produto, models.Produto.id == models.ItemEspacoCliente.produto_id
             )
-            .filter(models.ItemEspacoCliente.espaco_id == espaco.id)
+            .filter(
+                models.ItemEspacoCliente.espaco_id == espaco.id,
+                models.ItemEspacoCliente.status != "EXCLUIDO",
+            )
             .all()
         )
 
@@ -1593,6 +1597,210 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
     return resultado
 
+# =========================================================
+# EXCLUIR ITEM DA CASA DO CLIENTE
+# =========================================================
+
+
+@app.delete("/clientes/{cliente_id}/espacos/itens/{item_id}")
+def excluir_item_espaco(
+    cliente_id: int,
+    item_id: int,
+    db: Session = Depends(get_db),
+):
+
+    # -----------------------------------------------------
+    # BUSCAR ITEM E VERIFICAR PROPRIETÁRIO
+    # -----------------------------------------------------
+
+    item = (
+        db.query(models.ItemEspacoCliente)
+        .join(
+            models.EspacoCliente,
+            models.EspacoCliente.id == models.ItemEspacoCliente.espaco_id,
+        )
+        .filter(
+            models.ItemEspacoCliente.id == item_id,
+            models.EspacoCliente.cliente_id == cliente_id,
+        )
+        .first()
+    )
+
+    if item is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Item não encontrado na casa deste cliente.",
+        )
+
+    # -----------------------------------------------------
+    # EXCLUSÃO LÓGICA
+    # -----------------------------------------------------
+
+    if item.status == "VENDA":
+        raise HTTPException(
+            status_code=400,
+            detail="Este produto esta anunciado para venda e nao pode ser excluido.",
+        )
+
+    item.status = "EXCLUIDO"
+
+    db.commit()
+
+    return {
+        "mensagem": "Produto excluído da casa com sucesso.",
+        "item_id": item.id,
+    }
+
+
+# =========================================================
+# COLOCAR FIGURINHA A VENDA
+# =========================================================
+
+
+@app.post("/clientes/{cliente_id}/espacos/itens/{item_id}/vender")
+def colocar_item_a_venda(
+    cliente_id: int,
+    item_id: int,
+    dados: schemas.VendaUsadoCriar,
+    db: Session = Depends(get_db),
+):
+
+    if dados.cliente_id != cliente_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Cliente informado nao corresponde ao proprietario.",
+        )
+
+    item = (
+        db.query(models.ItemEspacoCliente)
+        .join(
+            models.EspacoCliente,
+            models.EspacoCliente.id == models.ItemEspacoCliente.espaco_id,
+        )
+        .filter(
+            models.ItemEspacoCliente.id == item_id,
+            models.EspacoCliente.cliente_id == cliente_id,
+        )
+        .first()
+    )
+
+    if item is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Item nao encontrado na casa deste cliente.",
+        )
+
+    if item.status == "EXCLUIDO":
+        raise HTTPException(
+            status_code=400,
+            detail="Este produto nao esta mais disponivel na casa.",
+        )
+
+    if item.status == "VENDA":
+        raise HTTPException(
+            status_code=400,
+            detail="Este produto ja esta anunciado para venda.",
+        )
+
+    produto = (
+        db.query(models.Produto)
+        .filter(models.Produto.id == item.produto_id)
+        .first()
+    )
+
+    if produto is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Produto original nao encontrado.",
+        )
+
+    limite_venda = round(produto.preco * 0.80, 2)
+
+    if dados.preco_venda <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="O preco de venda deve ser maior que zero.",
+        )
+
+    if dados.preco_venda > limite_venda:
+        raise HTTPException(
+            status_code=400,
+            detail=f"O preco maximo permitido e {limite_venda:.2f} CVT.",
+        )
+
+    item.status = "VENDA"
+    item.preco_venda = dados.preco_venda
+
+    venda = models.VendaUsado(
+        item_espaco_id=item.id,
+        vendedor_id=cliente_id,
+        produto_id=produto.id,
+        preco_venda=dados.preco_venda,
+        status="DISPONIVEL",
+        data_venda=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
+
+    db.add(venda)
+    db.commit()
+    db.refresh(venda)
+
+    return {
+        "mensagem": "Produto colocado a venda com sucesso.",
+        "venda_id": venda.id,
+        "item_id": item.id,
+        "produto_id": produto.id,
+        "preco_venda": venda.preco_venda,
+        "limite_maximo": limite_venda,
+        "status": venda.status,
+    }
+# =========================================================
+# LISTAR PRODUTOS USADOS DISPONIVEIS
+# =========================================================
+
+
+@app.get("/produtos-usados")
+def listar_produtos_usados(db: Session = Depends(get_db)):
+
+    vendas = (
+        db.query(
+            models.VendaUsado,
+            models.Produto,
+            models.Cliente,
+        )
+        .join(
+            models.Produto,
+            models.Produto.id == models.VendaUsado.produto_id,
+        )
+        .join(
+            models.Cliente,
+            models.Cliente.id == models.VendaUsado.vendedor_id,
+        )
+        .filter(
+            models.VendaUsado.status == "DISPONIVEL",
+        )
+        .all()
+    )
+
+    resultado = []
+
+    for venda, produto, vendedor in vendas:
+        resultado.append(
+            {
+                "venda_id": venda.id,
+                "produto_id": produto.id,
+                "nome": produto.nome,
+                "descricao": produto.descricao,
+                "imagem": produto.imagem,
+                "preco_original": produto.preco,
+                "preco_venda": venda.preco_venda,
+                "vendedor_id": vendedor.id,
+                "vendedor_nome": vendedor.nome,
+                "status": venda.status,
+            }
+        )
+
+    return resultado
+
 
 # =========================================================
 # DIAGNOSTICO TEMPORARIO
@@ -1605,3 +1813,258 @@ def diagnostico_versao():
         "arquivo": __file__,
         "confirmar_email": any(rota.path == "/confirmar-email" for rota in app.routes),
     }
+
+# =========================================================
+# COMPRAR PRODUTO USADO
+# =========================================================
+
+
+@app.post("/produtos-usados/comprar")
+def comprar_produto_usado(
+    compra: schemas.CompraUsadoCriar,
+    db: Session = Depends(get_db),
+):
+
+    # -----------------------------------------------------
+    # VERIFICAR COMPRADOR
+    # -----------------------------------------------------
+
+    comprador = (
+        db.query(models.Cliente)
+        .filter(models.Cliente.id == compra.cliente_id)
+        .first()
+    )
+
+    if comprador is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Cliente comprador nao encontrado.",
+        )
+
+    # -----------------------------------------------------
+    # BUSCAR VENDA
+    # -----------------------------------------------------
+
+    venda = (
+        db.query(models.VendaUsado)
+        .filter(models.VendaUsado.id == compra.venda_id)
+        .first()
+    )
+
+    if venda is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Anuncio de produto usado nao encontrado.",
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR DISPONIBILIDADE
+    # -----------------------------------------------------
+
+    if venda.status != "DISPONIVEL":
+        raise HTTPException(
+            status_code=400,
+            detail="Este produto usado nao esta mais disponivel para venda.",
+        )
+
+    # -----------------------------------------------------
+    # IMPEDIR COMPRA PELO PROPRIO VENDEDOR
+    # -----------------------------------------------------
+
+    if venda.vendedor_id == compra.cliente_id:
+        raise HTTPException(
+            status_code=400,
+            detail="O vendedor nao pode comprar o proprio produto.",
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR CASA DE DESTINO
+    # -----------------------------------------------------
+
+    espaco = (
+        db.query(models.EspacoCliente)
+        .filter(
+            models.EspacoCliente.id == compra.espaco_id,
+            models.EspacoCliente.cliente_id == compra.cliente_id,
+        )
+        .first()
+    )
+
+    if espaco is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Espaco invalido ou nao pertence ao comprador.",
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR CAPACIDADE DA CASA
+    # -----------------------------------------------------
+
+    config = CASAS_CONFIG.get(espaco.tipo)
+
+    if config is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Configuracao da casa nao encontrada.",
+        )
+
+    itens_na_casa = (
+        db.query(models.ItemEspacoCliente)
+        .filter(
+            models.ItemEspacoCliente.espaco_id == espaco.id,
+            models.ItemEspacoCliente.status != "EXCLUIDO",
+        )
+        .count()
+    )
+
+    if itens_na_casa >= config["capacidade"]:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"A casa atingiu sua capacidade maxima de "
+                f"{config['capacidade']} itens."
+            ),
+        )
+
+    # -----------------------------------------------------
+    # VERIFICAR SALDO
+    # -----------------------------------------------------
+
+    if comprador.saldo_cvt < venda.preco_venda:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Saldo CVT insuficiente. "
+                f"Saldo disponivel: {comprador.saldo_cvt:.2f} CVT. "
+                f"Valor da compra: {venda.preco_venda:.2f} CVT."
+            ),
+        )
+
+    # -----------------------------------------------------
+    # REGISTRAR COMPRA
+    # -----------------------------------------------------
+
+    data_venda = datetime.now()
+    data_entrega_prevista = data_venda + timedelta(days=1)
+
+    comprador.saldo_cvt -= venda.preco_venda
+
+    venda.comprador_id = compra.cliente_id
+    venda.espaco_comprador_id = compra.espaco_id
+    venda.status = "EM_ENTREGA"
+    venda.data_venda = data_venda.strftime("%Y-%m-%d %H:%M:%S")
+    venda.data_entrega_prevista = data_entrega_prevista.strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    db.commit()
+    db.refresh(venda)
+
+    return {
+        "mensagem": "Compra do produto usado realizada com sucesso.",
+        "venda_id": venda.id,
+        "produto_id": venda.produto_id,
+        "preco_venda": venda.preco_venda,
+        "comprador_id": venda.comprador_id,
+        "espaco_comprador_id": venda.espaco_comprador_id,
+        "status": venda.status,
+        "data_entrega_prevista": venda.data_entrega_prevista,
+        "saldo_cvt": comprador.saldo_cvt,
+    }
+
+# =========================================================
+# ATUALIZAR VENDAS DE PRODUTOS USADOS AUTOMATICAMENTE
+# =========================================================
+
+
+def atualizar_vendas_usados_automaticamente(db):
+
+    agora = datetime.now()
+
+    vendas = (
+        db.query(models.VendaUsado)
+        .filter(models.VendaUsado.status == "EM_ENTREGA")
+        .all()
+    )
+
+    for venda in vendas:
+
+        if not venda.data_venda:
+            continue
+
+        try:
+
+            data_venda = datetime.strptime(
+                venda.data_venda,
+                "%Y-%m-%d %H:%M:%S",
+            )
+
+        except ValueError:
+
+            continue
+
+        tempo_decorrido = (agora - data_venda).total_seconds()
+
+        # Produto usado possui prazo fixo de 1 dia
+        tempo_total = 24 * 60 * 60
+
+        if tempo_decorrido < tempo_total:
+            continue
+
+        vendedor = (
+            db.query(models.Cliente)
+            .filter(models.Cliente.id == venda.vendedor_id)
+            .first()
+        )
+
+        comprador = (
+            db.query(models.Cliente)
+            .filter(models.Cliente.id == venda.comprador_id)
+            .first()
+        )
+
+        item = (
+            db.query(models.ItemEspacoCliente)
+            .filter(models.ItemEspacoCliente.id == venda.item_espaco_id)
+            .first()
+        )
+
+        if vendedor is None or comprador is None or item is None:
+            continue
+
+        valor_vendedor = round(venda.preco_venda * 0.60, 2)
+        valor_valt_on = round(venda.preco_venda * 0.40, 2)
+
+        vendedor.saldo_cvt += valor_vendedor
+
+        venda.valor_vendedor = valor_vendedor
+        venda.valor_valt_on = valor_valt_on
+        venda.status = "ENTREGUE"
+
+        item.status = "EXCLUIDO"
+        item.preco_venda = None
+
+        figurinha = models.ItemEspacoCliente(
+            espaco_id=venda.espaco_comprador_id,
+            produto_id=venda.produto_id,
+            data_entrada=agora.strftime("%Y-%m-%d %H:%M:%S"),
+        )
+
+        db.add(figurinha)
+
+        db.commit()
+
+        print(
+            f"Venda usada #{venda.id}: "
+            f"EM_ENTREGA -> ENTREGUE"
+        )
+
+        print(
+            f"Venda usada #{venda.id}: "
+            f"Vendedor recebeu {valor_vendedor:.2f} CVT"
+        )
+
+        print(
+            f"Venda usada #{venda.id}: "
+            f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
+        )

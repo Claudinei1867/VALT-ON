@@ -96,3 +96,17 @@ class PedidoResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# =========================================================
+# VENDAS DE PRODUTOS USADOS
+# =========================================================
+
+class VendaUsadoCriar(BaseModel):
+    cliente_id: int
+    item_id: int
+    preco_venda: float
+
+class CompraUsadoCriar(BaseModel):
+    cliente_id: int
+    venda_id: int
+    espaco_id: int
