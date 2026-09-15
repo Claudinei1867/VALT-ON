@@ -9,6 +9,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [aceitouSimulador, setAceitouSimulador] = useState(false);
 
   const cadastrar = async (e) => {
     e.preventDefault();
@@ -18,6 +19,13 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
 
     if (!nome.trim() || !email.trim() || !senha.trim()) {
       setErro("Preencha todos os campos.");
+      return;
+    }
+
+    if (!aceitouSimulador) {
+      setErro(
+        "Você precisa ler e confirmar que o VALT-ON é um simulador de vendas on-line e não realiza vendas reais."
+      );
       return;
     }
 
@@ -48,6 +56,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
       setNome("");
       setEmail("");
       setSenha("");
+      setAceitouSimulador(false);
 
       if (onCadastroSucesso) {
         onCadastroSucesso(dados);
@@ -61,40 +70,163 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
   };
 
   return (
-    <div className="pagina-cadastro">
-      <h2>📝 Cadastro</h2>
+    <div
+      className="pagina-cadastro"
+      style={{
+        width: "100%",
+        maxWidth: "500px",
+        margin: "30px auto",
+        padding: "25px",
+        boxSizing: "border-box",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "28px",
+          marginBottom: "10px",
+          textAlign: "center",
+        }}
+      >
+        📝 Cadastro
+      </h2>
 
-      <p>Crie sua conta na VALT-ON</p>
+      <p
+        style={{
+          fontSize: "18px",
+          textAlign: "center",
+          marginBottom: "25px",
+        }}
+      >
+        Crie sua conta na VALT-ON
+      </p>
 
-      <form onSubmit={cadastrar}>
-        <div>
+      <form
+        onSubmit={cadastrar}
+        style={{
+          width: "100%",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: "18px",
+          }}
+        >
           <label>Nome</label>
           <input
             type="text"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             placeholder="Digite seu nome"
+            style={{
+              width: "100%",
+              padding: "14px",
+              fontSize: "17px",
+              boxSizing: "border-box",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              marginTop: "6px",
+            }}
           />
         </div>
 
-        <div>
+        <div
+          style={{
+            marginBottom: "18px",
+          }}
+        >
           <label>E-mail</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Digite seu e-mail"
+            style={{
+              width: "100%",
+              padding: "14px",
+              fontSize: "17px",
+              boxSizing: "border-box",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              marginTop: "6px",
+            }}
           />
         </div>
 
-        <div>
+        <div
+          style={{
+            marginBottom: "18px",
+          }}
+        >
           <label>Senha</label>
           <input
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             placeholder="Digite sua senha"
+            style={{
+              width: "100%",
+              padding: "14px",
+              fontSize: "17px",
+              boxSizing: "border-box",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              marginTop: "6px",
+            }}
           />
+        </div>
+
+        <div
+          style={{
+            marginTop: "10px",
+            marginBottom: "20px",
+            padding: "15px",
+            borderRadius: "8px",
+            backgroundColor: "#f0f0f0",
+            border: "1px solid #ccc",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 12px 0",
+              fontSize: "15px",
+              lineHeight: "1.5",
+              textAlign: "left",
+            }}
+          >
+            O VALT-ON é um simulador de vendas on-line para fins de demonstração e
+            aprendizado. Não são realizadas vendas reais nem transações financeiras
+            reais.
+          </p>
+
+          <label
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "10px",
+              fontSize: "15px",
+              lineHeight: "1.4",
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={aceitouSimulador}
+              onChange={(e) =>
+                setAceitouSimulador(e.target.checked)
+              }
+              style={{
+                width: "20px",
+                height: "20px",
+                flexShrink: 0,
+                marginTop: "1px",
+              }}
+            />
+
+            <span>
+              Li e estou ciente de que o VALT-ON é um simulador de vendas on-line e
+              não realiza vendas reais.
+            </span>
+          </label>
         </div>
 
         {mensagem && (
