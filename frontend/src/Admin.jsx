@@ -107,6 +107,38 @@ function Admin({ usuario, onVoltar }) {
         setMensagem("Erro ao carregar sugestoes.");
       });
   };
+  const alterarStatusSugestao = async (sugestaoId, novoStatus) => {
+    try {
+      const resposta = await fetch(
+        `${API_URL}/sugestoes/${sugestaoId}/status?status=${encodeURIComponent(
+          novoStatus
+        )}&admin_id=${usuario.admin_id}`,
+        {
+          method: "PUT",
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail || "Erro ao alterar status da sugestão."
+        );
+      }
+
+      setSugestoes((sugestoesAtuais) =>
+        sugestoesAtuais.map((sugestao) =>
+          sugestao.id === sugestaoId
+            ? { ...sugestao, status: dados.status }
+            : sugestao
+        )
+      );
+    } catch (erro) {
+      console.error(erro);
+      setMensagem("Erro ao alterar status da sugestão.");
+    }
+  };
+
   const alterarStatusPedido = async (pedidoId, novoStatus) => {
     try {
       const resposta = await fetch(
@@ -543,7 +575,30 @@ function Admin({ usuario, onVoltar }) {
               </div>
 
               <div>
-                <strong>Status:</strong> {sugestao.status}
+                <strong>Status:</strong>{" "}
+                <select
+                  value={sugestao.status}
+                  onChange={(evento) => {
+                    console.log(
+                      "STATUS SELECIONADO:",
+                      sugestao.id,
+                      evento.target.value
+                    );
+
+                    alterarStatusSugestao(sugestao.id, evento.target.value);
+                  }}
+                  style={{
+                    marginLeft: "5px",
+                    padding: "5px",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <option value="Pendente">Pendente</option>
+                  <option value="Em análise">Em análise</option>
+                  <option value="Respondida">Respondida</option>
+                  <option value="Encerrada">Encerrada</option>
+                </select>
               </div>
             </div>
           ))

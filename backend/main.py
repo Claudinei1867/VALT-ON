@@ -1839,6 +1839,70 @@ def criar_sugestao(
 # DIAGNOSTICO TEMPORARIO
 # =========================================================
 
+# =========================================================
+# ATUALIZAÇÃO DO STATUS DA SUGESTÃO
+# =========================================================
+
+@app.put("/sugestoes/{sugestao_id}/status")
+def atualizar_status_sugestao(
+    sugestao_id: int,
+    status: str,
+    admin_id: int,
+    db: Session = Depends(get_db),
+):
+    if admin_id != 0:
+        administrador = (
+            db.query(models.Administrador)
+            .filter(
+                models.Administrador.id == admin_id,
+                models.Administrador.ativo == 1,
+            )
+            .first()
+        )
+
+        if administrador is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Acesso permitido somente para administradores.",
+            )
+
+    status_permitidos = [
+        "Pendente",
+        "Em análise",
+        "Respondida",
+        "Encerrada",
+    ]
+
+    if status not in status_permitidos:
+        raise HTTPException(
+            status_code=400,
+            detail="Status inválido.",
+        )
+
+    sugestao = (
+        db.query(models.Sugestao)
+        .filter(models.Sugestao.id == sugestao_id)
+        .first()
+    )
+
+    if sugestao is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Sugestão não encontrada.",
+        )
+
+    sugestao.status = status
+
+    db.commit()
+    db.refresh(sugestao)
+
+    return {
+        "mensagem": "Status da sugestão atualizado com sucesso!",
+        "id": sugestao.id,
+        "status": sugestao.status,
+    }
+
+
 
 # =========================================================
 # LISTAGEM DAS SUGESTÕES
