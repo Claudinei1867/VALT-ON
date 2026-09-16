@@ -340,3 +340,53 @@ class Administrador(Base):
         nullable=False,
         default=1
     )
+
+    # =========================================================
+# SUGESTOES DOS CLIENTES
+# =========================================================
+
+class Sugestao(Base):
+    __tablename__ = "sugestoes"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    cliente_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=True
+    )
+
+    nome = Column(
+        String,
+        nullable=False
+    )
+
+    email = Column(
+        String,
+        nullable=False
+    )
+
+    tipo = Column(
+        String,
+        nullable=False
+    )
+
+    mensagem = Column(
+        String,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="Pendente"
+    )
+
+    data_criacao = Column(
+        String,
+        nullable=False
+    )

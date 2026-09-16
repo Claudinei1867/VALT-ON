@@ -1804,6 +1804,37 @@ def listar_produtos_usados(db: Session = Depends(get_db)):
 
 
 # =========================================================
+# SUGESTÕES DOS CLIENTES
+# =========================================================
+
+
+@app.post("/sugestoes")
+def criar_sugestao(
+    dados: schemas.SugestaoCriar,
+    db: Session = Depends(get_db),
+):
+    sugestao = models.Sugestao(
+        cliente_id=dados.cliente_id,
+        nome=dados.nome,
+        email=dados.email,
+        tipo=dados.tipo,
+        mensagem=dados.mensagem,
+        status="Pendente",
+        data_criacao=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
+
+    db.add(sugestao)
+    db.commit()
+    db.refresh(sugestao)
+
+    return {
+        "mensagem": "Sugestão enviada com sucesso!",
+        "id": sugestao.id,
+        "status": sugestao.status,
+    }
+
+
+# =========================================================
 # DIAGNOSTICO TEMPORARIO
 # =========================================================
 

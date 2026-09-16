@@ -110,3 +110,14 @@ class CompraUsadoCriar(BaseModel):
     cliente_id: int
     venda_id: int
     espaco_id: int
+
+    # =========================================================
+# SUGESTÕES DOS CLIENTES
+# =========================================================
+
+class SugestaoCriar(BaseModel):
+    cliente_id: int | None = None
+    nome: str
+    email: str
+    tipo: str
+    mensagem: str

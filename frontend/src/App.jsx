@@ -83,7 +83,22 @@ function App() {
   const [mostrarConta, setMostrarConta] =
     useState(false);
 
-  const [usuario, setUsuario] = useState(null);
+  const [mostrarSugestoes, setMostrarSugestoes] =
+    useState(false);
+
+  const [sugestaoNome, setSugestaoNome] =
+    useState("");
+
+  const [sugestaoEmail, setSugestaoEmail] =
+    useState("");
+
+  const [sugestaoTipo, setSugestaoTipo] =
+    useState("Sugestão");
+
+  const [sugestaoMensagem, setSugestaoMensagem] =
+    useState("");
+
+  const [usuario, setUsuario] = useState(null)
 
   const [espacos, setEspacos] = useState([]);
 
@@ -325,6 +340,7 @@ function App() {
         produto.nome
           .toLowerCase()
           .includes(
+
             pesquisa.trim().toLowerCase()
           );
 
@@ -1056,6 +1072,48 @@ function App() {
   // TELA DA LOJA
   // =====================================================
 
+  const enviarSugestao = async () => {
+    if (
+      !sugestaoNome.trim() ||
+      !sugestaoEmail.trim() ||
+      !sugestaoMensagem.trim()
+    ) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const resposta = await fetch(`${API_URL}/sugestoes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cliente_id: usuario?.id ?? null,
+          nome: sugestaoNome,
+          email: sugestaoEmail,
+          tipo: sugestaoTipo,
+          mensagem: sugestaoMensagem,
+        }),
+      });
+
+      if (!resposta.ok) {
+        throw new Error("Erro ao enviar sugestão.");
+      }
+
+      alert("Sugestão enviada com sucesso!");
+
+      setSugestaoNome("");
+      setSugestaoEmail("");
+      setSugestaoTipo("Sugestão");
+      setSugestaoMensagem("");
+      setMostrarSugestoes(false);
+    } catch (erro) {
+      alert("Não foi possível enviar a sugestão.");
+      console.error(erro);
+    }
+  };
+
   return (
     <div>
       {/* =================================================
@@ -1213,6 +1271,23 @@ function App() {
             🛍️ Produtos Usados
           </button>
 
+          {/* SUGESTÕES */}
+
+          <button
+            onClick={() => setMostrarSugestoes(true)}
+            style={{
+              padding: "10px 14px",
+              fontSize: "16px",
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "1px solid #000",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            💡 Sugestões
+          </button>
+
           {/* CARRINHO */}
 
           <button
@@ -1236,6 +1311,145 @@ function App() {
           </button>
         </div>
       </header >
+
+      {mostrarSugestoes && (
+        <div
+          style={{
+            padding: "30px 20px",
+            backgroundColor: "#e0e0e0",
+            minHeight: "400px",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "700px",
+              margin: "0 auto",
+              backgroundColor: "#fff",
+              padding: "25px",
+              borderRadius: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            }}
+          >
+            <h2
+              style={{
+                marginTop: 0,
+                color: "#000",
+              }}
+            >
+              💡 Sugestões
+            </h2>
+
+            <p>
+              Envie sua sugestão, informe um problema ou conte
+              para nós como podemos melhorar a VALT-ON.
+            </p>
+
+            <label>Nome</label>
+
+            <input
+              type="text"
+              placeholder="Seu nome"
+              value={sugestaoNome}
+              onChange={(e) => setSugestaoNome(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "5px",
+                marginBottom: "15px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            <label>E-mail</label>
+
+            <input
+              type="email"
+              placeholder="Seu e-mail"
+              value={sugestaoEmail}
+              onChange={(e) => setSugestaoEmail(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "5px",
+                marginBottom: "15px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            <label>Tipo</label>
+
+            <select
+              value={sugestaoTipo}
+              onChange={(e) => setSugestaoTipo(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "5px",
+                marginBottom: "15px",
+                boxSizing: "border-box",
+              }}
+            >
+              <option>Sugestão</option>
+              <option>Problema/erro</option>
+              <option>Melhoria</option>
+              <option>Outro</option>
+            </select>
+
+            <label>Mensagem</label>
+
+            <textarea
+              placeholder="Digite sua mensagem..."
+              value={sugestaoMensagem}
+              onChange={(e) => setSugestaoMensagem(e.target.value)}
+              rows="6"
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "5px",
+                marginBottom: "20px",
+                boxSizing: "border-box",
+                resize: "vertical",
+              }}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                onClick={() => setMostrarSugestoes(false)}
+                style={{
+                  padding: "10px 18px",
+                  backgroundColor: "#777",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={enviarSugestao}
+                style={{
+                  padding: "10px 18px",
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  border: "1px solid #000",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                📤 Enviar sugestão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =================================================
           CATEGORIAS
@@ -1296,11 +1510,24 @@ function App() {
           textAlign: "center",
         }}
       >
-        <h2>
+        <h2
+          style={{
+            color: "#222",
+            fontSize: "30px",
+            fontWeight: "700",
+            marginBottom: "10px",
+          }}
+        >
           Bem-vindo à VALT-ON
         </h2>
 
-        <p>
+        <p
+          style={{
+            color: "#444",
+            fontSize: "18px",
+            fontWeight: "500",
+          }}
+        >
           Encontre os melhores
           produtos em um só lugar.
         </p>
@@ -1326,7 +1553,14 @@ function App() {
           padding: "20px",
         }}
       >
-        <h2>
+        <h2
+          style={{
+            color: "#222",
+            fontSize: "28px",
+            fontWeight: "700",
+            marginBottom: "20px",
+          }}
+        >
           Produtos em destaque
         </h2>
 

@@ -1161,6 +1161,32 @@ function MinhaConta({
             <h2>
               🏠 {espacoAberto.nome}
             </h2>
+
+            <div
+              style={{
+                textAlign: "center",
+                marginBottom: "20px",
+                fontSize: "20px",
+                fontWeight: "bold",
+                color: "#222",
+              }}
+            >
+              🏠 Figurinhas:{" "}
+              {espacoAberto.figurinhas
+                ? espacoAberto.figurinhas.length
+                : 0}
+              {" / "}
+              {espacoAberto.tipo === "pequena"
+                ? 30
+                : espacoAberto.tipo === "media"
+                  ? 80
+                  : espacoAberto.tipo === "grande"
+                    ? 150
+                    : espacoAberto.tipo === "mansao"
+                      ? 500
+                      : 0}
+            </div>
+
             <img
               src={
                 espacoAberto.tipo === "pequena"
