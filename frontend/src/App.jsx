@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./App.css";
 
@@ -640,7 +640,7 @@ function App() {
   if (mostrarAdmin) {
     return (
       <div>
-        <Admin onVoltar={() => {
+        <Admin usuario={usuario} onVoltar={() => {
           setMostrarAdmin(false);
           carregarProdutos();
         }} />

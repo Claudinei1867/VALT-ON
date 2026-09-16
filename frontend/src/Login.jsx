@@ -69,6 +69,7 @@ function Login({ onLogin, onVoltar }) {
           onLogin({
             admin: true,
             email: dados.email,
+            admin_id: dados.admin_id,
           });
         } else {
           onLogin(dados.cliente);

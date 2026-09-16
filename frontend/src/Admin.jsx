@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 
 const API_URL = "https://valt-on.onrender.com";
 
-function Admin({ onVoltar }) {
+function Admin({ usuario, onVoltar }) {
   const [produtos, setProdutos] = useState([]);
   const [buscaProduto, setBuscaProduto] = useState("");
   const [pedidos, setPedidos] = useState([]);
   const [buscaPedido, setBuscaPedido] = useState("");
   const [quantidadeClientes, setQuantidadeClientes] = useState(0);
   const [quantidadeProdutos, setQuantidadeProdutos] = useState(0);
+  const [sugestoes, setSugestoes] = useState([]);
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -85,6 +86,27 @@ function Admin({ onVoltar }) {
       });
   };
 
+  const carregarSugestoes = () => {
+    if (usuario?.admin_id === undefined) {
+      return;
+    }
+
+    fetch(`${API_URL}/sugestoes?admin_id=${usuario.admin_id}`)
+      .then((resposta) => {
+        if (!resposta.ok) {
+          throw new Error("Erro ao carregar sugestoes");
+        }
+
+        return resposta.json();
+      })
+      .then((dados) => {
+        setSugestoes(dados);
+      })
+      .catch((erro) => {
+        console.error(erro);
+        setMensagem("Erro ao carregar sugestoes.");
+      });
+  };
   const alterarStatusPedido = async (pedidoId, novoStatus) => {
     try {
       const resposta = await fetch(
@@ -127,6 +149,7 @@ function Admin({ onVoltar }) {
     carregarProdutos();
     carregarPedidos();
     carregarEstatisticas();
+    carregarSugestoes();
   }, []);
 
   // =====================================================
@@ -476,6 +499,55 @@ function Admin({ onVoltar }) {
             Produtos cadastrados
           </div>
         </div>
+      </div>
+
+      {/* =====================================================
+          SUGESTÕES DOS USUÁRIOS
+      ===================================================== */}
+
+      <div style={{ marginBottom: "30px" }}>
+        <h2>💡 Sugestões dos usuários</h2>
+
+        {sugestoes.length === 0 ? (
+          <p>Nenhuma sugestão recebida.</p>
+        ) : (
+          sugestoes.map((sugestao) => (
+            <div
+              key={sugestao.id}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                padding: "15px",
+                marginBottom: "15px",
+                background: "#f9f9f9",
+              }}
+            >
+              <div style={{ marginBottom: "8px" }}>
+                <strong>Nome:</strong> {sugestao.nome}
+              </div>
+
+              <div style={{ marginBottom: "8px" }}>
+                <strong>E-mail:</strong> {sugestao.email}
+              </div>
+
+              <div style={{ marginBottom: "8px" }}>
+                <strong>Tipo:</strong> {sugestao.tipo}
+              </div>
+
+              <div style={{ marginBottom: "8px" }}>
+                <strong>Mensagem:</strong> {sugestao.mensagem}
+              </div>
+
+              <div style={{ marginBottom: "8px" }}>
+                <strong>Data:</strong> {sugestao.data_criacao}
+              </div>
+
+              <div>
+                <strong>Status:</strong> {sugestao.status}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div style={{ marginBottom: "25px" }}>

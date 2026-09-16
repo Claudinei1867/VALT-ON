@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -982,6 +982,7 @@ def login_admin(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
             "mensagem": "Login de administrador realizado com sucesso!",
             "admin": True,
             "email": dados.email,
+            "admin_id": 0,
         }
 
     # DEMAIS ADMINISTRADORES
@@ -1839,6 +1840,50 @@ def criar_sugestao(
 # =========================================================
 
 
+# =========================================================
+# LISTAGEM DAS SUGESTÕES
+# =========================================================
+
+@app.get("/sugestoes")
+def listar_sugestoes(
+    admin_id: int,
+    db: Session = Depends(get_db),
+):
+    if admin_id != 0:
+        administrador = (
+            db.query(models.Administrador)
+            .filter(
+                models.Administrador.id == admin_id,
+                models.Administrador.ativo == 1,
+            )
+            .first()
+        )
+
+        if administrador is None:
+            raise HTTPException(
+                status_code=403,
+                detail="Acesso permitido somente para administradores.",
+            )
+
+    sugestoes = (
+        db.query(models.Sugestao)
+        .order_by(models.Sugestao.id.desc())
+        .all()
+    )
+
+    return [
+        {
+            "id": sugestao.id,
+            "cliente_id": sugestao.cliente_id,
+            "nome": sugestao.nome,
+            "email": sugestao.email,
+            "tipo": sugestao.tipo,
+            "mensagem": sugestao.mensagem,
+            "status": sugestao.status,
+            "data_criacao": sugestao.data_criacao,
+        }
+        for sugestao in sugestoes
+    ]
 @app.get("/diagnostico-versao")
 def diagnostico_versao():
     return {
