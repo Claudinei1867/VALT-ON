@@ -309,6 +309,48 @@ class VendaUsado(Base):
 
 
 # =========================================================
+# =========================================================
+# OFERTAS DE PRODUTOS USADOS
+# =========================================================
+
+
+class OfertaUsado(Base):
+    __tablename__ = "ofertas_usados"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    venda_id = Column(
+        Integer,
+        ForeignKey("vendas_usados.id"),
+        nullable=False
+    )
+
+    comprador_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    valor_oferta = Column(
+        Float,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="PENDENTE"
+    )
+
+    data_oferta = Column(
+        String,
+        nullable=False
+    )
+
 # ADMINISTRADORES
 # =========================================================
 

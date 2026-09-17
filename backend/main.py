@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+﻿from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -1980,6 +1980,143 @@ def diagnostico_versao():
         "arquivo": __file__,
         "confirmar_email": any(rota.path == "/confirmar-email" for rota in app.routes),
     }
+
+# =========================================================
+# ENVIAR OFERTA POR PRODUTO USADO
+# =========================================================
+
+@app.post("/produtos-usados/ofertar")
+def enviar_oferta_produto_usado(
+    dados: schemas.OfertaUsadoCriar,
+    db: Session = Depends(get_db),
+):
+    comprador = (
+        db.query(models.Cliente)
+        .filter(models.Cliente.id == dados.comprador_id)
+        .first()
+    )
+
+    if comprador is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Comprador não encontrado.",
+        )
+
+    venda = (
+        db.query(models.VendaUsado)
+        .filter(models.VendaUsado.id == dados.venda_id)
+        .first()
+    )
+
+    if venda is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Venda não encontrada.",
+        )
+
+    if venda.status != "DISPONIVEL":
+        raise HTTPException(
+            status_code=400,
+            detail="Esta venda não está mais disponível.",
+        )
+
+    if venda.vendedor_id == dados.comprador_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Você não pode fazer uma oferta para o próprio produto.",
+        )
+
+    if dados.valor_oferta <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="O valor da oferta deve ser maior que zero.",
+        )
+
+    if dados.valor_oferta > venda.preco_venda:
+        raise HTTPException(
+            status_code=400,
+            detail="A oferta não pode ultrapassar o preço anunciado.",
+        )
+
+    oferta = models.OfertaUsado(
+        venda_id=venda.id,
+        comprador_id=dados.comprador_id,
+        valor_oferta=dados.valor_oferta,
+        status="PENDENTE",
+        data_oferta=datetime.now().isoformat(),
+    )
+
+    db.add(oferta)
+    db.commit()
+    db.refresh(oferta)
+
+    return {
+        "mensagem": "Oferta enviada com sucesso!",
+        "id": oferta.id,
+        "venda_id": oferta.venda_id,
+        "comprador_id": oferta.comprador_id,
+        "valor_oferta": oferta.valor_oferta,
+        "status": oferta.status,
+        "data_oferta": oferta.data_oferta,
+    }
+
+    # =========================================================
+# LISTAR OFERTAS RECEBIDAS PELO VENDEDOR
+# =========================================================
+
+@app.get("/produtos-usados/ofertas/{vendedor_id}")
+def listar_ofertas_produtos_usados(
+    vendedor_id: int,
+    db: Session = Depends(get_db),
+):
+    ofertas = (
+        db.query(
+            models.OfertaUsado,
+            models.VendaUsado,
+            models.Produto,
+            models.Cliente,
+        )
+        .join(
+            models.VendaUsado,
+            models.VendaUsado.id == models.OfertaUsado.venda_id,
+        )
+        .join(
+            models.Produto,
+            models.Produto.id == models.VendaUsado.produto_id,
+        )
+        .join(
+            models.Cliente,
+            models.Cliente.id == models.OfertaUsado.comprador_id,
+        )
+        .filter(
+            models.VendaUsado.vendedor_id == vendedor_id,
+        )
+        .order_by(
+            models.OfertaUsado.id.desc()
+        )
+        .all()
+    )
+
+    resultado = []
+
+    for oferta, venda, produto, comprador in ofertas:
+        resultado.append(
+            {
+                "oferta_id": oferta.id,
+                "venda_id": venda.id,
+                "produto_id": produto.id,
+                "produto_nome": produto.nome,
+                "comprador_id": comprador.id,
+                "comprador_nome": comprador.nome,
+                "preco_venda": venda.preco_venda,
+                "valor_oferta": oferta.valor_oferta,
+                "status": oferta.status,
+                "data_oferta": oferta.data_oferta,
+            }
+        )
+
+    return resultado
+
 
 # =========================================================
 # COMPRAR PRODUTO USADO
