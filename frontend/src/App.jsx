@@ -1163,6 +1163,7 @@ function App() {
               fontSize: "16px",
               backgroundColor: "#e0e0e0",
               border: "1px solid #000",
+              color: "#000",
               borderRadius: "6px",
               width: "220px",
             }}
