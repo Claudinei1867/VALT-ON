@@ -386,6 +386,11 @@ class Sugestao(Base):
         default="Pendente"
     )
 
+    resposta_admin = Column(
+        String,
+        nullable=True
+    )
+
     data_criacao = Column(
         String,
         nullable=False

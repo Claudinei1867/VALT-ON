@@ -1832,6 +1832,7 @@ def criar_sugestao(
         "mensagem": "Sugestão enviada com sucesso!",
         "id": sugestao.id,
         "status": sugestao.status,
+        "resposta_admin": sugestao.resposta_admin,
     }
 
 
@@ -1848,6 +1849,7 @@ def atualizar_status_sugestao(
     sugestao_id: int,
     status: str,
     admin_id: int,
+    resposta_admin: str | None = None,
     db: Session = Depends(get_db),
 ):
     if admin_id != 0:
@@ -1893,13 +1895,36 @@ def atualizar_status_sugestao(
 
     sugestao.status = status
 
+    if resposta_admin is not None:
+        sugestao.resposta_admin = resposta_admin
+
     db.commit()
     db.refresh(sugestao)
+
+    if status == "Respondida" and sugestao.resposta_admin:
+        assunto = "Resposta ? sua sugest?o - VALT-ON"
+
+        mensagem_email = (
+            f"Ol?, {sugestao.nome}!\n\n"
+            "Recebemos sua sugest?o enviada ao VALT-ON.\n\n"
+            f"Sua mensagem:\n{sugestao.mensagem}\n\n"
+            "Resposta do administrador:\n"
+            f"{sugestao.resposta_admin}\n\n"
+            "Atenciosamente,\n"
+            "Equipe VALT-ON"
+        )
+
+        enviar_email(
+            sugestao.email,
+            assunto,
+            mensagem_email,
+        )
 
     return {
         "mensagem": "Status da sugestão atualizado com sucesso!",
         "id": sugestao.id,
         "status": sugestao.status,
+        "resposta_admin": sugestao.resposta_admin,
     }
 
 
@@ -1944,6 +1969,7 @@ def listar_sugestoes(
             "tipo": sugestao.tipo,
             "mensagem": sugestao.mensagem,
             "status": sugestao.status,
+            "resposta_admin": sugestao.resposta_admin,
             "data_criacao": sugestao.data_criacao,
         }
         for sugestao in sugestoes

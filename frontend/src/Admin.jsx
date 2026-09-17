@@ -107,12 +107,18 @@ function Admin({ usuario, onVoltar }) {
         setMensagem("Erro ao carregar sugestoes.");
       });
   };
-  const alterarStatusSugestao = async (sugestaoId, novoStatus) => {
+  const alterarStatusSugestao = async (
+    sugestaoId,
+    novoStatus,
+    respostaAdmin
+  ) => {
     try {
       const resposta = await fetch(
         `${API_URL}/sugestoes/${sugestaoId}/status?status=${encodeURIComponent(
           novoStatus
-        )}&admin_id=${usuario.admin_id}`,
+        )}&admin_id=${usuario.admin_id}&resposta_admin=${encodeURIComponent(
+          respostaAdmin || ""
+        )}`,
         {
           method: "PUT",
         }
@@ -129,7 +135,7 @@ function Admin({ usuario, onVoltar }) {
       setSugestoes((sugestoesAtuais) =>
         sugestoesAtuais.map((sugestao) =>
           sugestao.id === sugestaoId
-            ? { ...sugestao, status: dados.status }
+            ? { ...sugestao, status: dados.status, resposta_admin: dados.resposta_admin }
             : sugestao
         )
       );
@@ -574,18 +580,49 @@ function Admin({ usuario, onVoltar }) {
                 <strong>Data:</strong> {sugestao.data_criacao}
               </div>
 
+              <div style={{ marginBottom: "12px" }}>
+                <strong>Resposta do administrador:</strong>
+                <textarea
+                  value={sugestao.resposta_admin || ""}
+                  onChange={(evento) => {
+                    const novaResposta = evento.target.value;
+
+                    setSugestoes((sugestoesAtuais) =>
+                      sugestoesAtuais.map((item) =>
+                        item.id === sugestao.id
+                          ? { ...item, resposta_admin: novaResposta }
+                          : item
+                      )
+                    );
+                  }}
+                  placeholder="Digite aqui a resposta para o usu?rio..."
+                  rows={4}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    maxWidth: "700px",
+                    marginTop: "6px",
+                    padding: "10px",
+                    boxSizing: "border-box",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
               <div>
                 <strong>Status:</strong>{" "}
                 <select
                   value={sugestao.status}
                   onChange={(evento) => {
-                    console.log(
-                      "STATUS SELECIONADO:",
-                      sugestao.id,
-                      evento.target.value
-                    );
 
-                    alterarStatusSugestao(sugestao.id, evento.target.value);
+
+                    alterarStatusSugestao(
+                      sugestao.id,
+                      evento.target.value,
+                      sugestao.resposta_admin
+                    );
                   }}
                   style={{
                     marginLeft: "5px",
