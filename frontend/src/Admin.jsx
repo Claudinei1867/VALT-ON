@@ -10,6 +10,7 @@ function Admin({ usuario, onVoltar }) {
   const [quantidadeClientes, setQuantidadeClientes] = useState(0);
   const [quantidadeProdutos, setQuantidadeProdutos] = useState(0);
   const [sugestoes, setSugestoes] = useState([]);
+  const [secaoAdmin, setSecaoAdmin] = useState("inicio");
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
