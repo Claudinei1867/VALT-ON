@@ -1222,6 +1222,49 @@ function App() {
             ))}
           </div>
         )}
+      {usuario && ofertasRecebidasUsados.length > 0 && (
+        <div
+          style={{
+            marginTop: "30px",
+            marginBottom: "20px",
+          }}
+        >
+          <h2>Ofertas recebidas</h2>
+
+          {ofertasRecebidasUsados.map((oferta) => (
+            <div
+              key={oferta.oferta_id}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "15px",
+                marginTop: "10px",
+                backgroundColor: "#fff",
+              }}
+            >
+              <p>
+                <strong>Produto:</strong>{" "}
+                {oferta.produto_nome}
+              </p>
+
+              <p>
+                <strong>Comprador:</strong>{" "}
+                {oferta.comprador_nome}
+              </p>
+
+              <p>
+                <strong>Valor da oferta:</strong>{" "}
+                {Number(oferta.valor_oferta).toFixed(2)} CVT
+              </p>
+
+              <p>
+                <strong>Status:</strong>{" "}
+                {oferta.status}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
       </div>
     );
   }
