@@ -2277,6 +2277,159 @@ def comprar_produto_usado(
     }
 
 # =========================================================
+# ACEITAR OFERTA DE PRODUTO USADO
+# =========================================================
+
+
+@app.post("/produtos-usados/ofertas/aceitar")
+def aceitar_oferta_produto_usado(
+    oferta_id: int,
+    vendedor_id: int,
+    espaco_id: int,
+    db: Session = Depends(get_db),
+):
+
+    oferta = (
+        db.query(models.OfertaUsado)
+        .filter(models.OfertaUsado.id == oferta_id)
+        .first()
+    )
+
+    if oferta is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Oferta nao encontrada.",
+        )
+
+    if oferta.status != "PENDENTE":
+        raise HTTPException(
+            status_code=400,
+            detail="Esta oferta nao esta mais pendente.",
+        )
+
+    venda = (
+        db.query(models.VendaUsado)
+        .filter(models.VendaUsado.id == oferta.venda_id)
+        .first()
+    )
+
+    if venda is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Anuncio de produto usado nao encontrado.",
+        )
+
+    if venda.vendedor_id != vendedor_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Voce nao pode aceitar uma oferta desta venda.",
+        )
+
+    if venda.status != "DISPONIVEL":
+        raise HTTPException(
+            status_code=400,
+            detail="Este produto usado nao esta mais disponivel para venda.",
+        )
+
+    comprador = (
+        db.query(models.Cliente)
+        .filter(models.Cliente.id == oferta.comprador_id)
+        .first()
+    )
+
+    if comprador is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Cliente comprador nao encontrado.",
+        )
+
+    espaco = (
+        db.query(models.EspacoCliente)
+        .filter(
+            models.EspacoCliente.id == espaco_id,
+            models.EspacoCliente.cliente_id == oferta.comprador_id,
+        )
+        .first()
+    )
+
+    if espaco is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Espaco invalido ou nao pertence ao comprador.",
+        )
+
+    config = CASAS_CONFIG.get(espaco.tipo)
+
+    if config is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Configuracao da casa nao encontrada.",
+        )
+
+    itens_na_casa = (
+        db.query(models.ItemEspacoCliente)
+        .filter(
+            models.ItemEspacoCliente.espaco_id == espaco.id,
+            models.ItemEspacoCliente.status != "EXCLUIDO",
+        )
+        .count()
+    )
+
+    if itens_na_casa >= config["capacidade"]:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"A casa atingiu sua capacidade maxima de "
+                f"{config['capacidade']} itens."
+            ),
+        )
+
+    if comprador.saldo_cvt < oferta.valor_oferta:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Saldo CVT insuficiente. "
+                f"Saldo disponivel: {comprador.saldo_cvt:.2f} CVT. "
+                f"Valor da oferta: {oferta.valor_oferta:.2f} CVT."
+            ),
+        )
+
+    data_venda = datetime.now()
+    data_entrega_prevista = data_venda + timedelta(days=1)
+
+    comprador.saldo_cvt -= oferta.valor_oferta
+
+    venda.preco_venda = oferta.valor_oferta
+    venda.comprador_id = oferta.comprador_id
+    venda.espaco_comprador_id = espaco_id
+    venda.status = "EM_ENTREGA"
+    venda.data_venda = data_venda.strftime("%Y-%m-%d %H:%M:%S")
+    venda.data_entrega_prevista = data_entrega_prevista.strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    oferta.status = "ACEITA"
+
+    db.commit()
+    db.refresh(venda)
+    db.refresh(oferta)
+
+    return {
+        "mensagem": "Oferta aceita com sucesso.",
+        "oferta_id": oferta.id,
+        "venda_id": venda.id,
+        "produto_id": venda.produto_id,
+        "valor_oferta": oferta.valor_oferta,
+        "comprador_id": venda.comprador_id,
+        "espaco_comprador_id": venda.espaco_comprador_id,
+        "status_oferta": oferta.status,
+        "status_venda": venda.status,
+        "data_entrega_prevista": venda.data_entrega_prevista,
+        "saldo_cvt": comprador.saldo_cvt,
+    }
+
+
+# =========================================================
 # ATUALIZAR VENDAS DE PRODUTOS USADOS AUTOMATICAMENTE
 # =========================================================
 
