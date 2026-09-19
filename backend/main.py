@@ -121,7 +121,7 @@ def conceder_credito_semanal(db: Session):
         # no mesmo domingo
         if cliente.ultimo_credito_cvt != data_domingo:
 
-            cliente.saldo_cvt += 1000.0
+            cliente.saldo_cvt += 500.0
 
             cliente.ultimo_credito_cvt = data_domingo
 
