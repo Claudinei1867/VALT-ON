@@ -335,6 +335,12 @@ class OfertaUsado(Base):
         nullable=False
     )
 
+    espaco_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=False
+    )
+
     valor_oferta = Column(
         Float,
         nullable=False
