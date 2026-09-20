@@ -940,7 +940,7 @@ function App() {
           alignItems: "center",
           justifyContent:
             "space-between",
-          padding: "20px",
+          padding: "14px",
           borderBottom:
             "1px solid #ddd",
           flexWrap: "wrap",
