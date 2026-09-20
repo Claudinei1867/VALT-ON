@@ -798,6 +798,14 @@ function Admin({ usuario, onVoltar }) {
             <option value="Esportes">
               Esportes
             </option>
+
+            <option value="Pet">
+              Pet
+            </option>
+
+            <option value="Infantil">
+              Infantil
+            </option>
           </select>
         </div>
 
