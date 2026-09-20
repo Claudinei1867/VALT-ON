@@ -119,6 +119,13 @@ class OfertaUsadoCriar(BaseModel):
     comprador_id: int
     venda_id: int
     valor_oferta: float
+    espaco_id: int
+
+
+class OfertaUsadoAceitarCriar(BaseModel):
+    oferta_id: int
+    comprador_id: int
+    espaco_id: int
 # =========================================================
 # SUGESTÕES DOS CLIENTES
 # =========================================================
