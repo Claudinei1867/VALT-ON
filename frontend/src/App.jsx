@@ -8,6 +8,8 @@ import Cadastro from "./Cadastro";
 import MinhaConta from "./MinhaConta";
 import ProdutoDetalhes from "./ProdutoDetalhes";
 import RedefinirSenha from "./RedefinirSenha";
+import ProdutosUsados from "./pages/ProdutosUsados";
+import BotoesNavegacao from "./components/BotoesNavegacao";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -70,6 +72,9 @@ function App() {
     useState(null);
 
   const [espacoUsadoSelecionado, setEspacoUsadoSelecionado] =
+    useState("");
+
+  const [espacoOfertaSelecionado, setEspacoOfertaSelecionado] =
     useState("");
 
   const [produtoUsadoOfertaSelecionado, setProdutoUsadoOfertaSelecionado] =
@@ -773,502 +778,29 @@ function App() {
 
   if (mostrarProdutosUsados) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#e0e0e0",
-          padding: "20px",
-        }}
-      >
-        <h1>🛍️ Produtos Usados</h1>
-
-        <button
-          onClick={() =>
-            setMostrarProdutosUsados(false)
-          }
-          style={{
-            padding: "10px 14px",
-            fontSize: "16px",
-            backgroundColor: "#000",
-            color: "#fff",
-            border: "1px solid #000",
-            borderRadius: "6px",
-            cursor: "pointer",
-            marginBottom: "20px",
-          }}
-        >
-          ← Voltar para a loja
-        </button>
-
-        {produtoUsadoSelecionado && (
-          <div
-            style={{
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <h2>🏠 Escolha a casa de destino</h2>
-
-            <p>
-              Produto:{" "}
-              <strong>
-                {produtoUsadoSelecionado.nome}
-              </strong>
-            </p>
-
-            <p>
-              Preço:{" "}
-              <strong>
-                {Number(
-                  produtoUsadoSelecionado.preco_venda
-                ).toFixed(2)}{" "}
-                CVT
-              </strong>
-            </p>
-
-            {espacos.length === 0 ? (
-              <p>
-                Você ainda não possui nenhuma casa disponível.
-              </p>
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                  maxWidth: "500px",
-                }}
-              >
-                {espacos.map((espaco) => (
-                  <button
-                    key={espaco.id}
-                    onClick={() =>
-                      setEspacoUsadoSelecionado(
-                        String(espaco.id)
-                      )
-                    }
-                    style={{
-                      padding: "12px",
-                      fontSize: "16px",
-                      textAlign: "left",
-                      backgroundColor:
-                        String(espaco.id) ===
-                          String(espacoUsadoSelecionado)
-                          ? "#d0ffd0"
-                          : "#f5f5f5",
-                      border:
-                        String(espaco.id) ===
-                          String(espacoUsadoSelecionado)
-                          ? "2px solid #008000"
-                          : "1px solid #ccc",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    🏠 {espaco.nome}
-                  </button>
-                ))}
-              </div>
-            )}
-            {espacoUsadoSelecionado && (
-              <button
-                onClick={async () => {
-                  try {
-                    const resposta = await fetch(
-                      `${API_URL}/produtos-usados/comprar`,
-                      {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          cliente_id: usuario.id,
-                          venda_id:
-                            produtoUsadoSelecionado.venda_id,
-                          espaco_id: Number(
-                            espacoUsadoSelecionado
-                          ),
-                        }),
-                      }
-                    );
-
-                    const dados = await resposta.json();
-
-                    if (!resposta.ok) {
-                      throw new Error(
-                        dados.detail ||
-                        "Erro ao comprar produto usado."
-                      );
-                    }
-
-                    alert(
-                      "Produto usado comprado com sucesso!"
-                    );
-
-                    setProdutoUsadoSelecionado(null);
-                    setEspacoUsadoSelecionado("");
-
-                    await carregarProdutosUsados();
-                  } catch (error) {
-                    console.error(
-                      "ERRO AO COMPRAR PRODUTO USADO:",
-                      error
-                    );
-
-                    alert(
-                      error.message ||
-                      "Não foi possível concluir a compra."
-                    );
-                  }
-                }}
-                style={{
-                  marginTop: "15px",
-                  padding: "12px 18px",
-                  fontSize: "16px",
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  border: "1px solid #000",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                ✅ Confirmar compra
-              </button>
-            )}
-          </div>
-        )}
-
-        {produtoUsadoOfertaSelecionado && (
-          <div
-            style={{
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "20px",
-              marginBottom: "20px",
-              maxWidth: "500px",
-            }}
-          >
-            <h2>Fazer oferta</h2>
-
-            <p>
-              Produto:{" "}
-              <strong>
-                {produtoUsadoOfertaSelecionado.nome}
-              </strong>
-            </p>
-
-            <p>
-              Preço anunciado:{" "}
-              <strong>
-                {Number(
-                  produtoUsadoOfertaSelecionado.preco_venda
-                ).toFixed(2)}{" "}
-                CVT
-              </strong>
-            </p>
-
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-              }}
-            >
-              Valor da sua oferta:
-            </label>
-
-            <input
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={valorOfertaUsado}
-              onChange={(e) =>
-                setValorOfertaUsado(e.target.value)
-              }
-              placeholder="Digite o valor em CVT"
-              style={{
-                width: "100%",
-                padding: "10px",
-                fontSize: "16px",
-                border: "1px solid #ccc",
-                borderRadius: "6px",
-                boxSizing: "border-box",
-              }}
-            />
-
-            <button
-              onClick={async () => {
-                try {
-                  const valor = Number(valorOfertaUsado);
-
-                  if (!valor || valor <= 0) {
-                    alert("Digite um valor de oferta válido.");
-                    return;
-                  }
-
-                  if (
-                    valor >
-                    Number(
-                      produtoUsadoOfertaSelecionado.preco_venda
-                    )
-                  ) {
-                    alert(
-                      "A oferta não pode ultrapassar o preço anunciado."
-                    );
-                    return;
-                  }
-
-                  const resposta = await fetch(
-                    `${API_URL}/produtos-usados/ofertar`,
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        comprador_id: usuario.id,
-                        venda_id:
-                          produtoUsadoOfertaSelecionado.venda_id,
-                        valor_oferta: valor,
-                      }),
-                    }
-                  );
-
-                  const dados = await resposta.json();
-
-                  if (!resposta.ok) {
-                    throw new Error(
-                      dados.detail ||
-                      "Erro ao enviar oferta."
-                    );
-                  }
-
-                  alert(
-                    "Oferta enviada com sucesso!"
-                  );
-
-                  setProdutoUsadoOfertaSelecionado(null);
-                  setValorOfertaUsado("");
-                } catch (error) {
-                  console.error(
-                    "ERRO AO ENVIAR OFERTA:",
-                    error
-                  );
-
-                  alert(
-                    error.message ||
-                    "Não foi possível enviar a oferta."
-                  );
-                }
-              }}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "15px",
-                fontSize: "16px",
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "1px solid #000",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              Enviar oferta
-            </button>
-
-            <button
-              onClick={() => {
-                setProdutoUsadoOfertaSelecionado(null);
-                setValorOfertaUsado("");
-              }}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "10px",
-                fontSize: "16px",
-                backgroundColor: "#fff",
-                color: "#000",
-                border: "1px solid #000",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              Cancelar
-            </button>
-          </div>
-        )}
-
-        {carregandoProdutosUsados ? (
-          <p>Carregando produtos usados...</p>
-        ) : produtosUsados.length === 0 ? (
-          <p>
-            Nenhum produto usado está disponível para venda no momento.
-          </p>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(220px, 1fr))",
-              gap: "20px",
-            }}
-          >
-            {produtosUsados.map((produto) => (
-              <div
-                key={produto.venda_id}
-                style={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "15px",
-                }}
-              >
-                <h2>{produto.nome}</h2>
-
-                {produto.imagem && (
-                  <img
-                    src={obterUrlImagem(
-                      produto.imagem
-                    )}
-                    alt={produto.nome}
-                    style={{
-                      width: "100%",
-                      height: "180px",
-                      objectFit: "contain",
-                    }}
-                  />
-                )}
-
-                <p>
-                  Preço original:{" "}
-                  {Number(
-                    produto.preco_original
-                  ).toFixed(2)}{" "}
-                  CVT
-                </p>
-
-                <p>
-                  <strong>
-                    Preço usado:{" "}
-                    {Number(
-                      produto.preco_venda
-                    ).toFixed(2)}{" "}
-                    CVT
-                  </strong>
-                </p>
-
-                <p>
-                  Vendedor:{" "}
-                  {produto.vendedor_nome}
-                </p>
-
-                <button
-                  onClick={() => {
-                    if (!usuario) {
-                      alert(
-                        "Você precisa estar logado para comprar um produto usado."
-                      );
-                      return;
-                    }
-
-                    setProdutoUsadoSelecionado(produto);
-                    setEspacoUsadoSelecionado("");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    marginTop: "10px",
-                    fontSize: "16px",
-                    backgroundColor: "#000",
-                    color: "#fff",
-                    border: "1px solid #000",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  🛒 Comprar produto
-                </button>
-                <button
-                  onClick={() => {
-                    if (!usuario) {
-                      alert(
-                        "Você precisa estar logado para fazer uma oferta."
-                      );
-                      return;
-                    }
-
-                    setProdutoUsadoOfertaSelecionado(produto);
-                    setValorOfertaUsado("");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    marginTop: "10px",
-                    fontSize: "16px",
-                    backgroundColor: "#fff",
-                    color: "#000",
-                    border: "1px solid #000",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Fazer oferta
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      {usuario && ofertasRecebidasUsados.length > 0 && (
-        <div
-          style={{
-            marginTop: "30px",
-            marginBottom: "20px",
-          }}
-        >
-          <h2>Ofertas recebidas</h2>
-
-          {ofertasRecebidasUsados.map((oferta) => (
-            <div
-              key={oferta.oferta_id}
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                padding: "15px",
-                marginTop: "10px",
-                backgroundColor: "#fff",
-              }}
-            >
-              <p>
-                <strong>Produto:</strong>{" "}
-                {oferta.produto_nome}
-              </p>
-
-              <p>
-                <strong>Comprador:</strong>{" "}
-                {oferta.comprador_nome}
-              </p>
-
-              <p>
-                <strong>Valor da oferta:</strong>{" "}
-                {Number(oferta.valor_oferta).toFixed(2)} CVT
-              </p>
-
-              <p>
-                <strong>Status:</strong>{" "}
-                {oferta.status}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-      </div>
+      <ProdutosUsados
+        usuario={usuario}
+        espacos={espacos}
+        produtoUsadoSelecionado={produtoUsadoSelecionado}
+        setProdutoUsadoSelecionado={setProdutoUsadoSelecionado}
+        espacoUsadoSelecionado={espacoUsadoSelecionado}
+        setEspacoUsadoSelecionado={setEspacoUsadoSelecionado}
+        espacoOfertaSelecionado={espacoOfertaSelecionado}
+        setEspacoOfertaSelecionado={setEspacoOfertaSelecionado}
+        produtoUsadoOfertaSelecionado={produtoUsadoOfertaSelecionado}
+        setProdutoUsadoOfertaSelecionado={setProdutoUsadoOfertaSelecionado}
+        valorOfertaUsado={valorOfertaUsado}
+        setValorOfertaUsado={setValorOfertaUsado}
+        carregandoProdutosUsados={carregandoProdutosUsados}
+        produtosUsados={produtosUsados}
+        ofertasRecebidasUsados={ofertasRecebidasUsados}
+        API_URL={API_URL}
+        obterUrlImagem={obterUrlImagem}
+        carregarProdutosUsados={carregarProdutosUsados}
+        setMostrarProdutosUsados={setMostrarProdutosUsados}
+      />
     );
   }
-
   // =====================================================
   // TELA MINHA CONTA
   // =====================================================
@@ -1424,6 +956,7 @@ function App() {
         </h1>
 
         <div
+          className="navegacao-topo"
           style={{
             display: "flex",
             gap: "10px",
@@ -1451,147 +984,20 @@ function App() {
             }}
           />
 
-          {/* LOGIN / MINHA CONTA */}
-
-          {usuario ? (
-            <button
-              onClick={() =>
-                setMostrarConta(true)
-              }
-              style={{
-                padding: "10px 14px",
-                fontSize: "16px",
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "1px solid #000",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              👤 {usuario.nome}
-            </button>
-          ) : (
-            <button
-              onClick={() =>
-                setMostrarLogin(true)
-              }
-              style={{
-                padding: "10px 14px",
-                fontSize: "16px",
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "1px solid #000",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              👤 Entrar
-            </button>
-          )}
-
-          <button
-            onClick={() =>
-              setMostrarCadastro(true)
-            }
-            style={{
-              padding: "10px 14px",
-              fontSize: "16px",
-              backgroundColor: "#000",
-              color: "#fff",
-              border: "1px solid #000",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            📝 Cadastro
-          </button>
-
-          {/* ADMIN */}
-
-          {usuario?.admin && (
-            <button
-              onClick={() =>
-                setMostrarAdmin(true)
-              }
-              style={{
-                padding: "10px 14px",
-                fontSize: "16px",
-                backgroundColor: "#000",
-                color: "#fff",
-                border: "1px solid #000",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              ⚙️ Administrador
-            </button>
-          )}
-
-          {/* PRODUTOS USADOS */}
-
-          <button
-            onClick={() => {
-              const novoEstado = !mostrarProdutosUsados;
-
-              setMostrarProdutosUsados(
-                novoEstado
-              );
-
-              if (novoEstado) {
-                carregarProdutosUsados();
-              }
-            }}
-            style={{
-              padding: "10px 14px",
-              fontSize: "16px",
-              backgroundColor: "#000",
-              color: "#fff",
-              border: "1px solid #000",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            🛍️ Produtos Usados
-          </button>
-
-          {/* SUGESTÕES */}
-
-          <button
-            onClick={() => setMostrarSugestoes(true)}
-            style={{
-              padding: "10px 14px",
-              fontSize: "16px",
-              backgroundColor: "#000",
-              color: "#fff",
-              border: "1px solid #000",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            💡 Sugestões
-          </button>
-
-          {/* CARRINHO */}
-
-          <button
-            onClick={() =>
-              setMostrarCarrinho(
-                !mostrarCarrinho
-              )
-            }
-            style={{
-              padding: "10px 14px",
-              fontSize: "16px",
-              backgroundColor: "#000",
-              color: "#fff",
-              border: "1px solid #000",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            🛒 Carrinho (
-            {quantidadeCarrinho})
-          </button>
+          <BotoesNavegacao
+            usuario={usuario}
+            setMostrarConta={setMostrarConta}
+            setMostrarLogin={setMostrarLogin}
+            setMostrarCadastro={setMostrarCadastro}
+            setMostrarAdmin={setMostrarAdmin}
+            mostrarProdutosUsados={mostrarProdutosUsados}
+            setMostrarProdutosUsados={setMostrarProdutosUsados}
+            carregarProdutosUsados={carregarProdutosUsados}
+            setMostrarSugestoes={setMostrarSugestoes}
+            mostrarCarrinho={mostrarCarrinho}
+            setMostrarCarrinho={setMostrarCarrinho}
+            quantidadeCarrinho={quantidadeCarrinho}
+          />
         </div>
       </header >
 
