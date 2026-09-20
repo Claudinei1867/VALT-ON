@@ -298,7 +298,9 @@ div[style*="position: fixed"] button:hover {
 @media (max-width: 600px) {
 
   header {
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
   }
 
   header {
@@ -313,14 +315,6 @@ div[style*="position: fixed"] button:hover {
   header>div {
     flex-wrap: wrap;
     justify-content: center;
-  }
-
-  .navegacao-topo {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: #fff;
-    padding: 10px;
   }
 
   header button {
