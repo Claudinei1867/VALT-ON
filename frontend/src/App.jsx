@@ -1163,6 +1163,8 @@ function App() {
             "Casa",
             "Moda",
             "Esportes",
+            "Pet",
+            "Infantil",
           ].map(
             (nomeCategoria) => (
               <button
