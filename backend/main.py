@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -2041,6 +2041,7 @@ def enviar_oferta_produto_usado(
     oferta = models.OfertaUsado(
         venda_id=venda.id,
         comprador_id=dados.comprador_id,
+        espaco_id=dados.espaco_id,
         valor_oferta=dados.valor_oferta,
         status="PENDENTE",
         data_oferta=datetime.now().isoformat(),
@@ -2285,7 +2286,6 @@ def comprar_produto_usado(
 def aceitar_oferta_produto_usado(
     oferta_id: int,
     vendedor_id: int,
-    espaco_id: int,
     db: Session = Depends(get_db),
 ):
 
@@ -2346,7 +2346,7 @@ def aceitar_oferta_produto_usado(
     espaco = (
         db.query(models.EspacoCliente)
         .filter(
-            models.EspacoCliente.id == espaco_id,
+            models.EspacoCliente.id == oferta.espaco_id,
             models.EspacoCliente.cliente_id == oferta.comprador_id,
         )
         .first()
@@ -2401,7 +2401,7 @@ def aceitar_oferta_produto_usado(
 
     venda.preco_venda = oferta.valor_oferta
     venda.comprador_id = oferta.comprador_id
-    venda.espaco_comprador_id = espaco_id
+    venda.espaco_comprador_id = oferta.espaco_id
     venda.status = "EM_ENTREGA"
     venda.data_venda = data_venda.strftime("%Y-%m-%d %H:%M:%S")
     venda.data_entrega_prevista = data_entrega_prevista.strftime(
