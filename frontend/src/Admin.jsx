@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import SugestoesAdmin from "./pages/SugestoesAdmin";
+import PedidosAdmin from "./pages/admin/PedidosAdmin";
+import ProdutosAdmin from "./pages/admin/ProdutosAdmin";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -474,6 +477,37 @@ function Admin({ usuario, onVoltar }) {
   // TELA
   // =====================================================
 
+
+  if (secaoAdmin === "sugestoes") {
+    return (
+      <SugestoesAdmin
+        usuario={usuario}
+        onVoltar={() => setSecaoAdmin("inicio")}
+      />
+    );
+  }
+
+  if (secaoAdmin === "pedidos") {
+    return (
+      <PedidosAdmin
+        onVoltar={() => setSecaoAdmin("inicio")}
+      />
+    );
+  }
+
+
+  if (secaoAdmin === "produtos") {
+    return (
+      <ProdutosAdmin
+        onVoltar={() => setSecaoAdmin("inicio")}
+        onEditarProduto={(produto) => {
+          editarProduto(produto);
+          setSecaoAdmin("inicio");
+        }}
+      />
+    );
+  }
+
   return (
     <div
       style={{
@@ -494,6 +528,61 @@ function Admin({ usuario, onVoltar }) {
       </button>
 
       <h1>⚙️ Administrador</h1>
+
+      <button
+        type="button"
+        onClick={() => setSecaoAdmin("sugestoes")}
+        style={{
+          marginBottom: "25px",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#222",
+          color: "#fff",
+          cursor: "pointer",
+          fontSize: "16px",
+          fontWeight: "bold",
+        }}
+      >
+        💡 Abrir sugestões
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setSecaoAdmin("pedidos")}
+        style={{
+          marginBottom: "25px",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#222",
+          color: "#fff",
+          cursor: "pointer",
+          fontSize: "16px",
+          fontWeight: "bold",
+        }}
+      >
+        📦 Abrir pedidos
+      </button>
+
+
+      <button
+        type="button"
+        onClick={() => setSecaoAdmin("produtos")}
+        style={{
+          marginBottom: "25px",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#222",
+          color: "#fff",
+          cursor: "pointer",
+          fontSize: "16px",
+          fontWeight: "bold",
+        }}
+      >
+        Abrir produtos
+      </button>
 
       <div
         style={{
@@ -538,109 +627,6 @@ function Admin({ usuario, onVoltar }) {
             Produtos cadastrados
           </div>
         </div>
-      </div>
-
-      {/* =====================================================
-          SUGESTÕES DOS USUÁRIOS
-      ===================================================== */}
-
-      <div style={{ marginBottom: "30px" }}>
-        <h2>💡 Sugestões dos usuários</h2>
-
-        {sugestoes.length === 0 ? (
-          <p>Nenhuma sugestão recebida.</p>
-        ) : (
-          sugestoes.map((sugestao) => (
-            <div
-              key={sugestao.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "10px",
-                padding: "15px",
-                marginBottom: "15px",
-                background: "#f9f9f9",
-              }}
-            >
-              <div style={{ marginBottom: "8px" }}>
-                <strong>Nome:</strong> {sugestao.nome}
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <strong>E-mail:</strong> {sugestao.email}
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <strong>Tipo:</strong> {sugestao.tipo}
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <strong>Mensagem:</strong> {sugestao.mensagem}
-              </div>
-
-              <div style={{ marginBottom: "8px" }}>
-                <strong>Data:</strong> {sugestao.data_criacao}
-              </div>
-
-              <div style={{ marginBottom: "12px" }}>
-                <strong>Resposta do administrador:</strong>
-                <textarea
-                  value={sugestao.resposta_admin || ""}
-                  onChange={(evento) => {
-                    const novaResposta = evento.target.value;
-
-                    setSugestoes((sugestoesAtuais) =>
-                      sugestoesAtuais.map((item) =>
-                        item.id === sugestao.id
-                          ? { ...item, resposta_admin: novaResposta }
-                          : item
-                      )
-                    );
-                  }}
-                  placeholder="Digite aqui a resposta para o usu?rio..."
-                  rows={4}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    maxWidth: "700px",
-                    marginTop: "6px",
-                    padding: "10px",
-                    boxSizing: "border-box",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                    resize: "vertical",
-                  }}
-                />
-              </div>
-
-              <div>
-                <strong>Status:</strong>{" "}
-                <select
-                  value={sugestao.status}
-                  onChange={(evento) => {
-
-
-                    alterarStatusSugestao(
-                      sugestao.id,
-                      evento.target.value,
-                      sugestao.resposta_admin
-                    );
-                  }}
-                  style={{
-                    marginLeft: "5px",
-                    padding: "5px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="Pendente">Pendente</option>
-                  <option value="Em análise">Em análise</option>
-                  <option value="Respondida">Respondida</option>
-                  <option value="Encerrada">Encerrada</option>
-                </select>
-              </div>
-            </div>
-          ))
-        )}
       </div>
 
       <div style={{ marginBottom: "25px" }}>
@@ -942,180 +928,10 @@ function Admin({ usuario, onVoltar }) {
         }}
       />
 
-      {/* =====================================================
-          LISTA DE PRODUTOS
-      ===================================================== */}
-
-      <h2>📦 Produtos cadastrados</h2>
-
-      {produtos.length === 0 ? (
-        <p>Nenhum produto cadastrado.</p>
-      ) : (
-        produtosFiltrados.map((produto) => (
-          <div
-            key={produto.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "15px",
-              marginBottom: "15px",
-            }}
-          >
-            {/* IMAGEM */}
-
-            {produto.imagem ? (
-              <img
-                src={obterUrlImagem(produto.imagem)}
-                alt={produto.nome}
-                style={{
-                  width: "150px",
-                  height: "120px",
-                  objectFit: "contain",
-                  display: "block",
-                  marginBottom: "10px",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "150px",
-                  height: "120px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#f5f5f5",
-                  fontSize: "40px",
-                  marginBottom: "10px",
-                }}
-              >
-                🛍️
-              </div>
-            )}
-
-            <h3>{produto.nome}</h3>
-
-            <p>{produto.descricao}</p>
-
-            <strong>
-              CVT {Number(produto.preco).toFixed(2)}
-            </strong>
-
-            <p>
-              Categoria: {produto.categoria}
-              <br />
-              Estoque: {produto.estoque}
-              <br />
-              ID: {produto.id}
-            </p>
-
-            <button
-              onClick={() => editarProduto(produto)}
-            >
-              ✏️ Editar
-            </button>
-
-            <button
-              onClick={() =>
-                excluirProduto(produto.id)
-              }
-              style={{
-                marginLeft: "10px",
-              }}
-            >
-              🗑️ Excluir
-            </button>
-          </div>
-        ))
-      )}
-
-      {/* =====================================================
-          LISTA DE PEDIDOS
-      ===================================================== */}
-
-      <hr
-        style={{
-          margin: "35px 0",
-        }}
-      />
-
-      <h2>📦 Pedidos</h2>
-
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="🔎 Buscar pedido..."
-          value={buscaPedido}
-          onChange={(evento) => setBuscaPedido(evento.target.value)}
-          style={{
-            width: "100%",
-            maxWidth: "600px",
-            padding: "12px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-        />
+      <div style={{ marginTop: "30px" }}>
+        <p>Use o botão <strong>📦 Abrir produtos</strong> para gerenciar os produtos cadastrados.</p>
       </div>
-
-      {pedidos.length === 0 ? (
-        <p>Nenhum pedido encontrado.</p>
-      ) : pedidosFiltrados.length === 0 ? (
-        <p>Nenhum pedido corresponde à pesquisa.</p>
-      ) : (
-        pedidosFiltrados.map((pedido) => (
-          <div
-            key={pedido.pedido_id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "15px",
-              marginBottom: "15px",
-            }}
-          >
-            <h3>Pedido #{pedido.pedido_id}</h3>
-
-            <p>
-              <strong>Cliente:</strong> {pedido.cliente_nome}
-              <br />
-              <strong>E-mail:</strong> {pedido.cliente_email || "Não informado"}
-              <br />
-              <strong>Status:</strong> {pedido.status}
-              <br />
-
-              <label>
-                <strong>Alterar status:</strong>{" "}
-                <select
-                  value={pedido.status}
-                  onChange={(evento) =>
-                    alterarStatusPedido(
-                      pedido.pedido_id,
-                      evento.target.value
-                    )
-                  }
-                  style={{
-                    padding: "8px",
-                    marginTop: "8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <option value="Pago">Pago</option>
-                  <option value="Preparando">Preparando</option>
-                  <option value="Enviado">Enviado</option>
-                  <option value="A caminho">A caminho</option>
-                  <option value="Entregue">Entregue</option>
-                  <option value="Cancelado">Cancelado</option>
-                </select>
-              </label>
-              <strong>Total:</strong> CVT{" "}
-              {Number(pedido.total).toFixed(2)}
-              <br />
-              <strong>Prazo de entrega:</strong>{" "}
-              {pedido.prazo_entrega} dias
-            </p>
-          </div>
-        ))
-      )}
     </div>
   );
 }
-
 export default Admin;
