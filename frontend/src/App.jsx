@@ -940,11 +940,11 @@ function App() {
           alignItems: "center",
           justifyContent:
             "space-between",
-          padding: "14px",
+          padding: "8px",
           borderBottom:
             "1px solid #ddd",
           flexWrap: "wrap",
-          gap: "15px",
+          gap: "8px",
         }}
       >
         <h1>
