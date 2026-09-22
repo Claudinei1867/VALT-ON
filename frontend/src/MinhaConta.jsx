@@ -83,6 +83,19 @@ function MinhaConta({
     useState(false);
 
   // =====================================================
+  // COMPRA DE CRÉDITOS CVT
+  // =====================================================
+
+  const [mostrarCompraCVT, setMostrarCompraCVT] =
+    useState(false);
+
+  const [quantidadeCVT, setQuantidadeCVT] =
+    useState(1000);
+
+  const [comprandoCVT, setComprandoCVT] =
+    useState(false);
+
+  // =====================================================
   // ERRO GERAL
   // =====================================================
 
@@ -95,6 +108,70 @@ function MinhaConta({
 
   const [pedidoAberto, setPedidoAberto] =
     useState(null);
+
+  // =====================================================
+  // COMPRAR CRÉDITOS CVT
+  // =====================================================
+
+  const comprarCVT = async () => {
+    if (!usuario || !usuario.id) {
+      return;
+    }
+
+    const quantidade = Number(quantidadeCVT);
+
+    if (!Number.isFinite(quantidade) || quantidade <= 0) {
+      alert("Informe uma quantidade válida de CVT.");
+      return;
+    }
+
+    setComprandoCVT(true);
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/pagamentos/cvt/criar`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cliente_id: usuario.id,
+            quantidade_cvt: quantidade,
+          }),
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail ||
+            "Não foi possível criar o pagamento."
+        );
+      }
+
+      if (!dados.init_point) {
+        throw new Error(
+          "O Mercado Pago não retornou o endereço do pagamento."
+        );
+      }
+
+      window.location.href = dados.init_point;
+    } catch (error) {
+      console.error(
+        "ERRO AO COMPRAR CVT:",
+        error
+      );
+
+      alert(
+        error.message ||
+          "Não foi possível iniciar a compra de CVT."
+      );
+    } finally {
+      setComprandoCVT(false);
+    }
+  };
 
   // =====================================================
   // BUSCAR PEDIDOS DO CLIENTE
@@ -717,6 +794,21 @@ function MinhaConta({
               flexWrap: "wrap",
             }}
           >
+            {/* COMPRAR CRÉDITOS CVT */}
+
+            <button
+              onClick={() =>
+                setMostrarCompraCVT(!mostrarCompraCVT)
+              }
+              style={{
+                padding: "12px 20px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              ?? Comprar créditos CVT
+            </button>
+
             {/* PEDIDOS */}
 
             <button
@@ -749,8 +841,8 @@ function MinhaConta({
               }}
             >
               {carregandoEspacos
-                ? "? ⏳ Carregando..."
-                : ": 🏠 Meus Espaços"}
+                ? "⏳ Carregando..."
+                : "🏠 Meus Espaços"}
             </button>
 
             {/* SAIR */}
@@ -765,6 +857,64 @@ function MinhaConta({
               🚪 Sair da conta
             </button>
           </div>
+
+          {mostrarCompraCVT && (
+            <div
+              style={{
+                marginTop: "20px",
+                padding: "20px",
+                border: "1px solid #ddd",
+                borderRadius: "12px",
+                background: "#f8f9fa",
+              }}
+            >
+              <h3 style={{ marginTop: 0 }}>
+                ?? Comprar créditos CVT
+              </h3>
+
+              <p>
+                Escolha a quantidade de créditos CVT que deseja comprar:
+              </p>
+
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={quantidadeCVT}
+                onChange={(e) =>
+                  setQuantidadeCVT(e.target.value)
+                }
+                style={{
+                  width: "180px",
+                  padding: "10px",
+                  fontSize: "16px",
+                  marginBottom: "12px",
+                }}
+              />
+
+              <br />
+
+              <button
+                onClick={comprarCVT}
+                disabled={comprandoCVT}
+                style={{
+                  padding: "12px 20px",
+                  cursor: comprandoCVT
+                    ? "not-allowed"
+                    : "pointer",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#198754",
+                  color: "white",
+                }}
+              >
+                {comprandoCVT
+                  ? "Aguarde..."
+                  : "Continuar para pagamento"}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* =================================================
@@ -1994,4 +2144,3 @@ function MinhaConta({
 }
 
 export default MinhaConta;
-
