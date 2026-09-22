@@ -443,3 +443,56 @@ class Sugestao(Base):
         String,
         nullable=False
     )
+# =========================================================
+# PAGAMENTOS DE CVT
+# =========================================================
+
+class PagamentoCVT(Base):
+    __tablename__ = "pagamentos_cvt"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    cliente_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    quantidade_cvt = Column(
+        Float,
+        nullable=False
+    )
+
+    valor_reais = Column(
+        Float,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="PENDENTE"
+    )
+
+    referencia = Column(
+        String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    mp_payment_id = Column(
+        String,
+        nullable=True,
+        unique=True,
+        index=True
+    )
+
+    data_criacao = Column(
+        String,
+        nullable=False
+    )
