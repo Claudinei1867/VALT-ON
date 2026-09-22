@@ -136,3 +136,10 @@ class SugestaoCriar(BaseModel):
     email: str
     tipo: str
     mensagem: str
+# =========================================================
+# PAGAMENTO DE CVT
+# =========================================================
+
+class CompraCVT(BaseModel):
+    cliente_id: int
+    quantidade_cvt: int
