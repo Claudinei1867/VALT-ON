@@ -33,6 +33,9 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # =========================================================
 app = FastAPI(title="VALT-ON API")
 
+from routers import pagamentos_cvt
+app.include_router(pagamentos_cvt.router)
+
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
