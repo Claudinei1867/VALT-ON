@@ -1417,7 +1417,7 @@ function App() {
               zIndex: 1000,
             }}
           >
-            <h2>
+            <h2 style={{ color: "#000000", fontWeight: "700", marginTop: "0" }}>
               🛒 Meu Carrinho
             </h2>
 
