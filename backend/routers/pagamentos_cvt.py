@@ -75,6 +75,7 @@ def criar_pagamento_cvt(
                 "currency_id": "BRL"
             }
         ],
+        "statement_descriptor": "VALT-ON",
         "external_reference": referencia,
         "back_urls": {
             "success": f"{FRONTEND_URL}/minha-conta",
