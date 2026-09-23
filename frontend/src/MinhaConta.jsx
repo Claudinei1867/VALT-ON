@@ -34,6 +34,8 @@ function MinhaConta({
   onAtualizarUsuario,
   onVoltar,
   onLogout,
+  produtosFavoritos = [],
+  onAbrirProduto,
 }) {
 
   // =====================================================
@@ -690,6 +692,7 @@ function MinhaConta({
         padding: "30px 20px",
       }}
     >
+      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos neste navegador.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
       <div
         style={{
           maxWidth: "950px",

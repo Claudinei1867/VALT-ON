@@ -18,6 +18,10 @@ function ProdutoDetalhes({
   onVoltar,
   onComprar,
   obterUrlImagem,
+  relacionados = [],
+  onVerRelacionado,
+  favorito = false,
+  onAlternarFavorito,
 }) {
   // =====================================================
   // VERIFICAR PRODUTO
@@ -96,7 +100,7 @@ function ProdutoDetalhes({
   // =====================================================
 
   return (
-    <div
+    <div className="valt-detail-page"
       style={{
         minHeight: "100vh",
         background: "#f5f5f5",
@@ -237,26 +241,7 @@ function ProdutoDetalhes({
               {produto.nome}
             </h1>
 
-            {/* AVALIAÇÃO */}
-
-            <div
-              style={{
-                marginBottom: "20px",
-                fontSize: "18px",
-              }}
-            >
-              ⭐⭐⭐⭐⭐
-
-              <span
-                style={{
-                  fontSize: "14px",
-                  marginLeft: "8px",
-                  color: "#666",
-                }}
-              >
-                Produto em destaque
-              </span>
-            </div>
+            <button className="valt-detail-favorite" onClick={onAlternarFavorito} aria-pressed={favorito}>{favorito?"♥ Salvo nos favoritos":"♡ Adicionar aos favoritos"}</button>
 
             {/* DESCRIÇÃO */}
 
@@ -535,6 +520,7 @@ function ProdutoDetalhes({
           VALT-ON • Sua loja online
         </div>
       </div>
+      {relacionados.length>0&&<section className="valt-related"><h2>Você também pode gostar</h2><div className="valt-related-grid">{relacionados.map((item)=><button key={item.id} onClick={()=>onVerRelacionado?.(item)}><span>{item.imagem?<img src={obterUrlImagem(item.imagem)} alt="" loading="lazy"/>:"🛍️"}</span><strong>{item.nome}</strong><small>{formatarPreco(item.preco)}</small></button>)}</div></section>}
     </div>
   );
 }

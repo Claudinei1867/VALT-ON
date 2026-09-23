@@ -54,7 +54,8 @@ function App() {
   const [categoria, setCategoria] = useState("Todos");
 
   const [pesquisa, setPesquisa] = useState("");
-  const [favoritos, setFavoritos] = useState([]);
+  const [favoritos, setFavoritos] = useState(() => { try { return JSON.parse(localStorage.getItem("valt-favoritos") || "[]"); } catch { return []; } });
+  useEffect(() => { try { localStorage.setItem("valt-favoritos", JSON.stringify(favoritos)); } catch (erro) { console.warn("Favoritos não salvos", erro); } }, [favoritos]);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [ordenacao, setOrdenacao] = useState("destaques");
   const formatarCVT = (valor) => `CVT ${Number(valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -66,18 +67,20 @@ function App() {
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
 
-  const posicaoScrollCarrinho = useRef(0);
-
+  const posicaoScrollVitrine = useRef(null);
+  // Congela a vitrine sob o drawer e restaura a posição no fechamento.
   useEffect(() => {
-    if (mostrarCarrinho) {
-      posicaoScrollCarrinho.current = window.scrollY;
-    } else if (posicaoScrollCarrinho.current > 0) {
-      window.scrollTo({
-        top: posicaoScrollCarrinho.current,
-        behavior: "instant",
-      });
-    }
-  }, [mostrarCarrinho]);
+    if (!mostrarCarrinho) return;
+    const y = window.scrollY;
+    const body = document.body;
+    const anterior = {position:body.style.position,top:body.style.top,left:body.style.left,right:body.style.right,width:body.style.width};
+    Object.assign(body.style,{position:"fixed",top:`-${y}px`,left:"0",right:"0",width:"100%"});
+    return () => {Object.assign(body.style,anterior);window.scrollTo({top:y,behavior:"instant"});};
+  },[mostrarCarrinho]);
+  useEffect(() => {
+    if (produtoSelecionado || mostrarConta || mostrarAdmin || mostrarLogin || mostrarCadastro || mostrarProdutosUsados) return;
+    if (posicaoScrollVitrine.current !== null) {const y=posicaoScrollVitrine.current;posicaoScrollVitrine.current=null;requestAnimationFrame(()=>window.scrollTo({top:y,behavior:"instant"}));}
+  },[produtoSelecionado,mostrarConta,mostrarAdmin,mostrarLogin,mostrarCadastro,mostrarProdutosUsados]);
 
   const [mostrarProdutosUsados, setMostrarProdutosUsados] =
     useState(false);
@@ -491,7 +494,7 @@ function App() {
       }
     );
 
-    alert("✅ Produto adicionado ao carrinho!");
+    setMostrarCarrinho(true);
   };
 
   // =====================================================
@@ -499,6 +502,7 @@ function App() {
   // =====================================================
 
   const abrirDetalhesProduto = (produto) => {
+    if (!produtoSelecionado) posicaoScrollVitrine.current = window.scrollY;
     setProdutoSelecionado(produto);
     setQuantidadeDetalhes(1);
   };
@@ -605,7 +609,9 @@ function App() {
   // FINALIZAR COMPRA
   // =====================================================
 
+  const [finalizandoCompra, setFinalizandoCompra] = useState(false);
   const finalizarCompra = async () => {
+    if (finalizandoCompra) return;
     // Verificar se está logado
     if (!usuario || !usuario.id) {
       alert("❌ Você precisa estar logado para finalizar a compra.");
@@ -624,6 +630,7 @@ function App() {
       return;
     }
 
+    setFinalizandoCompra(true);
     try {
       // ---------------------------------------------------
       // PREPARAR ITENS DA COMPRA
@@ -716,7 +723,7 @@ function App() {
       alert(
         `❌ ${error.message || "Não foi possível finalizar a compra."}`
       );
-    }
+    } finally {setFinalizandoCompra(false);}
   };
   // =====================================================
   // TELA ADMINISTRADOR
@@ -858,6 +865,8 @@ function App() {
           setMostrarConta(false);
         }}
         onLogout={sairDaConta}
+        produtosFavoritos={produtos.filter((item)=>favoritos.includes(item.id))}
+        onAbrirProduto={(produto)=>{setMostrarConta(false);abrirDetalhesProduto(produto);}}
       />
     );
   }
@@ -877,12 +886,15 @@ function App() {
           setQuantidadeDetalhes(1);
         }}
         onComprar={() => {
-          for (let i = 0; i < quantidadeDetalhes; i++) {
-            adicionarCarrinho(produtoSelecionado);
-          }
-          setProdutoSelecionado(null);
-          setQuantidadeDetalhes(1);
+          const quantidade=Math.min(Math.max(1,quantidadeDetalhes),Number(produtoSelecionado.estoque));
+          if(quantidade<=0)return;
+          setCarrinho((atual)=>{const existente=atual.find((item)=>item.id===produtoSelecionado.id);const total=Math.min(Number(produtoSelecionado.estoque),(existente?.quantidade||0)+quantidade);return existente?atual.map((item)=>item.id===produtoSelecionado.id?{...item,quantidade:total}:item):[...atual,{...produtoSelecionado,quantidade:total}];});
+          setProdutoSelecionado(null);setQuantidadeDetalhes(1);setMostrarCarrinho(true);
         }}
+        relacionados={produtos.filter((item)=>item.id!==produtoSelecionado.id&&item.categoria===produtoSelecionado.categoria).slice(0,4)}
+        onVerRelacionado={(produto)=>{setProdutoSelecionado(produto);setQuantidadeDetalhes(1);window.scrollTo({top:0,behavior:"smooth"});}}
+        favorito={favoritos.includes(produtoSelecionado.id)}
+        onAlternarFavorito={()=>alternarFavorito(produtoSelecionado.id)}
         obterUrlImagem={obterUrlImagem}
       />
     );
@@ -1439,9 +1451,7 @@ function App() {
               zIndex: 1000,
             }}
           >
-            <h2 style={{ color: "#000000", fontWeight: "700", marginTop: "0" }}>
-              🛒 Meu Carrinho
-            </h2>
+            <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={()=>setMostrarCarrinho(false)}>✕</button></div>
 
             {carrinho.length ===
               0 ? (
@@ -1598,6 +1608,7 @@ function App() {
                 </div>
 
                 {/* TOTAL */}
+                <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total será debitado do saldo CVT após a confirmação.</small></div>
                 <h3>
                   Total: {formatarCVT(totalCarrinho)}
                 </h3>
@@ -1605,9 +1616,8 @@ function App() {
                 {/* FINALIZAR */}
 
                 <button
-                  onClick={
-                    finalizarCompra
-                  }
+                  onClick={finalizarCompra}
+                  disabled={finalizandoCompra}
                   style={{
                     padding: "14px 20px",
                     cursor: "pointer",
@@ -1622,7 +1632,7 @@ function App() {
                     borderRadius: "8px",
                   }}
                 >
-                  💳 Finalizar compra
+                  {finalizandoCompra ? "Processando..." : "💳 Finalizar compra"}
                 </button>
               </>
             )}
