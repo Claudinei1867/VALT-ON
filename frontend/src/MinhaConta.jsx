@@ -113,12 +113,12 @@ function MinhaConta({
   // COMPRAR CRÉDITOS CVT
   // =====================================================
 
-  const comprarCVT = async () => {
+  const comprarCVT = async (quantidadeSelecionada = quantidadeCVT) => {
     if (!usuario || !usuario.id) {
       return;
     }
 
-    const quantidade = Number(quantidadeCVT);
+    const quantidade = Number(quantidadeSelecionada);
 
     if (!Number.isFinite(quantidade) || quantidade <= 0) {
       alert("Informe uma quantidade válida de CVT.");
@@ -876,43 +876,58 @@ function MinhaConta({
                 Escolha a quantidade de créditos CVT que deseja comprar:
               </p>
 
-              <input
-                type="number"
-                min="1"
-                step="1"
-                value={quantidadeCVT}
-                onChange={(e) =>
-                  setQuantidadeCVT(e.target.value)
-                }
+              <div
                 style={{
-                  width: "180px",
-                  padding: "10px",
-                  fontSize: "16px",
-                  marginBottom: "12px",
-                }}
-              />
-
-              <br />
-
-              <button
-                onClick={comprarCVT}
-                disabled={comprandoCVT}
-                style={{
-                  padding: "12px 20px",
-                  cursor: comprandoCVT
-                    ? "not-allowed"
-                    : "pointer",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "#198754",
-                  color: "white",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "12px",
+                  marginTop: "15px",
                 }}
               >
-                {comprandoCVT
-                  ? "Aguarde..."
-                  : "Continuar para pagamento"}
-              </button>
+                {[
+                  { quantidade: 1000, valor: 5 },
+                  { quantidade: 2500, valor: 12 },
+                  { quantidade: 5000, valor: 35 },
+                  { quantidade: 10000, valor: 80 },
+                ].map((pacote) => (
+                  <button
+                    key={pacote.quantidade}
+                    onClick={() => comprarCVT(pacote.quantidade)}
+                    disabled={comprandoCVT}
+                    style={{
+                      padding: "18px 14px",
+                      cursor: comprandoCVT
+                        ? "not-allowed"
+                        : "pointer",
+                      borderRadius: "10px",
+                      border: "1px solid #ccc",
+                      background: "white",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                    }}
+                  >
+                    <div style={{ fontSize: "20px", marginBottom: "8px" }}>
+                      {pacote.quantidade.toLocaleString("pt-BR")} CVT
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "18px",
+                        color: "#198754",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      R$ {pacote.valor.toFixed(2).replace(".", ",")}
+                    </div>
+
+                    <div style={{ fontSize: "14px" }}>
+                      {comprandoCVT
+                        ? "Aguarde..."
+                        : "Comprar"}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
