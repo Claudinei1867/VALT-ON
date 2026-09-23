@@ -1441,6 +1441,13 @@ function App() {
                               item.id
                             )
                           }
+                          style={{
+                            width: "42px",
+                            height: "42px",
+                            fontSize: "22px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                          }}
                         >
                           −
                         </button>
@@ -1462,6 +1469,13 @@ function App() {
                               item.id
                             )
                           }
+                          style={{
+                            width: "42px",
+                            height: "42px",
+                            fontSize: "22px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                          }}
                         >
                           +
                         </button>
@@ -1474,8 +1488,12 @@ function App() {
                           )
                         }
                         style={{
-                          marginTop:
-                            "8px",
+                          marginTop: "8px",
+                          padding: "10px 14px",
+                          fontSize: "15px",
+                          fontWeight: "bold",
+                          cursor: "pointer",
+                          width: "100%",
                         }}
                       >
                         🗑️ Remover
@@ -1542,15 +1560,13 @@ function App() {
                     finalizarCompra
                   }
                   style={{
-                    padding:
-                      "12px 20px",
-                    cursor:
-                      "pointer",
-                    marginTop:
-                      "10px",
-                    fontWeight:
-                      "bold",
+                    padding: "14px 20px",
+                    cursor: "pointer",
+                    marginTop: "10px",
+                    fontWeight: "bold",
+                    fontSize: "16px",
                     width: "100%",
+                    minHeight: "48px",
                   }}
                 >
                   💳 Finalizar compra
@@ -1569,6 +1585,11 @@ function App() {
               style={{
                 marginTop: "10px",
                 width: "100%",
+                padding: "12px 20px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                minHeight: "46px",
               }}
             >
               Fechar

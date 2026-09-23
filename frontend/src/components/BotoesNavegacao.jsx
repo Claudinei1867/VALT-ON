@@ -39,8 +39,8 @@ export default function BotoesNavegacao({
       <button
         onClick={() => setMostrarCategorias(!mostrarCategorias)}
         style={{
-          padding: "10px 14px",
-          fontSize: "16px",
+          padding: "7px 10px",
+          fontSize: "12px",
           backgroundColor: "#000",
           color: "#fff",
           border: "1px solid #000",
@@ -101,8 +101,8 @@ export default function BotoesNavegacao({
         <button
           onClick={() => setMostrarConta(true)}
           style={{
-            padding: "10px 14px",
-            fontSize: "16px",
+            padding: "7px 10px",
+            fontSize: "12px",
             backgroundColor: "#000",
             color: "#fff",
             border: "1px solid #000",
@@ -116,8 +116,8 @@ export default function BotoesNavegacao({
         <button
           onClick={() => setMostrarLogin(true)}
           style={{
-            padding: "10px 14px",
-            fontSize: "16px",
+            padding: "7px 10px",
+            fontSize: "12px",
             backgroundColor: "#000",
             color: "#fff",
             border: "1px solid #000",
@@ -132,8 +132,8 @@ export default function BotoesNavegacao({
       <button
         onClick={() => setMostrarCadastro(true)}
         style={{
-          padding: "10px 14px",
-          fontSize: "16px",
+          padding: "7px 10px",
+          fontSize: "12px",
           backgroundColor: "#000",
           color: "#fff",
           border: "1px solid #000",
@@ -150,8 +150,8 @@ export default function BotoesNavegacao({
         <button
           onClick={() => setMostrarAdmin(true)}
           style={{
-            padding: "10px 14px",
-            fontSize: "16px",
+            padding: "7px 10px",
+            fontSize: "12px",
             backgroundColor: "#000",
             color: "#fff",
             border: "1px solid #000",
@@ -176,8 +176,8 @@ export default function BotoesNavegacao({
           }
         }}
         style={{
-          padding: "10px 14px",
-          fontSize: "16px",
+          padding: "7px 10px",
+          fontSize: "12px",
           backgroundColor: "#000",
           color: "#fff",
           border: "1px solid #000",
@@ -193,8 +193,8 @@ export default function BotoesNavegacao({
       <button
         onClick={() => setMostrarSugestoes(true)}
         style={{
-          padding: "10px 14px",
-          fontSize: "16px",
+          padding: "7px 10px",
+          fontSize: "12px",
           backgroundColor: "#000",
           color: "#fff",
           border: "1px solid #000",
@@ -210,8 +210,8 @@ export default function BotoesNavegacao({
       <button
         onClick={() => setMostrarCarrinho(!mostrarCarrinho)}
         style={{
-          padding: "10px 14px",
-          fontSize: "16px",
+          padding: "7px 10px",
+          fontSize: "12px",
           backgroundColor: "#000",
           color: "#fff",
           border: "1px solid #000",
