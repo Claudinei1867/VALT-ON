@@ -527,7 +527,7 @@ function Admin({ usuario, onVoltar }) {
         🛍️ Voltar para a loja
       </button>
 
-      <h1>⚙️ Administrador</h1>
+      <h1>⚙️ Administrador</h1><div className="valt-admin-quick"><div><strong>{quantidadeProdutos}</strong><span>Produtos cadastrados</span></div><div><strong>{quantidadeClientes}</strong><span>Clientes</span></div><div><strong>{pedidos.length}</strong><span>Pedidos carregados</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)<=0).length}</strong><span>Produtos sem estoque</span></div></div>
 
       <button
         type="button"
