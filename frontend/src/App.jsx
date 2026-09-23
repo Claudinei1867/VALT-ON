@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 
@@ -58,6 +58,19 @@ function App() {
 
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
+
+  const posicaoScrollCarrinho = useRef(0);
+
+  useEffect(() => {
+    if (mostrarCarrinho) {
+      posicaoScrollCarrinho.current = window.scrollY;
+    } else if (posicaoScrollCarrinho.current > 0) {
+      window.scrollTo({
+        top: posicaoScrollCarrinho.current,
+        behavior: "instant",
+      });
+    }
+  }, [mostrarCarrinho]);
 
   const [mostrarProdutosUsados, setMostrarProdutosUsados] =
     useState(false);
