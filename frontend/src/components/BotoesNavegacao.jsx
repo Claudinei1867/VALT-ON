@@ -35,8 +35,9 @@ export default function BotoesNavegacao({
   ];
 
   return (
-    <>
+    <nav className="valt-actions" aria-label="Navegação principal">
       <button
+        aria-expanded={mostrarCategorias}
         onClick={() => setMostrarCategorias(!mostrarCategorias)}
         style={{
           padding: "7px 10px",
@@ -208,6 +209,7 @@ export default function BotoesNavegacao({
       {/* CARRINHO */}
 
       <button
+        aria-expanded={mostrarCarrinho}
         onClick={() => setMostrarCarrinho(!mostrarCarrinho)}
         style={{
           padding: "7px 10px",
@@ -221,6 +223,6 @@ export default function BotoesNavegacao({
       >
         🛒 Carrinho ({quantidadeCarrinho})
       </button>
-    </>
+    </nav>
   );
 }

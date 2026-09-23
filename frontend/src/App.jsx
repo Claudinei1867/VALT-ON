@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
+import "./modernizacao.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -946,12 +947,12 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="valt-store">
       {/* =================================================
           HEADER
       ================================================= */}
 
-      <header
+      <header className="valt-header"
         style={{
           display: "flex",
           alignItems: "center",
@@ -984,7 +985,9 @@ function App() {
           {/* BUSCA */}
 
           <input
-            type="text"
+            className="valt-search"
+            aria-label="Pesquisar produtos"
+            type="search"
             placeholder="🔎 Pesquisar produto..."
             value={pesquisa}
             onChange={(e) =>
@@ -1165,7 +1168,7 @@ function App() {
           BANNER
       ================================================= */}
 
-      < section
+      <section className="valt-hero"
         style={{
           padding: "40px 20px",
           textAlign: "center",
@@ -1196,7 +1199,7 @@ function App() {
         <button
           onClick={() => {
             window.scrollTo({
-              top: 500,
+              top: document.getElementById("produtos")?.getBoundingClientRect().top + window.scrollY,
               behavior: "smooth",
             });
           }}
@@ -1209,7 +1212,7 @@ function App() {
           PRODUTOS
       ================================================= */}
 
-      < main
+      <main className="valt-main" id="produtos"
         style={{
           padding: "20px",
         }}
@@ -1267,6 +1270,7 @@ function App() {
           {produtosFiltrados.map(
             (produto) => (
               <div
+                className="valt-product-card"
                 key={produto.id}
                 onClick={() => abrirDetalhesProduto(produto)}
                 style={{
@@ -1291,6 +1295,8 @@ function App() {
                 >
                   {produto.imagem ? (
                     <img
+                      className="valt-product-image"
+                      loading="lazy"
                       src={obterUrlImagem(
                         produto.imagem
                       )}
@@ -1361,6 +1367,7 @@ function App() {
                 {/* COMPRAR */}
 
                 <button
+                  className="valt-buy-button"
                   onClick={(evento) => {
                     evento.stopPropagation();
 
@@ -1397,7 +1404,9 @@ function App() {
 
       {
         mostrarCarrinho && (
-          <div
+          <>
+          <div className="valt-cart-overlay" onClick={() => setMostrarCarrinho(false)} aria-hidden="true" />
+          <div className="valt-cart-drawer" role="dialog" aria-modal="true" aria-label="Meu carrinho"
             style={{
               position: "fixed",
               right: "20px",
@@ -1636,6 +1645,7 @@ function App() {
               Fechar
             </button>
           </div>
+          </>
         )
       }
     </div >
