@@ -730,6 +730,10 @@ function App() {
             style={{
               padding: "12px 25px",
               cursor: "pointer",
+              backgroundColor: "#e0e0e0",
+              color: "#000000",
+              border: "2px solid #000000",
+              borderRadius: "8px",
             }}
           >
             ← Voltar para a loja
@@ -1402,7 +1406,7 @@ function App() {
               maxWidth: "90%",
               maxHeight: "80vh",
               overflowY: "auto",
-              background: "white",
+              background: "#fff9d6",
               border:
                 "1px solid #ccc",
               borderRadius:
@@ -1460,6 +1464,10 @@ function App() {
                             fontSize: "22px",
                             fontWeight: "bold",
                             cursor: "pointer",
+                            backgroundColor: "#e0e0e0",
+                            color: "#000000",
+                            border: "2px solid #000000",
+                            borderRadius: "8px",
                           }}
                         >
                           −
@@ -1488,6 +1496,10 @@ function App() {
                             fontSize: "22px",
                             fontWeight: "bold",
                             cursor: "pointer",
+                            backgroundColor: "#e0e0e0",
+                            color: "#000000",
+                            border: "2px solid #000000",
+                            borderRadius: "8px",
                           }}
                         >
                           +
@@ -1507,6 +1519,10 @@ function App() {
                           fontWeight: "bold",
                           cursor: "pointer",
                           width: "100%",
+                          backgroundColor: "#e0e0e0",
+                          color: "#000000",
+                          border: "2px solid #000000",
+                          borderRadius: "8px",
                         }}
                       >
                         🗑️ Remover
@@ -1541,6 +1557,10 @@ function App() {
                       width: "100%",
                       padding: "10px",
                       fontSize: "16px",
+                      backgroundColor: "#e0e0e0",
+                      color: "#000000",
+                      border: "2px solid #000000",
+                      borderRadius: "8px",
                     }}
                   >
                     <option value="">
@@ -1580,6 +1600,10 @@ function App() {
                     fontSize: "16px",
                     width: "100%",
                     minHeight: "48px",
+                    backgroundColor: "#e0e0e0",
+                    color: "#000000",
+                    border: "2px solid #000000",
+                    borderRadius: "8px",
                   }}
                 >
                   💳 Finalizar compra
@@ -1603,6 +1627,10 @@ function App() {
                 fontWeight: "bold",
                 cursor: "pointer",
                 minHeight: "46px",
+                backgroundColor: "#e0e0e0",
+                color: "#000000",
+                border: "2px solid #000000",
+                borderRadius: "8px",
               }}
             >
               Fechar
