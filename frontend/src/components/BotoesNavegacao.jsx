@@ -13,9 +13,88 @@ export default function BotoesNavegacao({
   mostrarCarrinho,
   setMostrarCarrinho,
   quantidadeCarrinho,
+  categoria,
+  setCategoria,
 }) {
+  const [mostrarCategorias, setMostrarCategorias] = React.useState(false);
+
+  const categorias = [
+    "Todos",
+    "Celulares",
+    "Informática",
+    "Casa",
+    "Moda",
+    "Esportes",
+    "Pet",
+    "Infantil",
+    "Enfeites",
+    "Bebidas",
+    "Alimentos",
+    "Escritório",
+    "Ferramentas",
+  ];
+
   return (
     <>
+      <button
+        onClick={() => setMostrarCategorias(!mostrarCategorias)}
+        style={{
+          padding: "10px 14px",
+          fontSize: "16px",
+          backgroundColor: "#000",
+          color: "#fff",
+          border: "1px solid #000",
+          borderRadius: "6px",
+          cursor: "pointer",
+        }}
+      >
+        📂 Categorias
+      </button>
+
+      {mostrarCategorias && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: "0",
+            zIndex: 1000,
+            backgroundColor: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+            padding: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(130px, 1fr))",
+            gap: "6px",
+            minWidth: "280px",
+          }}
+        >
+          {categorias.map((nomeCategoria) => (
+            <button
+              key={nomeCategoria}
+              onClick={() => {
+                setCategoria(nomeCategoria);
+                setMostrarCategorias(false);
+              }}
+              style={{
+                padding: "8px 10px",
+                fontSize: "14px",
+                textAlign: "left",
+                backgroundColor:
+                  categoria === nomeCategoria ? "#000" : "#f5f5f5",
+                color:
+                  categoria === nomeCategoria ? "#fff" : "#222",
+                border: "1px solid #ddd",
+                borderRadius: "7px",
+                cursor: "pointer",
+              }}
+            >
+              {nomeCategoria}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* LOGIN / MINHA CONTA */}
 
       {usuario ? (

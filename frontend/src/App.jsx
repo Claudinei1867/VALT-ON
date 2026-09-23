@@ -997,6 +997,8 @@ function App() {
             mostrarCarrinho={mostrarCarrinho}
             setMostrarCarrinho={setMostrarCarrinho}
             quantidadeCarrinho={quantidadeCarrinho}
+            categoria={categoria}
+            setCategoria={setCategoria}
           />
         </div>
       </header >
@@ -1140,56 +1142,7 @@ function App() {
         </div>
       )}
 
-      {/* =================================================
-          CATEGORIAS
-      ================================================= */}
 
-      < nav
-        style={{
-          display: "flex",
-          gap: "10px",
-          padding: "15px 20px",
-          borderBottom:
-            "1px solid #ddd",
-          flexWrap: "wrap",
-        }
-        }
-      >
-        {
-          [
-            "Todos",
-            "Celulares",
-            "Informática",
-            "Casa",
-            "Moda",
-            "Esportes",
-            "Pet",
-            "Infantil",
-          ].map(
-            (nomeCategoria) => (
-              <button
-                key={nomeCategoria}
-                onClick={() =>
-                  setCategoria(
-                    nomeCategoria
-                  )
-                }
-                style={{
-                  fontWeight:
-                    categoria ===
-                      nomeCategoria
-                      ? "bold"
-                      : "normal",
-                  backgroundColor: "#6c757d",
-                  color: "white",
-                }}
-              >
-                {nomeCategoria}
-              </button>
-            )
-          )
-        }
-      </nav >
 
       {/* =================================================
           BANNER

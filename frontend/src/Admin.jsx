@@ -792,6 +792,25 @@ function Admin({ usuario, onVoltar }) {
             <option value="Infantil">
               Infantil
             </option>
+            <option value="Enfeites">
+              Enfeites
+            </option>
+
+            <option value="Bebidas">
+              Bebidas
+            </option>
+
+            <option value="Alimentos">
+              Alimentos
+            </option>
+
+            <option value="Escritório">
+              Escritório
+            </option>
+
+            <option value="Ferramentas">
+              Ferramentas
+            </option>
           </select>
         </div>
 
