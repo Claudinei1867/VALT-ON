@@ -77,10 +77,6 @@ function App() {
     Object.assign(body.style,{position:"fixed",top:`-${y}px`,left:"0",right:"0",width:"100%"});
     return () => {Object.assign(body.style,anterior);window.scrollTo({top:y,behavior:"instant"});};
   },[mostrarCarrinho]);
-  useEffect(() => {
-    if (produtoSelecionado || mostrarConta || mostrarAdmin || mostrarLogin || mostrarCadastro || mostrarProdutosUsados) return;
-    if (posicaoScrollVitrine.current !== null) {const y=posicaoScrollVitrine.current;posicaoScrollVitrine.current=null;requestAnimationFrame(()=>window.scrollTo({top:y,behavior:"instant"}));}
-  },[produtoSelecionado,mostrarConta,mostrarAdmin,mostrarLogin,mostrarCadastro,mostrarProdutosUsados]);
 
   const [mostrarProdutosUsados, setMostrarProdutosUsados] =
     useState(false);
@@ -148,6 +144,11 @@ function App() {
 
   const [quantidadeDetalhes, setQuantidadeDetalhes] =
     useState(1);
+
+  useEffect(() => {
+    if (produtoSelecionado || mostrarConta || mostrarAdmin || mostrarLogin || mostrarCadastro || mostrarProdutosUsados) return;
+    if (posicaoScrollVitrine.current !== null) {const y=posicaoScrollVitrine.current;posicaoScrollVitrine.current=null;requestAnimationFrame(()=>window.scrollTo({top:y,behavior:"instant"}));}
+  },[produtoSelecionado,mostrarConta,mostrarAdmin,mostrarLogin,mostrarCadastro,mostrarProdutosUsados]);
 
   // =====================================================
   // RECUPERAR USUARIO SALVO
