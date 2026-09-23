@@ -54,6 +54,12 @@ function App() {
   const [categoria, setCategoria] = useState("Todos");
 
   const [pesquisa, setPesquisa] = useState("");
+  const [favoritos, setFavoritos] = useState([]);
+  const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
+  const [ordenacao, setOrdenacao] = useState("destaques");
+  const formatarCVT = (valor) => `CVT ${Number(valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const categoriasDisponiveis = ["Todos", ...new Set(produtos.map((produto) => produto.categoria).filter(Boolean))];
+  const alternarFavorito = (id) => setFavoritos((atual) => atual.includes(id) ? atual.filter((item) => item !== id) : [...atual, id]);
 
   const [carrinho, setCarrinho] = useState([]);
 
@@ -417,10 +423,18 @@ function App() {
 
       return (
         correspondeCategoria &&
-        correspondePesquisa
+        correspondePesquisa &&
+        (!mostrarFavoritos || favoritos.includes(produto.id))
       );
     }
   );
+
+  const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
+    if (ordenacao === "menor-preco") return Number(a.preco) - Number(b.preco);
+    if (ordenacao === "maior-preco") return Number(b.preco) - Number(a.preco);
+    if (ordenacao === "nome") return a.nome.localeCompare(b.nome, "pt-BR");
+    return 0;
+  });
 
   // =====================================================
   // ADICIONAR AO CARRINHO
@@ -677,7 +691,7 @@ function App() {
         `✅ Compra realizada com sucesso!\n\n` +
         `📦 Pedido: #${dados.pedido_id}\n` +
         `👤 Cliente: ${usuario.nome}\n` +
-        `💰 Total: CVT ${Number(dados.total).toFixed(2)}`
+        `💰 Total: ${formatarCVT(dados.total)}`
       );
 
       // ---------------------------------------------------
@@ -1164,6 +1178,10 @@ function App() {
 
 
 
+      <div className="valt-benefits" aria-label="Diferenciais da loja">
+        <span>✦ Curadoria de produtos</span><span>◈ Compra com créditos CVT</span><span>♡ Seus favoritos em um só lugar</span>
+      </div>
+
       {/* =================================================
           BANNER
       ================================================= */}
@@ -1174,7 +1192,7 @@ function App() {
           textAlign: "center",
         }}
       >
-        <h2
+        <div className="valt-hero-content"><span className="valt-eyebrow">VALT-ON · SUA VITRINE DIGITAL</span><h2
           style={{
             color: "#222",
             fontSize: "30px",
@@ -1182,7 +1200,7 @@ function App() {
             marginBottom: "10px",
           }}
         >
-          Bem-vindo à VALT-ON
+          Descubra o que combina com você
         </h2>
 
         <p
@@ -1192,8 +1210,7 @@ function App() {
             fontWeight: "500",
           }}
         >
-          Encontre os melhores
-          produtos em um só lugar.
+          Uma seleção especial para explorar, favoritar e comprar com seus créditos CVT.
         </p>
 
         <button
@@ -1204,8 +1221,11 @@ function App() {
             });
           }}
         >
-          Comprar agora
-        </button>
+          Explorar produtos <span aria-hidden="true">→</span>
+        </button></div>
+        {produtos.find((produto) => produto.imagem) && (
+          <div className="valt-hero-visual" aria-hidden="true"><img src={obterUrlImagem(produtos.find((produto) => produto.imagem).imagem)} alt="" /><span>ESCOLHAS PARA VOCÊ</span></div>
+        )}
       </section >
 
       {/* =================================================
@@ -1217,16 +1237,9 @@ function App() {
           padding: "20px",
         }}
       >
-        <h2
-          style={{
-            color: "#222",
-            fontSize: "28px",
-            fontWeight: "700",
-            marginBottom: "20px",
-          }}
-        >
-          Produtos em destaque
-        </h2>
+        <div className="valt-section-heading"><div><span className="valt-kicker">EXPLORE A VALT-ON</span><h2>{mostrarFavoritos ? "Seus favoritos" : categoria === "Todos" ? "Produtos em destaque" : categoria}</h2><p>Encontre sua próxima escolha entre nossos produtos.</p></div><span className="valt-product-count">{produtosOrdenados.length} produtos</span></div>
+        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>♡ Favoritos ({favoritos.length})</button></div>
+        <div className="valt-toolbar"><span>{pesquisa ? `Resultados para “${pesquisa}”` : "Escolha seus favoritos"}</span><label>Ordenar por <select value={ordenacao} onChange={(evento) => setOrdenacao(evento.target.value)}><option value="destaques">Destaques</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="nome">Nome A–Z</option></select></label></div>
 
         {
           carregando && (
@@ -1267,7 +1280,7 @@ function App() {
             gap: "20px",
           }}
         >
-          {produtosFiltrados.map(
+          {produtosOrdenados.map(
             (produto) => (
               <div
                 className="valt-product-card"
@@ -1283,6 +1296,7 @@ function App() {
                   cursor: "pointer",
                 }}
               >
+                <div className="valt-card-badges"><span>{produto.estoque > 0 ? "DISPONÍVEL" : "ESGOTADO"}</span><button type="button" className={favoritos.includes(produto.id) ? "valt-favorite active" : "valt-favorite"} aria-label={favoritos.includes(produto.id) ? `Remover ${produto.nome} dos favoritos` : `Favoritar ${produto.nome}`} aria-pressed={favoritos.includes(produto.id)} onClick={(evento) => { evento.stopPropagation(); alternarFavorito(produto.id); }}>{favoritos.includes(produto.id) ? "♥" : "♡"}</button></div>
                 {/* IMAGEM */}
 
                 <div
@@ -1358,10 +1372,7 @@ function App() {
                     margin: "8px 0 12px 0",
                   }}
                 >
-                  CVT{" "}
-                  {Number(
-                    produto.preco
-                  ).toFixed(2)}
+                  {formatarCVT(produto.preco)}
                 </h3>
 
                 {/* COMPRAR */}
@@ -1389,14 +1400,16 @@ function App() {
                 >
                   {produto.estoque >
                     0
-                    ? "🛒 Comprar"
+                    ? "Adicionar ao carrinho"
                     : "Sem estoque"}
                 </button>
               </div>
             )
           )}
         </div>
+        <section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Ver favoritos →</button></section>
       </main >
+      <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
 
       {/* =================================================
           CARRINHO
@@ -1454,10 +1467,7 @@ function App() {
                       </strong>
 
                       <p>
-                        CVT{" "}
-                        {Number(
-                          item.preco
-                        ).toFixed(2)}
+                        {formatarCVT(item.preco)}
                       </p>
 
                       <div>
@@ -1589,10 +1599,7 @@ function App() {
 
                 {/* TOTAL */}
                 <h3>
-                  Total: CVT{" "}
-                  {totalCarrinho.toFixed(
-                    2
-                  )}
+                  Total: {formatarCVT(totalCarrinho)}
                 </h3>
 
                 {/* FINALIZAR */}
