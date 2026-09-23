@@ -1,0 +1,36 @@
+﻿# Segredos e configurações locais
+.env
+*.env
+
+# Banco de dados local
+backend/*.db
+backend/*.db-*
+*.db
+
+# Ambientes virtuais Python
+venv/
+.venv/
+backend/venv/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Build
+dist/
+frontend/dist/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Backups locais
+*.backup
+*.backup_*
+*.bak
+
+# Projeto Java separado
+valt-on/
