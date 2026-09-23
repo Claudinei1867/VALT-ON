@@ -378,7 +378,7 @@ def atualizar_status_pedidos_automaticamente(db):
         # SOMENTE QUANDO O STATUS MUDAR
         # -------------------------------------------------
 
-        if cliente and cliente.email:
+        if novo_status == "Entregue" and cliente and cliente.email:
 
             enviar_email(
                 cliente.email,
@@ -1373,7 +1373,7 @@ def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get
             .first()
         )
 
-        if cliente and cliente.email:
+        if novo_status == "Entregue" and cliente and cliente.email:
 
             enviar_email(
                 cliente.email,
