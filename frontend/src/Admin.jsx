@@ -5,7 +5,7 @@ import ProdutosAdmin from "./pages/admin/ProdutosAdmin";
 
 const API_URL = "https://valt-on.onrender.com";
 
-function Admin({ usuario, onVoltar }) {
+function Admin({ usuario, onVoltar, onLogout }) {
   const [produtos, setProdutos] = useState([]);
   const [buscaProduto, setBuscaProduto] = useState("");
   const [pedidos, setPedidos] = useState([]);
@@ -532,10 +532,10 @@ function Admin({ usuario, onVoltar }) {
           <button type="button" onClick={() => setSecaoAdmin("sugestoes")}>♧ <span>Sugestões</span></button>
           <button type="button" onClick={() => document.getElementById("valt-admin-formulario")?.scrollIntoView({behavior:"smooth"})}>＋ <span>Cadastrar produto</span></button>
         </nav>
-        <div className="valt-admin-sidebar-bottom"><button type="button" onClick={onVoltar}>↗ &nbsp; Ver loja</button><small>VALT-ON · Ambiente de simulação</small></div>
+        <div className="valt-admin-sidebar-bottom"><button type="button" onClick={onVoltar}>↗ &nbsp; Ver loja</button><button type="button" className="valt-admin-logout" onClick={onLogout}>↪ &nbsp; Sair da conta</button><small>VALT-ON · Ambiente de simulação</small></div>
       </aside>
       <div className="valt-admin-workspace">
-        <header className="valt-admin-topbar"><div className="valt-admin-topbar-search">⌕ <input aria-label="Buscar produto no painel" placeholder="Buscar produto cadastrado..." value={buscaProduto} onChange={(e)=>setBuscaProduto(e.target.value)} /></div><div className="valt-admin-user"><span className="valt-admin-avatar">♙</span><span>Administrador</span></div></header>
+        <header className="valt-admin-topbar"><div className="valt-admin-topbar-search">⌕ <input aria-label="Buscar produto no painel" placeholder="Buscar produto cadastrado..." value={buscaProduto} onChange={(e)=>setBuscaProduto(e.target.value)} /></div><div className="valt-admin-user"><span className="valt-admin-avatar">♙</span><span>Administrador</span><button type="button" className="valt-admin-logout-top" onClick={onLogout}>Sair</button></div></header>
         <main className="valt-admin-content">
           <div className="valt-admin-heading"><div><span className="valt-admin-kicker">PAINEL ADMINISTRATIVO</span><h1>Visão geral <span className="valt-admin-heading-dot">●</span></h1><p>Acompanhe os dados atuais da sua loja simulada.</p></div><button type="button" onClick={onVoltar} className="valt-admin-outline">↗ Ver loja</button></div>
           <section className="valt-admin-metrics" aria-label="Indicadores da loja">{metricas.map((item)=><div className="valt-admin-metric" key={item.rotulo}><span className={`valt-admin-metric-icon ${item.tom}`}>{item.simbolo}</span><span className="valt-admin-metric-label">{item.rotulo}</span><strong>{item.valor}</strong><small>Dados atuais da loja</small></div>)}</section>
