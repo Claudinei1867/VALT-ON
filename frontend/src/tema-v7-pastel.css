@@ -1,0 +1,132 @@
+/* VALT-ON V7 — pastel light, high-contrast text.
+   Scoped visual layer loaded LAST. Keeps all React state and API logic intact.
+   Background #f2f3f1, paper #fffefa, pastel yellow #f5df95,
+   ink #27313b, muted #56616b. Dark text on ALL yellow surfaces. */
+.valt-store{--navy:#f3d87d;--dark:#27313b;--orange:#f3d87d;--ink:#27313b;--muted:#596571;--line:#d6dadd;background:#f1f3f2!important;color:#27313b!important}
+.valt-store .valt-header{background:#fffefa!important;border-bottom:1px solid #d9dedf!important;box-shadow:0 3px 16px #2b343a10!important}
+.valt-store .valt-header .valt-search{background:#f4f6f5!important;color:#26333e!important;border:1px solid #b9c4ca!important}
+.valt-store .valt-header .valt-search::placeholder{color:#64717a!important}
+.valt-store .valt-header .valt-actions>button{background:#f0f2f1!important;color:#28343f!important;border:1px solid #cbd2d5!important}
+.valt-store .valt-header .valt-actions>button:last-of-type{background:#f3d87d!important;color:#27313b!important;border-color:#ddbd55!important}
+.valt-store .valt-header .valt-actions :is(button,a,span){text-shadow:none!important}
+.valt-store .valt-benefits{background:#e8eceb!important;color:#35434c!important;border-color:#d0d8da!important}
+.valt-store .valt-hero{background:linear-gradient(115deg,#fff8dc,#e6ebe9 75%,#e1e7e7)!important;border:1px solid #d4d9d6!important;box-shadow:0 10px 35px #26343a0b!important}
+.valt-store .valt-hero :is(h2,p,.valt-eyebrow){color:#28333c!important;text-shadow:none!important}
+.valt-store .valt-hero p{color:#52616c!important}
+.valt-store .valt-hero button{background:#f1d57a!important;color:#27313b!important;border:1px solid #d7b95c!important}
+.valt-store .valt-main{background:transparent!important;color:#27313b!important}
+.valt-store .valt-section-heading{background:#fff9e6!important;border:1px solid #e5d9af!important;border-left:5px solid #e0b84f!important;border-radius:7px!important;padding:20px 23px!important;box-shadow:0 5px 20px #2b333a08!important}
+.valt-store .valt-section-heading :is(h2,p,.valt-kicker){color:#29343c!important;text-shadow:none!important}
+.valt-store .valt-section-heading .valt-kicker{color:#785b15!important}
+.valt-store .valt-section-heading p{color:#5c6570!important}
+.valt-store .valt-product-count{background:#f0e5c1!important;color:#35404b!important}
+.valt-store .valt-category-strip button{background:#fffefa!important;color:#34414b!important;border:1px solid #d2d9dc!important;border-radius:6px!important}
+.valt-store .valt-category-strip button.active,.valt-store .valt-category-strip button:hover{background:#f2d77f!important;color:#26313a!important;border-color:#d4b657!important}
+.valt-store .valt-advanced-filters{background:#fffefa!important;border:1px solid #d6dcdd!important;border-radius:7px!important}
+.valt-store .valt-filter-heading,.valt-store .valt-filter-heading strong,.valt-store .valt-filter-fields>label,.valt-store .valt-filter-fields label,.valt-store .valt-toolbar,.valt-store .valt-toolbar label{color:#34414b!important}
+.valt-store .valt-filter-heading button{color:#735a20!important}
+.valt-store .valt-filter-fields input,.valt-store .valt-toolbar select{background:#fff!important;color:#29343d!important;border:1px solid #b8c4c9!important}
+.valt-store .valt-filter-fields input::placeholder{color:#68747c!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card{background:#fffefa!important;color:#27313b!important;border:1px solid #d8dfe0!important;border-radius:7px!important;box-shadow:0 5px 20px #26333b0c!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card:hover{border-color:#d5b657!important;box-shadow:0 10px 26px #26333b18!important}
+.valt-store .valt-main .valt-product-card>div:first-child,.valt-store .valt-main .valt-product-card>div:nth-child(2){background:#f5f7f7!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card :is(h3,h3:first-of-type,h3:nth-of-type(2),strong,.valt-product-price,.preco-produto){color:#27313b!important;text-shadow:none!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card h3:nth-of-type(2){font-weight:850!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card .valt-buy-button{background:#f3d77e!important;color:#27313b!important;border:1px solid #d9ba5c!important;border-radius:5px!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card .valt-buy-button:hover{background:#ebca65!important}
+.valt-store .valt-card-badges>span{background:#fff6d8!important;color:#715314!important;border:1px solid #e9d38b!important}
+.valt-store .valt-card-badges .valt-favorite{background:#fff!important;color:#294456!important;border:1px solid #d3dce0!important}
+.valt-store .valt-card-badges .valt-favorite.active{background:#fff0f2!important;color:#af254b!important}
+.valt-store .valt-bottom-cta{background:#e8edeb!important;border:1px solid #cfd9d9!important;color:#29353e!important}
+.valt-store .valt-bottom-cta :is(h2,p){color:#29353e!important}
+.valt-store .valt-bottom-cta button{background:#f3d77e!important;color:#27313b!important}
+.valt-store .valt-footer{background:#e6ebe9!important;color:#29353e!important;border-color:#cdd5d5!important}
+.valt-store .valt-footer :is(h2,p,strong,button,small){color:#29353e!important}
+.valt-store .valt-cart-drawer{background:#fffefa!important;color:#28343d!important;border-left:1px solid #d3dadd!important}
+.valt-store .valt-cart-drawer :is(h2,h3,p,strong,label,small,.valt-cart-summary){color:#29353e!important}
+.valt-store .valt-cart-drawer input,.valt-store .valt-cart-drawer select{background:#fff!important;color:#27343d!important;border:1px solid #b8c4c9!important}
+.valt-store .valt-cart-drawer button{border-radius:5px!important}
+.valt-store .valt-cart-drawer .valt-cart-title button{background:#f0f2f1!important;color:#26313b!important;border:1px solid #c7d1d5!important}
+.valt-store .valt-cart-drawer button:not(.valt-cart-title button){color:#27313b!important}
+.valt-detail-page{background:#f1f3f2!important;color:#29343d!important}
+.valt-detail-page :is(h1,h2,h3,p,strong,small){color:#29343d!important}
+.valt-detail-page>div>div:nth-of-type(1){background:#fffefa!important;border-color:#d6dfe0!important}
+.valt-detail-page button{border-radius:5px!important}
+.valt-related{background:#e8ecea!important;border:1px solid #cbd5d7!important}
+.valt-related h2{color:#29343d!important}
+.valt-related-grid>button{background:#fffefa!important;border:1px solid #cfd8da!important;color:#29343d!important}
+.valt-related-grid>button strong{color:#29343d!important}
+.valt-related-grid>button small{color:#68511a!important}
+.valt-login-screen{background:#edf0ee!important;color:#29343d!important}
+.valt-login-screen>div:first-child{background:#fffefa!important;color:#29343d!important;border:1px solid #d2dadd!important;box-shadow:0 14px 38px #25323b16!important}
+.valt-login-screen :is(h1,h2,label,p){color:#29343d!important}
+.valt-login-screen input{background:#fff!important;color:#29343d!important;border:1px solid #b9c4c9!important}
+.valt-login-screen input::placeholder{color:#66737c!important}
+.valt-login-screen button[type=submit]{background:#f3d77e!important;color:#27313b!important;border:1px solid #d9b95c!important}
+.valt-login-screen button:not([type=submit]){background:#edf1f0!important;color:#29343d!important;border:1px solid #c6d0d3!important}
+.valt-login-screen a{color:#6e5115!important}
+.pagina-cadastro{background:#fffefa!important;color:#29343d!important;border:1px solid #d0dadd!important;box-shadow:0 12px 36px #26343b16!important}
+.pagina-cadastro :is(h2,p,label,span){color:#29343d!important}
+.pagina-cadastro input:not([type=checkbox]){background:#fff!important;color:#29343d!important;border:1px solid #b7c3c9!important}
+.pagina-cadastro input::placeholder{color:#697680!important}
+.pagina-cadastro form>div:has(input[type=checkbox]){background:#fff7dc!important;color:#29343d!important;border:1px solid #e0cf96!important}
+.pagina-cadastro form>div:has(input[type=checkbox]) :is(p,label,span){color:#29343d!important}
+.pagina-cadastro input[type=checkbox]{accent-color:#9a741c}
+.pagina-cadastro button[type=submit]{background:#f3d77e!important;color:#27313b!important;border:1px solid #d8b95c!important}
+.pagina-cadastro>button:last-child{background:#edf1f0!important;color:#29343d!important;border:1px solid #c2cdd1!important}
+.valt-account-screen{background:#edf0ee!important;color:#29343d!important}
+.valt-account-screen>div>div,.valt-account-screen .valt-account-favorites{background:#fffefa!important;border:1px solid #d5dcdd!important;color:#29343d!important}
+.valt-account-screen :is(h1,h2,h3,strong,p,small){color:#29343d!important}
+.valt-account-screen button{color:#29343d!important}
+.valt-admin-v6{--a-bg:#edf0ee;--a-panel:#fffefa;--a-panel2:#f4f6f4;--a-line:#d1dadd;--a-text:#29343d;--a-muted:#5c6972;--a-gold:#f3d77e;background:#edf0ee!important;color:#29343d!important}
+.valt-admin-v6 .valt-admin-sidebar{background:#fffefa!important;border-right:1px solid #d4ddde!important}
+.valt-admin-v6 .valt-admin-brand{border-bottom-color:#d8dfe1!important}
+.valt-admin-v6 .valt-admin-brand :is(strong,small){color:#29343d!important}
+.valt-admin-v6 .valt-admin-nav-label{color:#66727a!important}
+.valt-admin-v6 .valt-admin-nav,.valt-admin-v6 .valt-admin-sidebar-bottom{background:#fffefa!important}
+.valt-admin-v6 .valt-admin-nav button{background:#fffefa!important;color:#36434c!important;border:1px solid transparent!important}
+.valt-admin-v6 .valt-admin-nav button:hover{background:#f2f3ed!important;color:#27343d!important}
+.valt-admin-v6 .valt-admin-nav button.active{background:#f3d77e!important;color:#26323b!important;border:1px solid #dfc36b!important}
+.valt-admin-v6 .valt-admin-sidebar-bottom button{background:#eef1ef!important;color:#29343d!important;border:1px solid #d2dadd!important}
+.valt-admin-v6 .valt-admin-topbar{background:#fffefa!important;border-bottom:1px solid #d4dddf!important}
+.valt-admin-v6 .valt-admin-topbar :is(strong,span){color:#29343d!important}
+.valt-admin-v6 .valt-admin-topbar-search{background:#f3f5f3!important;border:1px solid #d2dadd!important}
+.valt-admin-v6 .valt-admin-topbar-search input{background:transparent!important;color:#29343d!important}
+.valt-admin-v6 .valt-admin-topbar-search input::placeholder{color:#68747c!important}
+.valt-admin-v6 .valt-admin-heading{background:#fff8e1!important;border:1px solid #e7d9ab!important;border-radius:7px!important;padding:19px 22px!important}
+.valt-admin-v6 .valt-admin-heading :is(h1,p){color:#29343d!important;text-shadow:none!important}
+.valt-admin-v6 .valt-admin-heading .valt-admin-kicker{color:#7b5c14!important}
+.valt-admin-v6 .valt-admin-heading-dot{color:#b68c2b!important}
+.valt-admin-v6 .valt-admin-outline{background:#fffefa!important;color:#29343d!important;border:1px solid #c5d1d4!important}
+.valt-admin-v6 .valt-admin-metric{background:#fffefa!important;border:1px solid #d3dcdd!important;color:#29343d!important;box-shadow:0 5px 17px #28343b0a!important}
+.valt-admin-v6 .valt-admin-metric :is(strong,small,.valt-admin-metric-label){color:#29343d!important}
+.valt-admin-v6 .valt-admin-metric-icon{color:#29343d!important}
+.valt-admin-v6 .valt-admin-panel{background:#fffefa!important;color:#29343d!important;border:1px solid #d2dadd!important;box-shadow:0 6px 20px #28343b0c!important}
+.valt-admin-v6 .valt-admin-panel :is(h2,h3,strong,label,p,small){color:#29343d!important}
+.valt-admin-v6 .valt-admin-panel .valt-admin-panel-icon{color:#29343d!important}
+.valt-admin-v6 .valt-admin-alert-row{border-bottom:1px solid #e2e7e7!important}
+.valt-admin-v6 .valt-admin-alert-stock strong{color:#815f18!important}
+.valt-admin-v6 .valt-admin-product-form :is(input,textarea,select){background:#fff!important;color:#29343d!important;border:1px solid #b9c6ca!important}
+.valt-admin-v6 .valt-admin-product-form input::placeholder{color:#66747e!important}
+.valt-admin-v6 .valt-admin-product-form input[type=file]{background:transparent!important}
+.valt-admin-v6 .valt-admin-footer{color:#627079!important}
+.valt-admin-subpage{background:#edf0ee!important;color:#29343d!important}
+.valt-admin-subpage>h1{color:#29343d!important}
+.valt-admin-subpage>button:first-child{background:#f3d77e!important;color:#29343d!important}
+.valt-admin-subpage>div[style*="background"],.valt-admin-subpage>div[style*="box-shadow"],.valt-admin-subpage>div[style*="boxShadow"]{background:#fffefa!important;color:#29343d!important;border:1px solid #d3dddf!important;box-shadow:0 5px 18px #28343b0b!important}
+.valt-admin-subpage :is(h2,h3,p,strong,label){color:#29343d!important}
+.valt-admin-subpage :is(input,textarea,select){background:#fff!important;color:#29343d!important;border:1px solid #b9c6ca!important}
+.valt-admin-subpage :is(input,textarea)::placeholder{color:#66747e!important}
+.valt-admin-subpage select option{background:#fff;color:#29343d}
+.valt-admin-subpage>div>button{background:#f3d77e!important;color:#29343d!important}
+.valt-admin-subpage>div>button+button{background:#edf1ef!important;color:#29343d!important;border:1px solid #c8d2d6!important}
+.valt-store .valt-suggestion-screen{background:#edf0ee!important}
+.valt-store .valt-suggestion-card{background:#fffefa!important;color:#29343d!important;border:1px solid #d0dadd!important;box-shadow:0 10px 32px #26343b12!important}
+.valt-store .valt-suggestion-card :is(h2,p,label){color:#29343d!important}
+.valt-store .valt-suggestion-card :is(input,select,textarea){background:#fff!important;color:#29343d!important;border:1px solid #b9c6ca!important}
+.valt-store .valt-suggestion-card :is(input,textarea)::placeholder{color:#68747d!important}
+.valt-store .valt-suggestion-card button:last-child{background:#f3d77e!important;color:#29343d!important}
+.valt-store .valt-suggestion-card button:first-child{background:#edf1ef!important;color:#29343d!important;border:1px solid #c8d3d5!important}
+:is(.valt-store,.valt-admin-v6,.valt-admin-subpage,.valt-detail-page,.valt-login-screen,.pagina-cadastro,.valt-account-screen) :is(button,input,select,textarea,a):focus-visible{outline:3px solid #9d771b!important;outline-offset:3px!important}
+@media(prefers-contrast:more){.valt-store,.valt-admin-v6,.valt-admin-subpage,.pagina-cadastro{--ink:#17212a!important;--a-text:#17212a!important}.valt-store .valt-main .produtos-grid>.valt-product-card,.valt-admin-v6 .valt-admin-panel{border-color:#89979e!important}}
+@media(max-width:720px){.valt-store .valt-section-heading,.valt-admin-v6 .valt-admin-heading{padding:15px!important}.valt-store .valt-suggestion-card{padding:18px!important}}

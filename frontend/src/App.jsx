@@ -5,6 +5,7 @@ import "./modernizacao.css";
 import "./ajustes-visuais-seguros.css";
 import "./tema-v6-commerce.css";
 import "./correcoes-v6-contraste.css";
+import "./tema-v7-pastel.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
