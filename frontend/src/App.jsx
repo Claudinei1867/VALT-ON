@@ -7,6 +7,7 @@ import "./tema-v6-commerce.css";
 import "./correcoes-v6-contraste.css";
 import "./tema-v7-pastel.css";
 import "./mobile-account-menu.css";
+import "./fix-product-images.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
