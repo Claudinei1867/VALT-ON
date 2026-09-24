@@ -92,7 +92,7 @@ export default function ProdutosAdmin({
   });
 
   return (
-    <div
+    <div className="valt-admin-subpage valt-admin-products"
       style={{
         padding: "30px",
         maxWidth: "1100px",
