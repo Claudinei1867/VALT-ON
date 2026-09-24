@@ -54,8 +54,20 @@ function App() {
   const [categoria, setCategoria] = useState("Todos");
 
   const [pesquisa, setPesquisa] = useState("");
-  const [favoritos, setFavoritos] = useState(() => { try { return JSON.parse(localStorage.getItem("valt-favoritos") || "[]"); } catch { return []; } });
-  useEffect(() => { try { localStorage.setItem("valt-favoritos", JSON.stringify(favoritos)); } catch (erro) { console.warn("Favoritos não salvos", erro); } }, [favoritos]);
+  const [favoritos,setFavoritos]=useState([]);
+  const [favoritosCarregados,setFavoritosCarregados]=useState(false);
+  const [usuarioFavoritos,setUsuarioFavoritos]=useState(null);
+  // Favoritos ficam isolados por conta neste navegador. Sincronização remota exige sessão autenticada.
+  useEffect(()=>{
+    const chave=usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
+    try {const dados=JSON.parse(localStorage.getItem(chave)||"[]");setFavoritos(Array.isArray(dados)?dados:[]);}catch{setFavoritos([]);}
+    setFavoritosCarregados(true);
+  },[usuarioFavoritos]);
+  useEffect(()=>{
+    if(!favoritosCarregados)return;
+    const chave=usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
+    try{localStorage.setItem(chave,JSON.stringify(favoritos));}catch(erro){console.warn("Favoritos não salvos",erro);}
+  },[favoritos,favoritosCarregados,usuarioFavoritos]);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [ordenacao, setOrdenacao] = useState("destaques");
   const [precoMinimo,setPrecoMinimo]=useState("");
@@ -167,6 +179,8 @@ function App() {
           JSON.parse(usuarioSalvo);
 
         setUsuario(dados);
+        setFavoritosCarregados(false);
+        setUsuarioFavoritos(dados.id || null);
 
         console.log(
           "USUÁRIO RECUPERADO:",
@@ -373,6 +387,8 @@ function App() {
     );
 
     setUsuario(dadosUsuario);
+    setFavoritosCarregados(false);
+    setUsuarioFavoritos(dadosUsuario.id || null);
 
     localStorage.setItem(
       "usuario",
@@ -394,6 +410,8 @@ function App() {
     );
 
     setUsuario(null);
+    setFavoritosCarregados(false);
+    setUsuarioFavoritos(null);
 
     setMostrarConta(false);
 

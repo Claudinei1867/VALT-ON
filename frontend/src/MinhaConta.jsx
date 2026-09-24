@@ -48,6 +48,7 @@ function MinhaConta({
     useState(false);
   const [mostrarPedidos, setMostrarPedidos] =
     useState(false);
+  const [notificacoesPedidos,setNotificacoesPedidos]=useState([]);
 
   // =====================================================
   // MONITORAMENTO DE ALTERAÇÃO DE STATUS
@@ -218,6 +219,7 @@ function MinhaConta({
             statusAnterior !== pedido.status
           ) {
 
+            setNotificacoesPedidos(atuais=>[{id:`${pedido.pedido_id}-${pedido.status}-${Date.now()}`,texto:`Pedido #${pedido.pedido_id}: status atualizado para ${pedido.status}.`},...atuais].slice(0,5));
             console.log(
               "ALTERAÇÃO DE STATUS DETECTADA:",
               pedido.pedido_id,
@@ -692,7 +694,7 @@ function MinhaConta({
         padding: "30px 20px",
       }}
     >
-      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos neste navegador.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
+      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronização entre dispositivos estará disponível após a implantação de autenticação segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
       <div
         style={{
           maxWidth: "950px",
@@ -1530,6 +1532,7 @@ function MinhaConta({
               📦 Meus Pedidos
             </h2>
 
+            {notificacoesPedidos.length>0&&<div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>Atualizações recentes</strong><button type="button" onClick={()=>setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n=><p key={n.id}>{n.texto}</p>)}</div>}
             {pedidos.length === 0 ? (
               <p>
                 Você ainda não possui
