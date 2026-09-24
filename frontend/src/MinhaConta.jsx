@@ -892,8 +892,8 @@ function MinhaConta({
                 {[
                   { quantidade: 1000, valor: 5 },
                   { quantidade: 2500, valor: 12 },
-                  { quantidade: 5000, valor: 35 },
-                  { quantidade: 10000, valor: 60 },
+                  { quantidade: 5000, valor: 20 },
+                  { quantidade: 10000, valor: 35 },
                 ].map((pacote) => (
                   <button
                     key={pacote.quantidade}
