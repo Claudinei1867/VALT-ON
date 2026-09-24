@@ -144,7 +144,7 @@ function Login({ onLogin, onVoltar }) {
 
   if (mostrarRecuperacao) {
     return (
-      <div
+      <div className="valt-login-screen"
         style={{
           minHeight: "100vh",
           display: "flex",
@@ -287,7 +287,7 @@ function Login({ onLogin, onVoltar }) {
   }
 
   return (
-    <div
+    <div className="valt-login-screen"
       style={{
         minHeight: "100vh",
         display: "flex",
