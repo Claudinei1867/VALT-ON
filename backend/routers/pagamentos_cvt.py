@@ -19,8 +19,8 @@ BACKEND_URL = os.getenv("BACKEND_URL")
 PACOTES_CVT = {
     1000: {"quantidade_cvt": 1000.0, "valor_reais": 5.00},
     2500: {"quantidade_cvt": 2500.0, "valor_reais": 12.00},
-    5000: {"quantidade_cvt": 5000.0, "valor_reais": 35.00},
-    10000: {"quantidade_cvt": 10000.0, "valor_reais": 60.00},
+    5000: {"quantidade_cvt": 5000.0, "valor_reais": 20.00},
+    10000: {"quantidade_cvt": 10000.0, "valor_reais": 35.00},
 }
 
 
