@@ -527,7 +527,7 @@ function Admin({ usuario, onVoltar }) {
         🛍️ Voltar para a loja
       </button>
 
-      <h1>⚙️ Administrador</h1><div className="valt-admin-quick"><div><strong>{quantidadeProdutos}</strong><span>Produtos cadastrados</span></div><div><strong>{quantidadeClientes}</strong><span>Clientes</span></div><div><strong>{pedidos.length}</strong><span>Pedidos carregados</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)<=0).length}</strong><span>Produtos sem estoque</span></div></div>
+      <h1>⚙️ Administrador</h1><p className="valt-admin-subtitle">Visão geral da operação · dados atuais da loja</p><div className="valt-admin-quick"><div><strong>{quantidadeProdutos}</strong><span>Produtos cadastrados</span></div><div><strong>{quantidadeClientes}</strong><span>Clientes</span></div><div><strong>{pedidos.length}</strong><span>Pedidos carregados</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)<=0).length}</strong><span>Produtos sem estoque</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)>0&&Number(item.estoque)<=5).length}</strong><span>Estoque baixo (até 5)</span></div></div><section className="valt-stock-alert"><h2>Alertas de estoque</h2>{produtos.filter((item)=>Number(item.estoque)<=5).length===0?<p>Todos os produtos estão com estoque acima de 5 unidades.</p>:<ul>{produtos.filter((item)=>Number(item.estoque)<=5).slice(0,8).map((item)=><li key={item.id}><span>{item.nome}</span><strong>{Number(item.estoque)<=0?"Esgotado":`${item.estoque} restantes`}</strong></li>)}</ul>}</section>
 
       <button
         type="button"
