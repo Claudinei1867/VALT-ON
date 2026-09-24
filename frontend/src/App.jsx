@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 import "./modernizacao.css";
+import "./refinamento-v5.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -819,13 +820,13 @@ function App() {
 
   if (mostrarCadastro) {
     return (
-      <Cadastro
+      <div className="valt-auth-shell"><Cadastro
         onCadastroSucesso={() => {
           setMostrarCadastro(false);
           setMostrarLogin(true);
         }}
         onVoltar={() => setMostrarCadastro(false)}
-      />
+      /></div>
     );
   }
 
