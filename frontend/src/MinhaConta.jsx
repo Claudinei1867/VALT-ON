@@ -1540,10 +1540,9 @@ function MinhaConta({
                 const aberto =
                   pedidoAberto === pedido.pedido_id;
 
-                const etapaAtual =
-                  obterEtapaPedido(
-                    pedido.status
-                  );
+                const etapaAtual = obterEtapaPedido(pedido.status);
+                const etapasPedido=["Pago","Preparando","Enviado","A caminho","Entregue"];
+                const etapaIndice=etapasPedido.findIndex(etapa=>etapa.toLowerCase()===String(pedido.status||"").toLowerCase());
 
                 return (
                   <div
@@ -1557,6 +1556,7 @@ function MinhaConta({
                       background: "#fff",
                     }}
                   >
+                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status||"").toLowerCase()==="cancelado"?<strong className="valt-order-cancelled">Pedido cancelado</strong>:etapasPedido.map((etapa,i)=><div key={etapa} className={i<=etapaIndice?"done":""}><span>{i<etapaIndice?"✓":i+1}</span><small>{etapa}</small></div>)}</div>
                     {/* RESUMO DO PEDIDO */}
 
                     <div

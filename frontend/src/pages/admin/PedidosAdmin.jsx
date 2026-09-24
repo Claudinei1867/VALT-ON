@@ -5,8 +5,11 @@ const API_URL = import.meta.env.VITE_API_URL || "https://valt-on.onrender.com";
 export default function PedidosAdmin({ onVoltar }) {
   const [pedidos, setPedidos] = useState([]);
   const [buscaPedido, setBuscaPedido] = useState("");
+  const [statusFiltro,setStatusFiltro]=useState("Todos");
+  const [erroPedidos,setErroPedidos]=useState("");
 
   const carregarPedidos = async () => {
+    setErroPedidos("");
     try {
       const resposta = await fetch(`${API_URL}/pedidos`);
 
@@ -18,6 +21,7 @@ export default function PedidosAdmin({ onVoltar }) {
       setPedidos(dados);
     } catch (erro) {
       console.error("ERRO AO CARREGAR PEDIDOS:", erro);
+      setErroPedidos("Não foi possível carregar os pedidos.");
     }
   };
 
@@ -64,6 +68,7 @@ export default function PedidosAdmin({ onVoltar }) {
   const pedidosFiltrados = pedidos.filter((pedido) => {
     const texto = buscaPedido.toLowerCase().trim();
 
+    if(statusFiltro!=="Todos" && pedido.status!==statusFiltro) return false;
     if (!texto) return true;
 
     return (
@@ -118,6 +123,7 @@ export default function PedidosAdmin({ onVoltar }) {
         />
       </div>
 
+      <div className="valt-admin-filter"><label>Status <select value={statusFiltro} onChange={e=>setStatusFiltro(e.target.value)}>{["Todos","Pago","Preparando","Enviado","A caminho","Entregue","Cancelado"].map(s=><option key={s}>{s}</option>)}</select></label><button onClick={carregarPedidos}>Atualizar pedidos</button></div>{erroPedidos&&<p role="alert">{erroPedidos}</p>}
       {pedidos.length === 0 ? (
         <p>Nenhum pedido encontrado.</p>
       ) : pedidosFiltrados.length === 0 ? (
