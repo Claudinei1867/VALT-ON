@@ -1,0 +1,64 @@
+/* V5 visual concept: low-glare graphite, warm yellow, square cards. */
+:root{--v5-bg:#1b2026;--v5-panel:#2a3139;--v5-input:#363f49;--v5-line:#505b66;--v5-text:#f1f3f5;--v5-yellow:#ffd12b}
+body{background:var(--v5-bg);color:var(--v5-text)}
+.valt-store{--navy:#ffd12b;--dark:#f1f3f5;--orange:#ffd12b;--ink:#f1f3f5;--muted:#c0c9d2;--line:#505b66;background:var(--v5-bg)!important;color:var(--v5-text)!important}
+.valt-store .valt-header{background:#2a3139!important;border-color:#505b66!important}
+.valt-store .valt-header .valt-search,.valt-store .valt-filter-fields input,.valt-store .valt-toolbar select{background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #66717d!important;border-radius:5px!important}
+.valt-store .valt-header .valt-search::placeholder{color:#c0c9d2}
+.valt-store .valt-header .valt-actions>button{background:#39434d!important;color:#f1f3f5!important;border-radius:5px!important}
+.valt-store .valt-header .valt-actions>button:last-of-type{background:#ffd12b!important;color:#202329!important}
+.valt-store .valt-benefits{background:#242b32!important;color:#d0d7de!important}
+.valt-store .valt-hero{background:radial-gradient(ellipse at 80% 30%,#49535e,#292f37 55%,#20262d)!important;border-radius:8px!important}
+.valt-store .valt-hero button,.valt-store .valt-hero-visual span{border-radius:5px!important}
+.valt-store .valt-section-heading h2,.valt-store .valt-product-card h3{color:#f1f3f5!important}
+.valt-store .valt-section-heading p,.valt-store .valt-toolbar{color:#c0c9d2!important}
+.valt-store .valt-category-strip button{background:#343d47!important;color:#f1f3f5!important;border-color:#596570!important;border-radius:5px!important}
+.valt-store .valt-category-strip button.active,.valt-store .valt-category-strip button:hover{background:#ffd12b!important;color:#202329!important}
+.valt-store .valt-advanced-filters,.valt-store .produtos-grid>.valt-product-card{background:var(--v5-panel)!important;border:1px solid var(--v5-line)!important;border-radius:7px!important;box-shadow:0 5px 16px #0003!important}
+.valt-store .valt-filter-fields>label,.valt-store .valt-filter-heading{color:#f1f3f5!important}
+.valt-store .valt-filter-heading button{color:#ffe27b!important}
+.valt-store .valt-product-count{background:#363f49!important;color:#e1e5e9!important;border-radius:5px!important}
+.valt-store .valt-main .valt-product-card>div:nth-child(2){background:#3a444f!important;border-radius:5px!important}
+.valt-store .valt-product-card h3:nth-of-type(2){color:#f1f3f5!important}
+.valt-store .valt-product-card .valt-buy-button{background:#ffd12b!important;color:#202329!important;border-radius:5px!important}
+.valt-store .valt-card-badges>span{background:#3e4035!important;color:#ffe27b!important;border-radius:4px!important}
+.valt-store .valt-card-badges .valt-favorite{background:#3a444f!important;color:#f1f3f5!important;border-radius:5px!important}
+.valt-store .valt-bottom-cta{background:#2f3740!important;border:1px solid #505b66!important;border-radius:7px!important;color:#f1f3f5!important}
+.valt-store .valt-bottom-cta h2,.valt-store .valt-bottom-cta p{color:#f1f3f5!important}
+.valt-store .valt-footer{background:#151a1f!important}
+.valt-store .valt-cart-overlay{background:#0b1015b8!important}
+.valt-store .valt-cart-drawer{background:var(--v5-panel)!important;color:#f1f3f5!important;border:1px solid #505b66!important;border-radius:7px 0 0 7px!important}
+.valt-store .valt-cart-drawer h2{color:#f1f3f5!important}.valt-store .valt-cart-title span,.valt-store .valt-cart-summary small{color:#c0c9d2!important}
+.valt-store .valt-cart-drawer :is(input,select){background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #66717d!important;border-radius:5px!important}
+.valt-store .valt-cart-drawer button{border-radius:5px!important}
+.valt-detail-page{background:var(--v5-bg)!important;color:#f1f3f5!important}
+.valt-detail-page>div>div:nth-of-type(1){background:var(--v5-panel)!important;border:1px solid var(--v5-line)!important;border-radius:7px!important}
+.valt-detail-page :is(h1,h2,h3){color:#f1f3f5!important}.valt-detail-page button{border-radius:5px!important}
+.valt-related{max-width:1200px;margin:30px auto!important;padding:22px!important;background:var(--v5-panel)!important;border:1px solid var(--v5-line)!important;border-radius:7px!important}
+.valt-related h2{color:#f1f3f5!important}
+.valt-related-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.valt-related-grid button{min-width:0!important;max-width:100%!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;background:#353e48!important;border:1px solid #596570!important;border-radius:6px!important;padding:12px!important}
+.valt-related-grid button>span{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:180px!important;max-height:180px!important;overflow:hidden!important;background:#e9ebed!important;border-radius:4px!important}
+.valt-related-grid button>span img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+.valt-related-grid button strong{color:#f1f3f5!important;overflow-wrap:anywhere!important}.valt-related-grid button small{color:#ffe27b!important;margin-top:auto!important}
+.valt-login-page{background:var(--v5-bg)!important;color:#f1f3f5!important}
+.valt-login-page .valt-login-card{background:var(--v5-panel)!important;color:#f1f3f5!important;border:1px solid var(--v5-line)!important;border-radius:7px!important}
+.valt-login-page :is(h1,h2,label){color:#f1f3f5!important}
+.valt-login-page input{background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #66717d!important;border-radius:5px!important}
+.valt-login-page button{border-radius:5px!important}.valt-login-page button[type=submit]{background:#ffd12b!important;color:#202329!important}.valt-login-page a{color:#ffe27b!important}
+.valt-auth-shell{min-height:100dvh;background:var(--v5-bg);padding:35px 16px}
+.valt-auth-shell .pagina-cadastro{max-width:520px!important;width:100%!important;margin:0 auto!important;padding:30px!important;background:var(--v5-panel)!important;color:#f1f3f5!important;border:1px solid var(--v5-line)!important;border-radius:7px!important}
+.valt-auth-shell .pagina-cadastro input:not([type=checkbox]){width:100%!important;min-height:45px!important;background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #66717d!important;border-radius:5px!important}
+.valt-auth-shell .pagina-cadastro form>div:has(input[type=checkbox]){background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #596570!important;border-radius:5px!important}
+.valt-auth-shell .pagina-cadastro button{min-height:44px!important;padding:10px 18px!important;border-radius:5px!important;cursor:pointer}
+.valt-auth-shell .pagina-cadastro button[type=submit]{background:#ffd12b!important;color:#202329!important;width:100%!important}
+.valt-auth-shell .pagina-cadastro>button{background:#39434d!important;color:#f1f3f5!important;width:100%!important}
+.valt-account-page{background:var(--v5-bg)!important;color:#f1f3f5!important}
+.valt-account-page>div>div,.valt-account-page .valt-account-favorites{background:var(--v5-panel)!important;border:1px solid var(--v5-line)!important;border-radius:7px!important;box-shadow:0 6px 20px #0003!important}
+.valt-account-page :is(h1,h2,h3,strong){color:#f1f3f5!important}.valt-account-page p{color:#c0c9d2!important}
+.valt-account-page .valt-account-favorites-grid button{background:#353e48!important;border-color:#596570!important;border-radius:5px!important;color:#f1f3f5!important}
+.valt-account-page .valt-account-favorites-grid span{color:#ffe27b!important}
+.valt-account-page button,.valt-account-page :is(input,select){border-radius:5px!important}
+.valt-account-page :is(input,select){background:var(--v5-input)!important;color:#f1f3f5!important;border:1px solid #66717d!important}
+:is(.valt-store,.valt-detail-page,.valt-account-page,.valt-auth-shell,.valt-login-page) :is(button,input,select):focus-visible{outline:2px solid #ffd12b!important;outline-offset:2px!important}
+@media(max-width:720px){.valt-related{margin:18px 12px!important;padding:15px!important}.valt-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.valt-related-grid button>span{height:135px!important;max-height:135px!important}.valt-account-page{padding:18px 12px!important}.valt-store .valt-cart-drawer{border-radius:0!important}}

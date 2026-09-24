@@ -687,7 +687,7 @@ function MinhaConta({
   // =====================================================
 
   return (
-    <div
+    <div className="valt-account-page"
       style={{
         minHeight: "100vh",
         background: "#e0e0e0",
