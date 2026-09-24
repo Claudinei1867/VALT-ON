@@ -4,6 +4,7 @@ import "./App.css";
 import "./modernizacao.css";
 import "./ajustes-visuais-seguros.css";
 import "./tema-v6-commerce.css";
+import "./correcoes-v6-contraste.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -1070,14 +1071,14 @@ function App() {
       </header >
 
       {mostrarSugestoes && (
-        <div
+        <div className="valt-suggestion-screen"
           style={{
             padding: "30px 20px",
             backgroundColor: "#e0e0e0",
             minHeight: "400px",
           }}
         >
-          <div
+          <div className="valt-suggestion-card"
             style={{
               maxWidth: "700px",
               margin: "0 auto",

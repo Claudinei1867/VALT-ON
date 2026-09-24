@@ -1,0 +1,72 @@
+/* V6 accessibility patch. Loaded after V6. Scoped, no global resets. */
+/* Text on dark cards: original dark pricing came from --dark / inline colors. */
+.valt-store .valt-main .produtos-grid>.valt-product-card h3:nth-of-type(2),
+.valt-store .valt-main .produtos-grid>.valt-product-card :is(.valt-product-price,.preco-produto),
+.valt-store .valt-main .produtos-grid>.valt-product-card>strong{color:#ffdb69!important;text-shadow:none!important}
+.valt-store .valt-main .produtos-grid>.valt-product-card h3:first-of-type{color:#f4f7f9!important}
+.valt-store .valt-section-heading{background:#24343e!important;border:1px solid #485d6a!important;border-radius:8px!important;padding:18px 22px!important}
+.valt-store .valt-section-heading :is(h2,p,.valt-kicker){color:#f2f6f8!important}
+.valt-store .valt-section-heading .valt-kicker{color:#ffdb69!important}
+.valt-store .valt-product-count{background:#344550!important;color:#eaf1f6!important}
+.valt-store .valt-card-badges .valt-favorite{color:#223d55!important;background:#fff!important}
+.valt-store .valt-card-badges .valt-favorite.active{color:#b31c40!important;background:#fff1f4!important}
+.valt-store .valt-header .valt-actions>button,.valt-store .valt-header .valt-actions>.valt-category-button{color:#f7fafc!important}
+.valt-store .valt-header .valt-actions>button:last-of-type{color:#17232c!important}
+.valt-store .valt-category-strip button{color:#f0f5f8!important}.valt-store .valt-category-strip button.active{color:#17232c!important}
+.valt-store .valt-filter-fields label,.valt-store .valt-filter-heading strong,.valt-store .valt-toolbar label{color:#f2f6f9!important}
+.valt-store .valt-bottom-cta :is(h2,p),.valt-store .valt-footer :is(h2,p,strong,button){color:#f0f5f8!important}
+/* Admin navigation: legacy generic button rules painted its entire sidebar white. */
+.valt-admin-v6 .valt-admin-sidebar,.valt-admin-v6 .valt-admin-nav,.valt-admin-v6 .valt-admin-nav button,.valt-admin-v6 .valt-admin-sidebar-bottom{background-color:#19242d!important}
+.valt-admin-v6 .valt-admin-nav button{background:#19242d!important;color:#e5edf3!important;border:1px solid transparent!important;box-shadow:none!important}
+.valt-admin-v6 .valt-admin-nav button:hover{background:#334551!important;color:#fff!important}
+.valt-admin-v6 .valt-admin-nav button.active{background:linear-gradient(105deg,#ffe17a,#d7aa29)!important;color:#1e2830!important}
+.valt-admin-v6 .valt-admin-sidebar-bottom button{background:#263540!important;color:#f3f6f8!important}
+.valt-admin-v6 .valt-admin-heading{background:#24343e!important;border:1px solid #4b606e!important;border-radius:8px!important;padding:18px 20px!important}
+.valt-admin-v6 .valt-admin-heading :is(h1,p){color:#f4f8fa!important}.valt-admin-v6 .valt-admin-heading .valt-admin-kicker{color:#ffda69!important}
+.valt-admin-v6 .valt-admin-metric{background:#24343e!important;border-color:#4c6070!important}.valt-admin-v6 .valt-admin-metric :is(strong,small,.valt-admin-metric-label){color:#f1f6f9!important}
+.valt-admin-v6 .valt-admin-metric .valt-admin-metric-icon.gold{color:#19232b!important}
+.valt-admin-v6 .valt-admin-panel :is(h2,h3,strong,label){color:#f4f7fa!important}
+.valt-admin-v6 .valt-admin-panel .valt-admin-alert-stock strong{color:#ffb7a8!important}
+.valt-admin-v6 .valt-admin-panel .valt-admin-panel-icon{color:#1d2b34!important}
+.valt-admin-v6 .valt-admin-topbar-search input{color:#fff!important}.valt-admin-v6 .valt-admin-topbar-search input::placeholder{color:#bdcad5!important}
+.valt-admin-v6 .valt-admin-product-form :is(input,textarea,select){color:#f5f8fa!important;background:#2c3d49!important}
+.valt-admin-v6 .valt-admin-product-form input[type=file]{background:transparent!important}
+/* Customer suggestions: style the actual screen, not unrelated store cards. */
+.valt-store .valt-suggestion-screen{background:#172129!important;padding:32px 16px!important;min-height:auto!important}
+.valt-store .valt-suggestion-card{background:#24343f!important;color:#f2f6f9!important;border:1px solid #536876!important;box-shadow:0 16px 42px #0004!important;max-width:740px!important;padding:28px!important}
+.valt-store .valt-suggestion-card :is(h2,p,label){color:#f1f5f8!important}
+.valt-store .valt-suggestion-card h2{font-size:25px!important}
+.valt-store .valt-suggestion-card label{display:block;margin:5px 0 3px;font-weight:650}
+.valt-store .valt-suggestion-card :is(input,select,textarea){background:#30414e!important;color:#fff!important;border:1px solid #6a7e8d!important;border-radius:6px!important;outline:none}
+.valt-store .valt-suggestion-card :is(input,textarea)::placeholder{color:#c3d0db!important}
+.valt-store .valt-suggestion-card button:last-child{background:#ffd044!important;color:#1c2933!important;border:0!important;font-weight:800!important}
+.valt-store .valt-suggestion-card button:first-child{background:#42525f!important;color:#fff!important}
+/* Registration: the old inline white disclaimer and light inputs were unreadable. */
+.pagina-cadastro{background:#24343f!important;color:#f3f7fa!important;border:1px solid #526776!important;box-shadow:0 16px 44px #0004!important}
+.pagina-cadastro :is(h2,p,label,span){color:#f3f7fa!important}
+.pagina-cadastro input:not([type=checkbox]){background:#31424f!important;color:#fff!important;border:1px solid #718493!important}
+.pagina-cadastro input::placeholder{color:#c3d0dc!important}
+.pagina-cadastro form>div:has(input[type=checkbox]){background:#31414c!important;border:1px solid #6b7d89!important;color:#f5f8fa!important}
+.pagina-cadastro form>div:has(input[type=checkbox]) :is(p,label,span){color:#f4f8fa!important}
+.pagina-cadastro input[type=checkbox]{accent-color:#ffd044}
+.pagina-cadastro button[type=submit]{background:#ffd044!important;color:#1e2a33!important;border:0!important;font-weight:800!important}
+.pagina-cadastro>button:last-child{background:#3c4d59!important;color:#fff!important;border:1px solid #718493!important}
+.pagina-cadastro :is(input,button):focus-visible{outline:2px solid #ffd044!important;outline-offset:2px}
+/* Admin subpages use standalone JSX, so the admin dashboard selectors never reached them. */
+.valt-admin-subpage{min-height:100vh!important;max-width:none!important;margin:0!important;padding:32px clamp(16px,4vw,60px)!important;background:#172129!important;color:#f1f6f9!important;font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+.valt-admin-subpage>h1{font-size:clamp(25px,3vw,35px)!important;letter-spacing:-.03em;color:#f5f8fa!important;margin:8px 0 25px!important}
+.valt-admin-subpage>button:first-child{background:#ffd044!important;color:#202c35!important;border:0!important;border-radius:6px!important;padding:11px 17px!important;font-weight:800!important}
+.valt-admin-subpage>div[style*="background"],.valt-admin-subpage>div[style*="box-shadow"],.valt-admin-subpage>div[style*="boxShadow"]{background:#24343f!important;color:#f2f6f9!important;border:1px solid #4e6371!important;border-radius:8px!important;box-shadow:0 8px 26px #0002!important;padding:22px!important}
+.valt-admin-subpage :is(h2,h3,p,strong,label){color:#f2f6f9!important}
+.valt-admin-subpage :is(input,textarea,select){background:#30424f!important;color:#f5f8fa!important;border:1px solid #6a8090!important;border-radius:6px!important;padding:10px!important;max-width:100%}
+.valt-admin-subpage :is(input,textarea)::placeholder{color:#c5d1dc!important}
+.valt-admin-subpage select option{background:#30424f;color:#fff}
+.valt-admin-subpage :is(button,input,select,textarea):focus-visible{outline:2px solid #ffd044!important;outline-offset:2px!important}
+.valt-admin-subpage>div>button{background:#ffd044!important;color:#202a32!important;border:0!important;border-radius:5px!important;padding:9px 14px!important;font-weight:750!important}
+.valt-admin-subpage>div>button+button{background:#3c4c59!important;color:#fff!important;border:1px solid #6a7b88!important}
+.valt-admin-suggestions>div{max-width:1200px!important;margin:0 0 17px!important}
+.valt-admin-suggestions>div>p{margin:8px 0!important;overflow-wrap:anywhere}
+.valt-admin-suggestions textarea{width:100%!important;min-height:105px}
+.valt-admin-suggestions select{min-width:170px}
+.valt-admin-products>div[style*="display: grid"],.valt-admin-orders>div[style*="display: grid"]{gap:15px!important}
+@media(max-width:650px){.valt-store .valt-section-heading{padding:14px!important}.valt-admin-v6 .valt-admin-heading{padding:14px!important}.valt-store .valt-suggestion-card{padding:18px!important}.valt-admin-subpage{padding:20px 13px!important}}

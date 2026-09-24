@@ -80,7 +80,7 @@ export default function PedidosAdmin({ onVoltar }) {
   });
 
   return (
-    <div
+    <div className="valt-admin-subpage valt-admin-orders"
       style={{
         padding: "30px",
         maxWidth: "1100px",
