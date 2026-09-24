@@ -1,0 +1,24 @@
+/* Mobile navigation and account switch — V7 pastel, contrast-first. */
+.valt-store .valt-mobile-menu-toggle{display:none;background:#f3d77e!important;color:#26323b!important;border:1px solid #d2b65c!important;border-radius:6px!important;padding:10px 15px!important;font-weight:800!important;min-height:44px}
+.valt-store .valt-profile-wrap{position:relative;min-width:0}
+.valt-store .valt-profile-trigger{display:flex;align-items:center;justify-content:center;gap:8px;background:#edf1ef!important;color:#26323b!important;border:1px solid #c5d0d3!important;border-radius:6px!important;padding:10px 12px!important;min-height:44px;max-width:100%;font-weight:750}
+.valt-store .valt-profile-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:2500;width:min(290px,calc(100vw - 28px));padding:8px;background:#fffefa;border:1px solid #c5d0d3;border-radius:8px;box-shadow:0 15px 35px #25323b2b;display:flex;flex-direction:column;gap:5px}
+.valt-store .valt-profile-menu button{background:#f4f6f5!important;color:#26323b!important;border:1px solid transparent!important;border-radius:5px!important;text-align:left!important;padding:12px!important;min-height:44px!important;font-size:14px!important;font-weight:700!important}
+.valt-store .valt-profile-menu button:hover{background:#fff3ce!important;border-color:#e2c76f!important}
+.valt-store .valt-profile-menu .valt-logout-button{background:#fff1eb!important;color:#883b2b!important;border:1px solid #e5c5bb!important}
+.valt-store .valt-profile-trigger:focus-visible,.valt-store .valt-mobile-menu-toggle:focus-visible,.valt-store .valt-profile-menu button:focus-visible{outline:3px solid #97701b!important;outline-offset:2px!important}
+.valt-admin-v6 .valt-admin-sidebar-bottom .valt-admin-logout,.valt-admin-v6 .valt-admin-topbar .valt-admin-logout-top{background:#fff1eb!important;color:#813b2d!important;border:1px solid #dfc4ba!important;border-radius:6px!important;padding:10px 14px!important;font-weight:750!important;min-height:44px}
+.valt-admin-v6 .valt-admin-sidebar-bottom{display:flex!important;flex-direction:column!important;gap:10px!important}
+.valt-admin-v6 .valt-admin-topbar .valt-admin-logout-top{margin-left:12px!important}
+@media(max-width:800px){
+.valt-store .valt-header{position:sticky!important;top:0!important;z-index:2100!important}
+.valt-store .valt-header .navegacao-topo{width:100%!important;display:flex!important;flex-wrap:wrap!important;gap:8px!important;position:relative!important}
+.valt-store .valt-header .valt-search{flex:1 1 160px!important;min-width:0!important;max-width:none!important}
+.valt-store .valt-mobile-menu-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important}
+.valt-store .valt-actions{display:none!important;width:100%!important;max-height:min(70vh,570px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:#fffefa!important;border:1px solid #cdd7d9!important;border-radius:8px!important;padding:10px!important;box-shadow:0 12px 28px #25323b20!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important}
+.valt-store .valt-actions.valt-actions-open{display:flex!important}
+.valt-store .valt-actions>button,.valt-store .valt-profile-trigger{width:100%!important;justify-content:flex-start!important;min-height:44px!important;font-size:14px!important}
+.valt-store .valt-profile-menu{position:static!important;width:100%!important;margin-top:6px!important;box-shadow:none!important;background:#f6f7f4!important}
+.valt-store .valt-actions>div[style*="position: absolute"]{position:static!important;min-width:0!important;width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.valt-admin-v6 .valt-admin-logout-top{display:inline-flex!important;align-items:center!important}
+}

@@ -6,6 +6,7 @@ import "./ajustes-visuais-seguros.css";
 import "./tema-v6-commerce.css";
 import "./correcoes-v6-contraste.css";
 import "./tema-v7-pastel.css";
+import "./mobile-account-menu.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -418,9 +419,11 @@ function App() {
     setUsuarioFavoritos(null);
 
     setMostrarConta(false);
-
+    setMostrarAdmin(false);
+    setMostrarCadastro(false);
+    setMostrarSugestoes(false);
+    setMostrarProdutosUsados(false);
     setMostrarLogin(false);
-
     setMostrarCarrinho(false);
 
     localStorage.removeItem(
@@ -754,7 +757,7 @@ function App() {
   if (mostrarAdmin) {
     return (
       <div>
-        <Admin usuario={usuario} onVoltar={() => {
+        <Admin usuario={usuario} onLogout={sairDaConta} onVoltar={() => {
           setMostrarAdmin(false);
           carregarProdutos();
         }} />
@@ -1055,6 +1058,7 @@ function App() {
           <BotoesNavegacao
             usuario={usuario}
             setMostrarConta={setMostrarConta}
+            onLogout={sairDaConta}
             setMostrarLogin={setMostrarLogin}
             setMostrarCadastro={setMostrarCadastro}
             setMostrarAdmin={setMostrarAdmin}
