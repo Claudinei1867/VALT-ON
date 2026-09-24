@@ -144,7 +144,7 @@ function Login({ onLogin, onVoltar }) {
 
   if (mostrarRecuperacao) {
     return (
-      <div className="valt-login-page"
+      <div
         style={{
           minHeight: "100vh",
           display: "flex",
@@ -154,7 +154,7 @@ function Login({ onLogin, onVoltar }) {
           padding: "20px",
         }}
       >
-        <div className="valt-login-card"
+        <div
           style={{
             width: "100%",
             maxWidth: "400px",
@@ -287,7 +287,7 @@ function Login({ onLogin, onVoltar }) {
   }
 
   return (
-    <div className="valt-login-page"
+    <div
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -297,7 +297,7 @@ function Login({ onLogin, onVoltar }) {
         padding: "20px",
       }}
     >
-      <div className="valt-login-card"
+      <div
         style={{
           width: "100%",
           maxWidth: "400px",
