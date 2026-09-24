@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import "./modernizacao.css";
 import "./ajustes-visuais-seguros.css";
+import "./tema-v6-commerce.css";
 
 import Admin from "./Admin";
 import Login from "./Login";

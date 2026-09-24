@@ -508,167 +508,44 @@ function Admin({ usuario, onVoltar }) {
     );
   }
 
+  const semEstoque = produtos.filter((item) => Number(item.estoque) <= 0).length;
+  const estoqueBaixo = produtos.filter((item) => Number(item.estoque) > 0 && Number(item.estoque) <= 5).length;
+  const alertas = produtos.filter((item) => Number(item.estoque) <= 5).slice(0, 8);
+  const metricas = [
+    { simbolo: "◈", rotulo: "Produtos cadastrados", valor: quantidadeProdutos, tom: "gold" },
+    { simbolo: "♙", rotulo: "Clientes", valor: quantidadeClientes, tom: "violet" },
+    { simbolo: "▣", rotulo: "Pedidos carregados", valor: pedidos.length, tom: "blue" },
+    { simbolo: "◇", rotulo: "Sem estoque", valor: semEstoque, tom: "gray" },
+    { simbolo: "⚠", rotulo: "Estoque baixo (até 5)", valor: estoqueBaixo, tom: "gold" },
+  ];
+
   return (
-    <div
-      style={{
-        padding: "30px",
-        maxWidth: "1100px",
-        margin: "0 auto",
-      }}
-    >
-      <button
-        onClick={onVoltar}
-        style={{
-          padding: "12px 20px",
-          marginBottom: "20px",
-          cursor: "pointer",
-        }}
-      >
-        🛍️ Voltar para a loja
-      </button>
-
-      <h1>⚙️ Administrador</h1><p className="valt-admin-subtitle">Visão geral da operação · dados atuais da loja</p><div className="valt-admin-quick"><div><strong>{quantidadeProdutos}</strong><span>Produtos cadastrados</span></div><div><strong>{quantidadeClientes}</strong><span>Clientes</span></div><div><strong>{pedidos.length}</strong><span>Pedidos carregados</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)<=0).length}</strong><span>Produtos sem estoque</span></div><div><strong>{produtos.filter((item)=>Number(item.estoque)>0&&Number(item.estoque)<=5).length}</strong><span>Estoque baixo (até 5)</span></div></div><section className="valt-stock-alert"><h2>Alertas de estoque</h2>{produtos.filter((item)=>Number(item.estoque)<=5).length===0?<p>Todos os produtos estão com estoque acima de 5 unidades.</p>:<ul>{produtos.filter((item)=>Number(item.estoque)<=5).slice(0,8).map((item)=><li key={item.id}><span>{item.nome}</span><strong>{Number(item.estoque)<=0?"Esgotado":`${item.estoque} restantes`}</strong></li>)}</ul>}</section>
-
-      <button
-        type="button"
-        onClick={() => setSecaoAdmin("sugestoes")}
-        style={{
-          marginBottom: "25px",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#222",
-          color: "#fff",
-          cursor: "pointer",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
-        💡 Abrir sugestões
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setSecaoAdmin("pedidos")}
-        style={{
-          marginBottom: "25px",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#222",
-          color: "#fff",
-          cursor: "pointer",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
-        📦 Abrir pedidos
-      </button>
-
-
-      <button
-        type="button"
-        onClick={() => setSecaoAdmin("produtos")}
-        style={{
-          marginBottom: "25px",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#222",
-          color: "#fff",
-          cursor: "pointer",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
-        Abrir produtos
-      </button>
-
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          marginBottom: "30px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            flex: "1",
-            minWidth: "220px",
-            padding: "20px",
-            borderRadius: "12px",
-            background: "#f5f5f5",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ fontSize: "32px", fontWeight: "bold" }}>
-            {quantidadeClientes}
-          </div>
-          <div style={{ fontSize: "18px" }}>
-            Clientes cadastrados
-          </div>
-        </div>
-
-        <div
-          style={{
-            flex: "1",
-            minWidth: "220px",
-            padding: "20px",
-            borderRadius: "12px",
-            background: "#f5f5f5",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ fontSize: "32px", fontWeight: "bold" }}>
-            {quantidadeProdutos}
-          </div>
-          <div style={{ fontSize: "18px" }}>
-            Produtos cadastrados
-          </div>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: "25px" }}>
-        <input
-          type="text"
-          placeholder="🔎 Buscar produto..."
-          value={buscaProduto}
-          onChange={(evento) => setBuscaProduto(evento.target.value)}
-          style={{
-            width: "100%",
-            maxWidth: "600px",
-            padding: "12px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-        />
-      </div>
-
-      <h2>
-        {editandoId !== null
-          ? "✏️ Alterar Produto"
-          : "➕ Cadastrar Produto"}
-      </h2>
-
-      {mensagem && (
-        <div
-          style={{
-            padding: "12px",
-            marginBottom: "20px",
-            background: "#e8f5e9",
-            borderRadius: "8px",
-          }}
-        >
-          {mensagem}
-        </div>
-      )}
-
-      {/* =====================================================
-          FORMULÁRIO
-      ===================================================== */}
-
-      <form onSubmit={salvarProduto}>
+    <div className="valt-admin-v6">
+      <aside className="valt-admin-sidebar" aria-label="Navegação administrativa">
+        <div className="valt-admin-brand"><span className="valt-admin-brand-icon">▣</span><div><strong>VALT-<em>ON</em></strong><small>SIMULADOR DE COMPRAS</small></div></div>
+        <div className="valt-admin-nav-label">PAINEL</div>
+        <nav className="valt-admin-nav">
+          <button className="active" type="button" aria-current="page" onClick={() => setSecaoAdmin("inicio")}>▦ <span>Visão geral</span></button>
+          <button type="button" onClick={() => setSecaoAdmin("produtos")}>◈ <span>Produtos</span></button>
+          <button type="button" onClick={() => setSecaoAdmin("pedidos")}>▣ <span>Pedidos</span></button>
+          <button type="button" onClick={() => document.getElementById("valt-admin-alertas")?.scrollIntoView({behavior:"smooth"})}>⚠ <span>Estoque</span></button>
+          <button type="button" onClick={() => setSecaoAdmin("sugestoes")}>♧ <span>Sugestões</span></button>
+          <button type="button" onClick={() => document.getElementById("valt-admin-formulario")?.scrollIntoView({behavior:"smooth"})}>＋ <span>Cadastrar produto</span></button>
+        </nav>
+        <div className="valt-admin-sidebar-bottom"><button type="button" onClick={onVoltar}>↗ &nbsp; Ver loja</button><small>VALT-ON · Ambiente de simulação</small></div>
+      </aside>
+      <div className="valt-admin-workspace">
+        <header className="valt-admin-topbar"><div className="valt-admin-topbar-search">⌕ <input aria-label="Buscar produto no painel" placeholder="Buscar produto cadastrado..." value={buscaProduto} onChange={(e)=>setBuscaProduto(e.target.value)} /></div><div className="valt-admin-user"><span className="valt-admin-avatar">♙</span><span>Administrador</span></div></header>
+        <main className="valt-admin-content">
+          <div className="valt-admin-heading"><div><span className="valt-admin-kicker">PAINEL ADMINISTRATIVO</span><h1>Visão geral <span className="valt-admin-heading-dot">●</span></h1><p>Acompanhe os dados atuais da sua loja simulada.</p></div><button type="button" onClick={onVoltar} className="valt-admin-outline">↗ Ver loja</button></div>
+          <section className="valt-admin-metrics" aria-label="Indicadores da loja">{metricas.map((item)=><div className="valt-admin-metric" key={item.rotulo}><span className={`valt-admin-metric-icon ${item.tom}`}>{item.simbolo}</span><span className="valt-admin-metric-label">{item.rotulo}</span><strong>{item.valor}</strong><small>Dados atuais da loja</small></div>)}</section>
+          <div className="valt-admin-columns">
+            <section className="valt-admin-panel valt-admin-alerts" id="valt-admin-alertas"><div className="valt-admin-panel-title"><div><span className="valt-admin-panel-icon">⚠</span><h2>Alertas de estoque</h2></div><button type="button" onClick={()=>setSecaoAdmin("produtos")}>Ver produtos ↗</button></div>
+              {alertas.length===0?<p className="valt-admin-empty">Nenhum produto com estoque baixo no momento.</p>:<div className="valt-admin-alert-list">{alertas.map((item)=><div className="valt-admin-alert-row" key={item.id}><div className="valt-admin-alert-thumb">{item.imagem?<img src={obterUrlImagem(item.imagem)} alt="" loading="lazy"/>:"◈"}</div><div className="valt-admin-alert-info"><strong>{item.nome}</strong><small>{item.categoria||"Produto"}</small></div><div className="valt-admin-alert-stock"><strong>{Number(item.estoque)<=0?"Esgotado":`${item.estoque} restantes`}</strong><span><i style={{width:`${Math.min(100,Math.max(0,Number(item.estoque))*20)}%`}}/></span></div><button type="button" onClick={()=>editarProduto(item)}>Editar</button></div>)}</div>}
+            </section>
+            <section className="valt-admin-panel valt-admin-form-panel" id="valt-admin-formulario"><div className="valt-admin-panel-title"><div><span className="valt-admin-panel-icon">＋</span><h2>{editandoId!==null?"Editar produto":"Cadastrar produto"}</h2></div></div><p className="valt-admin-panel-hint">Gerencie seu catálogo sem sair do painel.</p>
+              {mensagem&&<div className="valt-admin-message" role="status">{mensagem}</div>}
+              <div className="valt-admin-product-form"><form onSubmit={salvarProduto}>
         {/* NOME */}
 
         <div style={{ marginBottom: "15px" }}>
@@ -939,16 +816,11 @@ function Admin({ usuario, onVoltar }) {
             ❌ Cancelar
           </button>
         )}
-      </form>
-
-      <hr
-        style={{
-          margin: "35px 0",
-        }}
-      />
-
-      <div style={{ marginTop: "30px" }}>
-        <p>Use o botão <strong>📦 Abrir produtos</strong> para gerenciar os produtos cadastrados.</p>
+      </form></div>
+            </section>
+          </div>
+          <footer className="valt-admin-footer">VALT-ON · Simulador de vendas — nenhuma transação financeira real.</footer>
+        </main>
       </div>
     </div>
   );
