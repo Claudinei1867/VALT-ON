@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SugestoesAdmin from "./pages/SugestoesAdmin";
 import PedidosAdmin from "./pages/admin/PedidosAdmin";
 import ProdutosAdmin from "./pages/admin/ProdutosAdmin";
@@ -33,6 +33,13 @@ function Admin({ usuario, onVoltar, onLogout }) {
 
   const [mensagem, setMensagem] = useState("");
   const [editandoId, setEditandoId] = useState(null);
+  const rolarParaEdicao = useRef(false);
+
+  useEffect(() => {
+    if (secaoAdmin !== "inicio" || !rolarParaEdicao.current) return;
+    rolarParaEdicao.current = false;
+    document.getElementById("valt-admin-formulario")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [secaoAdmin, editandoId]);
 
   // =====================================================
   // CARREGAR PRODUTOS
@@ -391,6 +398,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
   // =====================================================
 
   const editarProduto = (produto) => {
+    rolarParaEdicao.current = true;
     setEditandoId(produto.id);
 
     setNome(produto.nome || "");
@@ -406,10 +414,8 @@ function Admin({ usuario, onVoltar, onLogout }) {
     // Nenhum novo arquivo selecionado inicialmente
     setArquivoImagem(null);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    // O formulário fica na visão geral, abaixo dos indicadores.
+    // O useEffect acima rola até ele após a tela de produtos ser desmontada.
   };
 
   // =====================================================
