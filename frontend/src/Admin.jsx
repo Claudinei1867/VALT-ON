@@ -14,6 +14,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
   const [quantidadeClientes, setQuantidadeClientes] = useState(0);
   const [visitantesAtivos, setVisitantesAtivos] = useState(null);
   const [quantidadeProdutos, setQuantidadeProdutos] = useState(0);
+  const [vendasResumo, setVendasResumo] = useState(null);
   const [sugestoes, setSugestoes] = useState([]);
   const [secaoAdmin, setSecaoAdmin] = useState("inicio");
 
@@ -86,6 +87,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
         setQuantidadeClientes(dados.clientes);
         setVisitantesAtivos(dados.visitantes_ativos ?? null);
         setQuantidadeProdutos(dados.produtos);
+        setVendasResumo({comprados30:dados.comprados_30_dias,compradosTotal:dados.comprados_total,usados30:dados.usados_vendidos_30_dias,usadosTotal:dados.usados_vendidos_total});
       })
       .catch((erro) => {
         console.error(erro);
@@ -521,6 +523,10 @@ function Admin({ usuario, onVoltar, onLogout }) {
     { simbolo: "♙", rotulo: "Clientes", valor: quantidadeClientes, tom: "violet" },
     { simbolo: "●", rotulo: "Visitantes ativos (2 min)", valor: visitantesAtivos ?? "—", tom: "blue" },
     { simbolo: "▣", rotulo: "Pedidos carregados", valor: pedidos.length, tom: "blue" },
+    { simbolo: "🛒", rotulo: "Produtos novos comprados (30 dias)", valor: vendasResumo?.comprados30 ?? "—", tom: "gold" },
+    { simbolo: "🛒", rotulo: "Produtos novos comprados (total)", valor: vendasResumo?.compradosTotal ?? "—", tom: "gold" },
+    { simbolo: "↗", rotulo: "Produtos usados vendidos (30 dias)", valor: vendasResumo?.usados30 ?? "—", tom: "violet" },
+    { simbolo: "↗", rotulo: "Produtos usados vendidos (total)", valor: vendasResumo?.usadosTotal ?? "—", tom: "violet" },
     { simbolo: "◇", rotulo: "Sem estoque", valor: semEstoque, tom: "gray" },
     { simbolo: "⚠", rotulo: "Estoque baixo (até 5)", valor: estoqueBaixo, tom: "gold" },
   ];
