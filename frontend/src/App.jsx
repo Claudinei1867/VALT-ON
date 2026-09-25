@@ -9,6 +9,7 @@ import "./tema-v7-pastel.css";
 import "./mobile-account-menu.css";
 import "./fix-product-images.css";
 import "./melhorias-mobile.css";
+import "./admin-mobile-fix.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
