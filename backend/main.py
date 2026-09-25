@@ -775,6 +775,61 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
     return novo_cliente
 
 
+
+# Reenvio público por e-mail: resposta neutra para não revelar contas.
+@app.post("/reenviar-confirmacao-email")
+def reenviar_confirmacao_publico(dados: schemas.ReenviarConfirmacao, db: Session = Depends(get_db)):
+    resposta_neutra = {"mensagem": "Se houver uma conta pendente com esse e-mail, enviaremos um novo link. Confira também a pasta de spam."}
+    email_normalizado = dados.email.strip().lower()
+    if not email_normalizado or len(email_normalizado) > 254 or "@" not in email_normalizado:
+        raise HTTPException(status_code=422, detail="Informe um e-mail válido.")
+    cliente = db.query(models.Cliente).filter(models.Cliente.email == email_normalizado).first()
+    if cliente is None or cliente.email_confirmado == 1:
+        return resposta_neutra
+    agora = datetime.now()
+    # Limite de um envio a cada dois minutos, inclusive após o cadastro inicial.
+    if cliente.token_confirmacao_expira_em:
+        try:
+            criado_em = datetime.fromisoformat(cliente.token_confirmacao_expira_em) - timedelta(hours=24)
+            if agora - criado_em < timedelta(minutes=2):
+                return resposta_neutra
+        except ValueError:
+            pass
+    token = secrets.token_urlsafe(32)
+    link = "https://valt-on.onrender.com/confirmar-email?token=" + token
+    link_seguro = html.escape(link, quote=True)
+    texto = f"Olá, {cliente.nome}!\\n\\nConfirme seu e-mail VALT-ON:\\n{link}\\n\\nO link é válido por 24 horas."
+    html_corpo = (
+        f"<p>Olá, {html.escape(cliente.nome)}!</p>"
+        "<p>Seu novo link de confirmação VALT-ON:</p>"
+        f'<p><a href="{link_seguro}" style="display:inline-block;background:#f3d77e;color:#27313b;padding:12px 18px;font-weight:bold">Confirmar meu e-mail</a></p>'
+        f'<p>Ou acesse: <a href="{link_seguro}">{link_seguro}</a></p>'
+        "<p>Válido por 24 horas.</p>"
+    )
+    if not enviar_email(cliente.email, "Novo link de confirmação - VALT-ON", texto, html_corpo):
+        raise HTTPException(status_code=503, detail="Não foi possível enviar agora. Tente novamente mais tarde.")
+    cliente.token_confirmacao_email = token
+    cliente.token_confirmacao_expira_em = (agora + timedelta(hours=24)).isoformat()
+    db.commit()
+    return resposta_neutra
+
+# Contagem aproximada de navegadores ativos nos últimos 2 minutos.
+@app.post("/presenca/ping")
+def registrar_presenca(dados: schemas.PresencaPing, db: Session = Depends(get_db)):
+    sessao = dados.sessao
+    if not isinstance(sessao, str) or len(sessao) != 36 or any(c not in "0123456789abcdef-" for c in sessao.lower()):
+        raise HTTPException(status_code=422, detail="Sessão inválida.")
+    agora = datetime.now()
+    limite = (agora - timedelta(minutes=2)).isoformat()
+    db.query(models.PresencaVisitante).filter(models.PresencaVisitante.ultima_atividade < limite).delete(synchronize_session=False)
+    existente = db.query(models.PresencaVisitante).filter(models.PresencaVisitante.sessao == sessao).first()
+    if existente:
+        existente.ultima_atividade = agora.isoformat()
+    else:
+        db.add(models.PresencaVisitante(sessao=sessao, ultima_atividade=agora.isoformat()))
+    db.commit()
+    return {"ok": True}
+
 # =========================================================
 # RECUPERAÃ‡ÃƒO DE SENHA
 # ========================================================
@@ -1069,7 +1124,9 @@ def estatisticas_admin(db: Session = Depends(get_db)):
 
     quantidade_produtos = db.query(models.Produto).count()
 
-    return {"clientes": quantidade_clientes, "produtos": quantidade_produtos}
+    limite = (datetime.now() - timedelta(minutes=2)).isoformat()
+    visitantes_ativos = db.query(models.PresencaVisitante).filter(models.PresencaVisitante.ultima_atividade >= limite).count()
+    return {"clientes": quantidade_clientes, "produtos": quantidade_produtos, "visitantes_ativos": visitantes_ativos}
 
 
 # =========================================================

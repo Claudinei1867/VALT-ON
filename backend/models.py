@@ -508,3 +508,10 @@ class PagamentoCVT(Base):
         String,
         nullable=False
     )
+
+
+# Presença anônima por navegador; não guarda e-mail, nome ou IP.
+class PresencaVisitante(Base):
+    __tablename__ = "presenca_visitantes"
+    sessao = Column(String(64), primary_key=True)
+    ultima_atividade = Column(String(32), nullable=False, index=True)

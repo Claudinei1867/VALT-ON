@@ -12,6 +12,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
   const [pedidos, setPedidos] = useState([]);
   const [buscaPedido, setBuscaPedido] = useState("");
   const [quantidadeClientes, setQuantidadeClientes] = useState(0);
+  const [visitantesAtivos, setVisitantesAtivos] = useState(null);
   const [quantidadeProdutos, setQuantidadeProdutos] = useState(0);
   const [sugestoes, setSugestoes] = useState([]);
   const [secaoAdmin, setSecaoAdmin] = useState("inicio");
@@ -83,6 +84,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
       })
       .then((dados) => {
         setQuantidadeClientes(dados.clientes);
+        setVisitantesAtivos(dados.visitantes_ativos ?? null);
         setQuantidadeProdutos(dados.produtos);
       })
       .catch((erro) => {
@@ -187,6 +189,8 @@ function Admin({ usuario, onVoltar, onLogout }) {
       setMensagem("Erro ao alterar status do pedido.");
     }
   };
+
+  useEffect(() => {const intervalo=setInterval(carregarEstatisticas,30000);return ()=>clearInterval(intervalo);},[]);
 
   useEffect(() => {
     carregarProdutos();
@@ -515,6 +519,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
   const metricas = [
     { simbolo: "◈", rotulo: "Produtos cadastrados", valor: quantidadeProdutos, tom: "gold" },
     { simbolo: "♙", rotulo: "Clientes", valor: quantidadeClientes, tom: "violet" },
+    { simbolo: "●", rotulo: "Visitantes ativos (2 min)", valor: visitantesAtivos ?? "—", tom: "blue" },
     { simbolo: "▣", rotulo: "Pedidos carregados", valor: pedidos.length, tom: "blue" },
     { simbolo: "◇", rotulo: "Sem estoque", valor: semEstoque, tom: "gray" },
     { simbolo: "⚠", rotulo: "Estoque baixo (até 5)", valor: estoqueBaixo, tom: "gold" },

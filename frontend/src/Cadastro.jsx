@@ -7,10 +7,26 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [numeroIndicador, setNumeroIndicador] = useState("");
+  const [emailReenvio, setEmailReenvio] = useState("");
+  const [reenvioMensagem, setReenvioMensagem] = useState("");
+  const [reenviando, setReenviando] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [aceitouSimulador, setAceitouSimulador] = useState(false);
+
+  const reenviarConfirmacao = async (e) => {
+    e.preventDefault();
+    if (!emailReenvio.trim()) return;
+    setReenviando(true);
+    setReenvioMensagem("");
+    try {
+      const resposta = await fetch(`${API_URL}/reenviar-confirmacao-email`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:emailReenvio.trim()})});
+      const dados = await resposta.json();
+      setReenvioMensagem(resposta.ok ? dados.mensagem : (dados.detail || "Tente novamente mais tarde."));
+    } catch { setReenvioMensagem("Não foi possível conectar. Tente novamente."); }
+    finally { setReenviando(false); }
+  };
 
   const cadastrar = async (e) => {
     e.preventDefault();
@@ -56,6 +72,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
       setMensagem("Cadastro realizado com sucesso!");
 
       setNome("");
+      setEmailReenvio(email.trim());
       setEmail("");
       setSenha("");
       setNumeroIndicador("");
@@ -250,6 +267,16 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
         </button>
       </form>
 
+      <section style={{marginTop:24,padding:18,border:"1px solid #d6dadd",borderRadius:10,background:"#fffefa"}} aria-label="Reenviar confirmação de e-mail">
+        <h3 style={{marginTop:0,color:"#27313b"}}>Não recebeu o e-mail ou o link expirou?</h3>
+        <p style={{color:"#52616c"}}>Peça outro link de confirmação. Ele será válido por 24 horas.</p>
+        <form onSubmit={reenviarConfirmacao}>
+          <label htmlFor="email-reenvio-cadastro">E-mail cadastrado</label>
+          <input id="email-reenvio-cadastro" type="email" required value={emailReenvio} onChange={e=>setEmailReenvio(e.target.value)} placeholder="seu@email.com" style={{width:"100%",boxSizing:"border-box",padding:12,margin:"8px 0",border:"1px solid #b9c6ca",borderRadius:6}} />
+          <button type="submit" disabled={reenviando} style={{background:"#f3d77e",color:"#27313b",padding:12,border:"1px solid #d2b65c",borderRadius:6,fontWeight:800}}>{reenviando?"Enviando...":"Reenviar link de confirmação"}</button>
+          {reenvioMensagem && <p role="status" style={{color:"#27313b"}}>{reenvioMensagem}</p>}
+        </form>
+      </section>
       <button type="button" onClick={onVoltar}>
         Voltar
       </button>
