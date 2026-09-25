@@ -10,6 +10,7 @@ import "./mobile-account-menu.css";
 import "./fix-product-images.css";
 import "./melhorias-mobile.css";
 import "./admin-mobile-fix.css";
+import "./home-carousel-welcome.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -64,6 +65,23 @@ function App() {
   // ESTADOS
 
   const [produtos, setProdutos] = useState([]);
+  const [indiceDestaque, setIndiceDestaque] = useState(0);
+  const [mostrarBoasVindas, setMostrarBoasVindas] = useState(() => {
+    try { return sessionStorage.getItem("valt-boas-vindas-v1") !== "visto"; }
+    catch { return true; }
+  });
+  const fecharBoasVindas = () => {
+    try { sessionStorage.setItem("valt-boas-vindas-v1", "visto"); } catch {}
+    setMostrarBoasVindas(false);
+  };
+  const produtosDestaque = produtos.filter((produto) => produto.imagem).slice(0, 8);
+  useEffect(() => {
+    if (produtosDestaque.length < 2 || mostrarBoasVindas) return;
+    const intervalo = setInterval(() => {
+      if (document.visibilityState === "visible") setIndiceDestaque((indice) => (indice + 1) % produtosDestaque.length);
+    }, 5000);
+    return () => clearInterval(intervalo);
+  }, [produtosDestaque.length, mostrarBoasVindas]);
 
   const [carregando, setCarregando] = useState(true);
 
@@ -1012,6 +1030,17 @@ function App() {
 
   return (
     <div className="valt-store">
+      {mostrarBoasVindas && (
+        <div className="valt-welcome-backdrop" role="presentation" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) fecharBoasVindas(); }}>
+          <section className="valt-welcome-dialog" role="dialog" aria-modal="true" aria-labelledby="valt-welcome-title" aria-describedby="valt-welcome-description">
+            <button type="button" className="valt-welcome-close" onClick={fecharBoasVindas} aria-label="Fechar aviso">×</button>
+            <img src="/logo-valt-on.png" alt="VALT-ON" className="valt-welcome-logo" />
+            <h2 id="valt-welcome-title">Bem-vindo à VALT-ON!</h2>
+            <p id="valt-welcome-description">Um simulador de compras online. Todas as compras são fictícias: não há compras, pagamentos nem entregas reais.</p>
+            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e começar a navegar →</button>
+          </section>
+        </div>
+      )}
       {/* =================================================
           HEADER
       ================================================= */}
@@ -1274,8 +1303,12 @@ function App() {
         >
           Explorar produtos <span aria-hidden="true">→</span>
         </button></div>
-        {produtos.find((produto) => produto.imagem) && (
-          <div className="valt-hero-visual" aria-hidden="true"><img src={obterUrlImagem(produtos.find((produto) => produto.imagem).imagem)} alt="" /><span>ESCOLHAS PARA VOCÊ</span></div>
+        {produtosDestaque.length > 0 && (
+          <div className="valt-hero-visual valt-hero-carousel" aria-label="Produtos em destaque">
+            <img key={produtosDestaque[indiceDestaque % produtosDestaque.length]?.id ?? indiceDestaque} src={obterUrlImagem(produtosDestaque[indiceDestaque % produtosDestaque.length].imagem)} alt={produtosDestaque[indiceDestaque % produtosDestaque.length].nome || "Produto em destaque"} />
+            <span>ESCOLHAS PARA VOCÊ</span>
+            {produtosDestaque.length > 1 && <div className="valt-carousel-dots" aria-label="Selecionar produto em destaque">{produtosDestaque.map((produto, indice) => <button type="button" key={produto.id ?? indice} className={indice === indiceDestaque % produtosDestaque.length ? "active" : ""} onClick={() => setIndiceDestaque(indice)} aria-label={`Ver destaque ${indice + 1}`} aria-current={indice === indiceDestaque % produtosDestaque.length ? "true" : undefined} />)}</div>}
+          </div>
         )}
       </section >
 
