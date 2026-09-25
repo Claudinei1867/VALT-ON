@@ -1307,7 +1307,6 @@ function App() {
           <div className="valt-hero-visual valt-hero-carousel" aria-label="Produtos em destaque">
             <img key={produtosDestaque[indiceDestaque % produtosDestaque.length]?.id ?? indiceDestaque} src={obterUrlImagem(produtosDestaque[indiceDestaque % produtosDestaque.length].imagem)} alt={produtosDestaque[indiceDestaque % produtosDestaque.length].nome || "Produto em destaque"} />
             <span>ESCOLHAS PARA VOCÊ</span>
-            {produtosDestaque.length > 1 && <div className="valt-carousel-dots" aria-label="Selecionar produto em destaque">{produtosDestaque.map((produto, indice) => <button type="button" key={produto.id ?? indice} className={indice === indiceDestaque % produtosDestaque.length ? "active" : ""} onClick={() => setIndiceDestaque(indice)} aria-label={`Ver destaque ${indice + 1}`} aria-current={indice === indiceDestaque % produtosDestaque.length ? "true" : undefined} />)}</div>}
           </div>
         )}
       </section >
