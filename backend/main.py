@@ -12,6 +12,9 @@ import secrets
 import urllib.request
 import urllib.error
 import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import bcrypt
 from dotenv import load_dotenv
 from database import engine, Base, SessionLocal
@@ -154,42 +157,32 @@ def enviar_email(
 
     try:
 
-        api_key = os.getenv("BREVO_API_KEY")
+        servidor = os.getenv("SMTP_HOST")
+        porta = int(os.getenv("SMTP_PORT", "465"))
+        usuario = os.getenv("SMTP_USER")
+        senha = os.getenv("SMTP_PASSWORD")
 
-        dados = {
-            "sender": {"name": "Valt-on", "email": os.getenv("SMTP_USER")},
-            "to": [{"email": destinatario}],
-            "subject": assunto,
-            "textContent": mensagem,
-            "htmlContent": (
-                html_mensagem
-                if html_mensagem is not None
-                else mensagem.replace("\n", "<br>")
-            ),
-        }
-
-        dados_json = json.dumps(dados).encode("utf-8")
-
-        requisicao = urllib.request.Request(
-            "https://api.brevo.com/v3/smtp/email",
-            data=dados_json,
-            headers={
-                "accept": "application/json",
-                "api-key": api_key,
-                "content-type": "application/json",
-            },
-            method="POST",
+        corpo_html = (
+            html_mensagem
+            if html_mensagem is not None
+            else mensagem.replace("\n", "<br>")
         )
 
-        with urllib.request.urlopen(requisicao) as resposta:
+        msg = MIMEMultipart("alternative")
+        msg["From"] = f"Valt-on <{usuario}>"
+        msg["To"] = destinatario
+        msg["Subject"] = assunto
 
-            resultado = resposta.read().decode("utf-8")
+        msg.attach(MIMEText(mensagem, "plain", "utf-8"))
+        msg.attach(MIMEText(corpo_html, "html", "utf-8"))
 
-            print(f"E-mail enviado com sucesso para {destinatario}")
+        with smtplib.SMTP_SSL(servidor, porta) as conexao:
+            conexao.login(usuario, senha)
+            conexao.sendmail(usuario, destinatario, msg.as_string())
 
-            print(f"Resposta Brevo: {resultado}")
+        print(f"E-mail enviado com sucesso para {destinatario} via Hostinger")
 
-            return True
+        return True
 
     except Exception as erro:
 
