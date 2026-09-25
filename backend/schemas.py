@@ -34,6 +34,7 @@ class ClienteCreate(BaseModel):
     nome: str
     email: str
     senha: str
+    indicador_id: int | None = None
 
 
 class ClienteLogin(BaseModel):

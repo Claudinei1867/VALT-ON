@@ -12,6 +12,7 @@ import secrets
 import urllib.request
 import urllib.error
 import json
+import html
 import bcrypt
 from dotenv import load_dotenv
 from database import engine, Base, SessionLocal
@@ -243,8 +244,16 @@ def reenviar_confirmacao_email(cliente_id: int, db: Session = Depends(get_db)):
         "VALT-ON"
     )
 
+    url_segura = html.escape(link_confirmacao, quote=True)
+    html_confirmacao = (
+        f"<p>Olá, {html.escape(cliente.nome)}!</p>"
+        "<p>Confirme seu e-mail VALT-ON:</p>"
+        f'<p><a href="{url_segura}" style="display:inline-block;padding:12px 20px;background:#f3d77e;color:#27313b;font-weight:bold;text-decoration:none;border-radius:6px">Confirmar meu e-mail</a></p>'
+        f'<p>Ou copie este endereço: <a href="{url_segura}">{url_segura}</a></p>'
+        "<p>O link é válido por 24 horas.</p>"
+    )
     enviado = enviar_email(
-        cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao
+        cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao, html_confirmacao
     )
 
     if not enviado:
@@ -676,6 +685,13 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
 
         raise HTTPException(status_code=400, detail="E-mail jÃ¡ cadastrado.")
 
+    if cliente.indicador_id is not None:
+        if cliente.indicador_id <= 0:
+            raise HTTPException(status_code=400, detail="Número do indicador inválido.")
+        indicador = db.query(models.Cliente).filter(models.Cliente.id == cliente.indicador_id, models.Cliente.email_confirmado == 1).first()
+        if indicador is None:
+            raise HTTPException(status_code=400, detail="Cliente indicador não encontrado ou e-mail ainda não confirmado.")
+
     # -----------------------------------------------------
     # CRIAR CLIENTE
     # -----------------------------------------------------
@@ -705,6 +721,10 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
     db.commit()
 
     db.refresh(novo_cliente)
+
+    if cliente.indicador_id is not None:
+        db.add(models.Indicacao(indicador_id=cliente.indicador_id, indicado_id=novo_cliente.id, creditada=0))
+        db.commit()
 
     # -----------------------------------------------------
     # CRIAR CASA PEQUENA AUTOMATICAMENTE
@@ -740,8 +760,16 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
         "VALT-ON"
     )
 
+    url_segura = html.escape(link_confirmacao, quote=True)
+    html_confirmacao = (
+        f"<p>Olá, {html.escape(novo_cliente.nome)}!</p>"
+        "<p>Sua conta no VALT-ON foi criada. Confirme seu e-mail:</p>"
+        f'<p><a href="{url_segura}" style="display:inline-block;padding:12px 20px;background:#f3d77e;color:#27313b;font-weight:bold;text-decoration:none;border-radius:6px">Confirmar meu e-mail</a></p>'
+        f'<p>Ou copie este endereço: <a href="{url_segura}">{url_segura}</a></p>'
+        "<p>O link é válido por 24 horas. Se não criou a conta, ignore esta mensagem.</p>"
+    )
     enviar_email(
-        novo_cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao
+        novo_cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao, html_confirmacao
     )
 
     return novo_cliente
@@ -917,6 +945,16 @@ def confirmar_email(token: str, db: Session = Depends(get_db)):
 
     if datetime.now() > expiracao:
         raise HTTPException(status_code=400, detail="Token de confirmaÃ§Ã£o expirado.")
+
+    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente.id).with_for_update().one()
+    if cliente.email_confirmado == 1:
+        return {"mensagem": "E-mail já confirmado."}
+    indicacao = db.query(models.Indicacao).filter(models.Indicacao.indicado_id == cliente.id, models.Indicacao.creditada == 0).with_for_update().first()
+    if indicacao is not None:
+        indicador = db.query(models.Cliente).filter(models.Cliente.id == indicacao.indicador_id).with_for_update().first()
+        if indicador is not None:
+            indicador.saldo_cvt = (indicador.saldo_cvt or 0) + 300.0
+            indicacao.creditada = 1
 
     cliente.email_confirmado = 1
     cliente.token_confirmacao_email = None

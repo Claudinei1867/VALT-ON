@@ -1,0 +1,11 @@
+html,body,#root{max-width:100%;overflow-x:clip}
+.valt-admin-v6,.valt-admin-v6 .valt-admin-workspace,.valt-admin-v6 .valt-admin-content,.valt-admin-v6 .valt-admin-columns,.valt-admin-v6 .valt-admin-form-panel,.valt-admin-v6 .valt-admin-product-form{min-width:0;max-width:100%}
+.valt-admin-v6 .valt-admin-product-form form{min-width:0;max-width:100%}
+.valt-admin-v6 .valt-admin-product-form :is(input,select,textarea){box-sizing:border-box!important;max-width:100%!important;min-width:0!important}
+.valt-admin-v6 .valt-admin-product-form input[type=file]{width:100%!important;min-width:0!important;overflow-wrap:anywhere}
+.valt-account-page .valt-enter-house,.valt-account-screen .valt-enter-house{background:#27313b!important;color:#fff!important;border:2px solid #27313b!important;font-size:15px!important;font-weight:800!important;line-height:1.35!important;min-height:46px!important;white-space:normal!important;text-shadow:none!important}
+.valt-account-page .valt-enter-house:hover,.valt-account-screen .valt-enter-house:hover{background:#3b4a56!important;color:#fff!important}
+.valt-client-number{background:#fff7dd!important;color:#27313b!important;border:1px solid #ddc97f!important;padding:12px!important;border-radius:7px!important;overflow-wrap:anywhere}
+.valt-client-number small{display:block;color:#52616c!important;margin-top:5px}
+.valt-referral-field small{display:block;margin-top:7px;color:#52616c!important;line-height:1.4}
+@media(max-width:800px){.valt-admin-v6{width:100%;max-width:100vw;overflow-x:clip}.valt-admin-v6 .valt-admin-content{padding-inline:12px!important}.valt-admin-v6 .valt-admin-columns{display:grid!important;grid-template-columns:minmax(0,1fr)!important}.valt-admin-v6 .valt-admin-form-panel{width:100%!important;padding:12px!important}.valt-admin-v6 .valt-admin-product-form form{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}.valt-admin-v6 .valt-admin-product-form form>div{grid-column:1/-1!important;max-width:100%!important}.valt-admin-v6 .valt-admin-product-form form>button{grid-column:1/-1!important;max-width:100%!important}.valt-admin-v6 .valt-admin-product-form textarea{resize:vertical}.valt-admin-v6 .valt-admin-product-form label{overflow-wrap:anywhere}}

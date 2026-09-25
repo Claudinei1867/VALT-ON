@@ -6,6 +6,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [numeroIndicador, setNumeroIndicador] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -41,6 +42,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
           nome: nome.trim(),
           email: email.trim(),
           senha,
+          indicador_id: numeroIndicador.trim() ? Number(numeroIndicador) : null,
         }),
       });
 
@@ -56,6 +58,7 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
       setNome("");
       setEmail("");
       setSenha("");
+      setNumeroIndicador("");
       setAceitouSimulador(false);
 
       if (onCadastroSucesso) {
@@ -175,6 +178,11 @@ function Cadastro({ onCadastroSucesso, onVoltar }) {
           />
         </div>
 
+        <div className="valt-referral-field" style={{ marginBottom: "18px" }}>
+          <label htmlFor="numero-indicador">Número do cliente que indicou você (opcional)</label>
+          <input id="numero-indicador" type="number" inputMode="numeric" min="1" step="1" value={numeroIndicador} onChange={(e) => setNumeroIndicador(e.target.value)} placeholder="Ex.: 4" style={{width:"100%",padding:"14px",fontSize:"17px",boxSizing:"border-box",borderRadius:"8px",border:"1px solid #ccc",marginTop:"6px"}} />
+          <small>Quem indicou recebe 300 CVT após você confirmar seu e-mail.</small>
+        </div>
         <div
           style={{
             marginTop: "10px",

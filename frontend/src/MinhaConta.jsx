@@ -768,6 +768,7 @@ function MinhaConta({
             {usuario.email}
           </p>
 
+          <p className="valt-client-number"><strong>Seu número de cliente:</strong> #{usuario.id} <small>Compartilhe este número para receber 300 CVT quando um novo cliente indicado confirmar o e-mail.</small></p>
           <p>
             <strong>Saldo CVT:</strong>{" "}
             {Number(usuario.saldo_cvt || 0).toFixed(2)} CVT
@@ -1172,6 +1173,7 @@ function MinhaConta({
                     onClick={() => {
                       setEspacoAberto(espaco);
                     }}
+                    className="valt-enter-house"
                     style={{
                       padding: "10px 16px",
                       borderRadius: "8px",
