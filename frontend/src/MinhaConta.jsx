@@ -34,6 +34,8 @@ function MinhaConta({
   onAtualizarUsuario,
   onVoltar,
   onLogout,
+  produtosFavoritos = [],
+  onAbrirProduto,
 }) {
 
   // =====================================================
@@ -46,6 +48,7 @@ function MinhaConta({
     useState(false);
   const [mostrarPedidos, setMostrarPedidos] =
     useState(false);
+  const [notificacoesPedidos,setNotificacoesPedidos]=useState([]);
 
   // =====================================================
   // MONITORAMENTO DE ALTERAÇÃO DE STATUS
@@ -216,6 +219,7 @@ function MinhaConta({
             statusAnterior !== pedido.status
           ) {
 
+            setNotificacoesPedidos(atuais=>[{id:`${pedido.pedido_id}-${pedido.status}-${Date.now()}`,texto:`Pedido #${pedido.pedido_id}: status atualizado para ${pedido.status}.`},...atuais].slice(0,5));
             console.log(
               "ALTERAÇÃO DE STATUS DETECTADA:",
               pedido.pedido_id,
@@ -683,13 +687,14 @@ function MinhaConta({
   // =====================================================
 
   return (
-    <div
+    <div className="valt-account-screen"
       style={{
         minHeight: "100vh",
         background: "#e0e0e0",
         padding: "30px 20px",
       }}
     >
+      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronização entre dispositivos estará disponível após a implantação de autenticação segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
       <div
         style={{
           maxWidth: "950px",
@@ -763,6 +768,7 @@ function MinhaConta({
             {usuario.email}
           </p>
 
+          <p className="valt-client-number"><strong>Seu número de cliente:</strong> #{usuario.id} <small>Compartilhe este número para receber 300 CVT quando um novo cliente indicado confirmar o e-mail.</small></p>
           <p>
             <strong>Saldo CVT:</strong>{" "}
             {Number(usuario.saldo_cvt || 0).toFixed(2)} CVT
@@ -887,8 +893,8 @@ function MinhaConta({
                 {[
                   { quantidade: 1000, valor: 5 },
                   { quantidade: 2500, valor: 12 },
-                  { quantidade: 5000, valor: 35 },
-                  { quantidade: 10000, valor: 80 },
+                  { quantidade: 5000, valor: 20 },
+                  { quantidade: 10000, valor: 35 },
                 ].map((pacote) => (
                   <button
                     key={pacote.quantidade}
@@ -1167,6 +1173,7 @@ function MinhaConta({
                     onClick={() => {
                       setEspacoAberto(espaco);
                     }}
+                    className="valt-enter-house"
                     style={{
                       padding: "10px 16px",
                       borderRadius: "8px",
@@ -1527,6 +1534,7 @@ function MinhaConta({
               📦 Meus Pedidos
             </h2>
 
+            {notificacoesPedidos.length>0&&<div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>Atualizações recentes</strong><button type="button" onClick={()=>setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n=><p key={n.id}>{n.texto}</p>)}</div>}
             {pedidos.length === 0 ? (
               <p>
                 Você ainda não possui
@@ -1537,10 +1545,9 @@ function MinhaConta({
                 const aberto =
                   pedidoAberto === pedido.pedido_id;
 
-                const etapaAtual =
-                  obterEtapaPedido(
-                    pedido.status
-                  );
+                const etapaAtual = obterEtapaPedido(pedido.status);
+                const etapasPedido=["Pago","Preparando","Enviado","A caminho","Entregue"];
+                const etapaIndice=etapasPedido.findIndex(etapa=>etapa.toLowerCase()===String(pedido.status||"").toLowerCase());
 
                 return (
                   <div
@@ -1554,6 +1561,7 @@ function MinhaConta({
                       background: "#fff",
                     }}
                   >
+                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status||"").toLowerCase()==="cancelado"?<strong className="valt-order-cancelled">Pedido cancelado</strong>:etapasPedido.map((etapa,i)=><div key={etapa} className={i<=etapaIndice?"done":""}><span>{i<etapaIndice?"✓":i+1}</span><small>{etapa}</small></div>)}</div>
                     {/* RESUMO DO PEDIDO */}
 
                     <div

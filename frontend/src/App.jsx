@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
+import "./modernizacao.css";
+import "./ajustes-visuais-seguros.css";
+import "./tema-v6-commerce.css";
+import "./correcoes-v6-contraste.css";
+import "./tema-v7-pastel.css";
+import "./mobile-account-menu.css";
+import "./fix-product-images.css";
+import "./melhorias-mobile.css";
+import "./admin-mobile-fix.css";
+import "./home-carousel-welcome.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -10,6 +20,7 @@ import ProdutoDetalhes from "./ProdutoDetalhes";
 import RedefinirSenha from "./RedefinirSenha";
 import ProdutosUsados from "./pages/ProdutosUsados";
 import BotoesNavegacao from "./components/BotoesNavegacao";
+import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -41,10 +52,36 @@ const obterUrlImagem = (url) => {
 // =====================================================
 
 function App() {
+  useEffect(() => {
+    let sessao = sessionStorage.getItem("valt-presenca");
+    if (!sessao) {sessao=crypto.randomUUID();sessionStorage.setItem("valt-presenca",sessao);}
+    const ping = () => {if(document.visibilityState!=="hidden")fetch(`${API_URL}/presenca/ping`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessao})}).catch(()=>{});};
+    ping();
+    const intervalo = setInterval(ping,45000);
+    document.addEventListener("visibilitychange",ping);
+    return () => {clearInterval(intervalo);document.removeEventListener("visibilitychange",ping);};
+  }, []);
   // =====================================================
   // ESTADOS
 
   const [produtos, setProdutos] = useState([]);
+  const [indiceDestaque, setIndiceDestaque] = useState(0);
+  const [mostrarBoasVindas, setMostrarBoasVindas] = useState(() => {
+    try { return sessionStorage.getItem("valt-boas-vindas-v1") !== "visto"; }
+    catch { return true; }
+  });
+  const fecharBoasVindas = () => {
+    try { sessionStorage.setItem("valt-boas-vindas-v1", "visto"); } catch {}
+    setMostrarBoasVindas(false);
+  };
+  const produtosDestaque = produtos.filter((produto) => produto.imagem).slice(0, 8);
+  useEffect(() => {
+    if (produtosDestaque.length < 2 || mostrarBoasVindas) return;
+    const intervalo = setInterval(() => {
+      if (document.visibilityState === "visible") setIndiceDestaque((indice) => (indice + 1) % produtosDestaque.length);
+    }, 5000);
+    return () => clearInterval(intervalo);
+  }, [produtosDestaque.length, mostrarBoasVindas]);
 
   const [carregando, setCarregando] = useState(true);
 
@@ -53,24 +90,44 @@ function App() {
   const [categoria, setCategoria] = useState("Todos");
 
   const [pesquisa, setPesquisa] = useState("");
+  const [favoritos,setFavoritos]=useState([]);
+  const [favoritosCarregados,setFavoritosCarregados]=useState(false);
+  const [usuarioFavoritos,setUsuarioFavoritos]=useState(null);
+  // Favoritos ficam isolados por conta neste navegador. Sincronização remota exige sessão autenticada.
+  useEffect(()=>{
+    const chave=usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
+    try {const dados=JSON.parse(localStorage.getItem(chave)||"[]");setFavoritos(Array.isArray(dados)?dados:[]);}catch{setFavoritos([]);}
+    setFavoritosCarregados(true);
+  },[usuarioFavoritos]);
+  useEffect(()=>{
+    if(!favoritosCarregados)return;
+    const chave=usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
+    try{localStorage.setItem(chave,JSON.stringify(favoritos));}catch(erro){console.warn("Favoritos não salvos",erro);}
+  },[favoritos,favoritosCarregados,usuarioFavoritos]);
+  const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
+  const [ordenacao, setOrdenacao] = useState("destaques");
+  const [precoMinimo,setPrecoMinimo]=useState("");
+  const [precoMaximo,setPrecoMaximo]=useState("");
+  const [apenasDisponiveis,setApenasDisponiveis]=useState(false);
+  const formatarCVT = (valor) => `CVT ${Number(valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const categoriasDisponiveis = ["Todos", ...CATEGORIAS, ...new Set(produtos.map((produto) => normalizarCategoria(produto.categoria)).filter(Boolean))].filter((item, index, lista) => lista.indexOf(item) === index);
+  const alternarFavorito = (id) => setFavoritos((atual) => atual.includes(id) ? atual.filter((item) => item !== id) : [...atual, id]);
 
   const [carrinho, setCarrinho] = useState([]);
 
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
 
-  const posicaoScrollCarrinho = useRef(0);
-
+  const posicaoScrollVitrine = useRef(null);
+  // Congela a vitrine sob o drawer e restaura a posição no fechamento.
   useEffect(() => {
-    if (mostrarCarrinho) {
-      posicaoScrollCarrinho.current = window.scrollY;
-    } else if (posicaoScrollCarrinho.current > 0) {
-      window.scrollTo({
-        top: posicaoScrollCarrinho.current,
-        behavior: "instant",
-      });
-    }
-  }, [mostrarCarrinho]);
+    if (!mostrarCarrinho) return;
+    const y = window.scrollY;
+    const body = document.body;
+    const anterior = {position:body.style.position,top:body.style.top,left:body.style.left,right:body.style.right,width:body.style.width};
+    Object.assign(body.style,{position:"fixed",top:`-${y}px`,left:"0",right:"0",width:"100%"});
+    return () => {Object.assign(body.style,anterior);window.scrollTo({top:y,behavior:"instant"});};
+  },[mostrarCarrinho]);
 
   const [mostrarProdutosUsados, setMostrarProdutosUsados] =
     useState(false);
@@ -139,6 +196,11 @@ function App() {
   const [quantidadeDetalhes, setQuantidadeDetalhes] =
     useState(1);
 
+  useEffect(() => {
+    if (produtoSelecionado || mostrarConta || mostrarAdmin || mostrarLogin || mostrarCadastro || mostrarProdutosUsados) return;
+    if (posicaoScrollVitrine.current !== null) {const y=posicaoScrollVitrine.current;posicaoScrollVitrine.current=null;requestAnimationFrame(()=>window.scrollTo({top:y,behavior:"instant"}));}
+  },[produtoSelecionado,mostrarConta,mostrarAdmin,mostrarLogin,mostrarCadastro,mostrarProdutosUsados]);
+
   // =====================================================
   // RECUPERAR USUARIO SALVO
   // =====================================================
@@ -153,6 +215,8 @@ function App() {
           JSON.parse(usuarioSalvo);
 
         setUsuario(dados);
+        setFavoritosCarregados(false);
+        setUsuarioFavoritos(dados.id || null);
 
         console.log(
           "USUÁRIO RECUPERADO:",
@@ -359,6 +423,8 @@ function App() {
     );
 
     setUsuario(dadosUsuario);
+    setFavoritosCarregados(false);
+    setUsuarioFavoritos(dadosUsuario.id || null);
 
     localStorage.setItem(
       "usuario",
@@ -380,11 +446,15 @@ function App() {
     );
 
     setUsuario(null);
+    setFavoritosCarregados(false);
+    setUsuarioFavoritos(null);
 
     setMostrarConta(false);
-
+    setMostrarAdmin(false);
+    setMostrarCadastro(false);
+    setMostrarSugestoes(false);
+    setMostrarProdutosUsados(false);
     setMostrarLogin(false);
-
     setMostrarCarrinho(false);
 
     localStorage.removeItem(
@@ -404,7 +474,7 @@ function App() {
     (produto) => {
       const correspondeCategoria =
         categoria === "Todos" ||
-        produto.categoria === categoria;
+        normalizarCategoria(produto.categoria) === categoria;
 
       const correspondePesquisa =
         produto.nome
@@ -414,12 +484,16 @@ function App() {
             pesquisa.trim().toLowerCase()
           );
 
-      return (
-        correspondeCategoria &&
-        correspondePesquisa
-      );
+      return correspondeCategoria && correspondePesquisa && (!mostrarFavoritos || favoritos.includes(produto.id)) && (precoMinimo==="" || Number(produto.preco)>=Number(precoMinimo)) && (precoMaximo==="" || Number(produto.preco)<=Number(precoMaximo)) && (!apenasDisponiveis || Number(produto.estoque)>0);
     }
   );
+
+  const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
+    if (ordenacao === "menor-preco") return Number(a.preco) - Number(b.preco);
+    if (ordenacao === "maior-preco") return Number(b.preco) - Number(a.preco);
+    if (ordenacao === "nome") return a.nome.localeCompare(b.nome, "pt-BR");
+    return 0;
+  });
 
   // =====================================================
   // ADICIONAR AO CARRINHO
@@ -476,7 +550,7 @@ function App() {
       }
     );
 
-    alert("✅ Produto adicionado ao carrinho!");
+    setMostrarCarrinho(true);
   };
 
   // =====================================================
@@ -484,6 +558,7 @@ function App() {
   // =====================================================
 
   const abrirDetalhesProduto = (produto) => {
+    if (!produtoSelecionado) posicaoScrollVitrine.current = window.scrollY;
     setProdutoSelecionado(produto);
     setQuantidadeDetalhes(1);
   };
@@ -590,7 +665,9 @@ function App() {
   // FINALIZAR COMPRA
   // =====================================================
 
+  const [finalizandoCompra, setFinalizandoCompra] = useState(false);
   const finalizarCompra = async () => {
+    if (finalizandoCompra) return;
     // Verificar se está logado
     if (!usuario || !usuario.id) {
       alert("❌ Você precisa estar logado para finalizar a compra.");
@@ -609,6 +686,7 @@ function App() {
       return;
     }
 
+    setFinalizandoCompra(true);
     try {
       // ---------------------------------------------------
       // PREPARAR ITENS DA COMPRA
@@ -676,7 +754,7 @@ function App() {
         `✅ Compra realizada com sucesso!\n\n` +
         `📦 Pedido: #${dados.pedido_id}\n` +
         `👤 Cliente: ${usuario.nome}\n` +
-        `💰 Total: CVT ${Number(dados.total).toFixed(2)}`
+        `💰 Total: ${formatarCVT(dados.total)}`
       );
 
       // ---------------------------------------------------
@@ -701,7 +779,7 @@ function App() {
       alert(
         `❌ ${error.message || "Não foi possível finalizar a compra."}`
       );
-    }
+    } finally {setFinalizandoCompra(false);}
   };
   // =====================================================
   // TELA ADMINISTRADOR
@@ -710,7 +788,7 @@ function App() {
   if (mostrarAdmin) {
     return (
       <div>
-        <Admin usuario={usuario} onVoltar={() => {
+        <Admin usuario={usuario} onLogout={sairDaConta} onVoltar={() => {
           setMostrarAdmin(false);
           carregarProdutos();
         }} />
@@ -843,6 +921,8 @@ function App() {
           setMostrarConta(false);
         }}
         onLogout={sairDaConta}
+        produtosFavoritos={produtos.filter((item)=>favoritos.includes(item.id))}
+        onAbrirProduto={(produto)=>{setMostrarConta(false);abrirDetalhesProduto(produto);}}
       />
     );
   }
@@ -862,12 +942,15 @@ function App() {
           setQuantidadeDetalhes(1);
         }}
         onComprar={() => {
-          for (let i = 0; i < quantidadeDetalhes; i++) {
-            adicionarCarrinho(produtoSelecionado);
-          }
-          setProdutoSelecionado(null);
-          setQuantidadeDetalhes(1);
+          const quantidade=Math.min(Math.max(1,quantidadeDetalhes),Number(produtoSelecionado.estoque));
+          if(quantidade<=0)return;
+          setCarrinho((atual)=>{const existente=atual.find((item)=>item.id===produtoSelecionado.id);const total=Math.min(Number(produtoSelecionado.estoque),(existente?.quantidade||0)+quantidade);return existente?atual.map((item)=>item.id===produtoSelecionado.id?{...item,quantidade:total}:item):[...atual,{...produtoSelecionado,quantidade:total}];});
+          setProdutoSelecionado(null);setQuantidadeDetalhes(1);setMostrarCarrinho(true);
         }}
+        relacionados={produtos.filter((item)=>item.id!==produtoSelecionado.id&&item.categoria===produtoSelecionado.categoria).slice(0,4)}
+        onVerRelacionado={(produto)=>{setProdutoSelecionado(produto);setQuantidadeDetalhes(1);window.scrollTo({top:0,behavior:"smooth"});}}
+        favorito={favoritos.includes(produtoSelecionado.id)}
+        onAlternarFavorito={()=>alternarFavorito(produtoSelecionado.id)}
         obterUrlImagem={obterUrlImagem}
       />
     );
@@ -946,12 +1029,23 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="valt-store">
+      {mostrarBoasVindas && (
+        <div className="valt-welcome-backdrop" role="presentation" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) fecharBoasVindas(); }}>
+          <section className="valt-welcome-dialog" role="dialog" aria-modal="true" aria-labelledby="valt-welcome-title" aria-describedby="valt-welcome-description">
+            <button type="button" className="valt-welcome-close" onClick={fecharBoasVindas} aria-label="Fechar aviso">×</button>
+            <img src="/logo-valt-on.png" alt="VALT-ON" className="valt-welcome-logo" />
+            <h2 id="valt-welcome-title">Bem-vindo à VALT-ON!</h2>
+            <p id="valt-welcome-description">Um simulador de compras online. Todas as compras são fictícias: não há compras, pagamentos nem entregas reais.</p>
+            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e começar a navegar →</button>
+          </section>
+        </div>
+      )}
       {/* =================================================
           HEADER
       ================================================= */}
 
-      <header
+      <header className="valt-header"
         style={{
           display: "flex",
           alignItems: "center",
@@ -984,7 +1078,9 @@ function App() {
           {/* BUSCA */}
 
           <input
-            type="text"
+            className="valt-search"
+            aria-label="Pesquisar produtos"
+            type="search"
             placeholder="🔎 Pesquisar produto..."
             value={pesquisa}
             onChange={(e) =>
@@ -1004,6 +1100,7 @@ function App() {
           <BotoesNavegacao
             usuario={usuario}
             setMostrarConta={setMostrarConta}
+            onLogout={sairDaConta}
             setMostrarLogin={setMostrarLogin}
             setMostrarCadastro={setMostrarCadastro}
             setMostrarAdmin={setMostrarAdmin}
@@ -1021,14 +1118,14 @@ function App() {
       </header >
 
       {mostrarSugestoes && (
-        <div
+        <div className="valt-suggestion-screen"
           style={{
             padding: "30px 20px",
             backgroundColor: "#e0e0e0",
             minHeight: "400px",
           }}
         >
-          <div
+          <div className="valt-suggestion-card"
             style={{
               maxWidth: "700px",
               margin: "0 auto",
@@ -1161,17 +1258,21 @@ function App() {
 
 
 
+      <div className="valt-benefits" aria-label="Diferenciais da loja">
+        <span>✦ Curadoria de produtos</span><span>◈ Compra com créditos CVT</span><span>♡ Seus favoritos em um só lugar</span>
+      </div>
+
       {/* =================================================
           BANNER
       ================================================= */}
 
-      < section
+      <section className="valt-hero"
         style={{
           padding: "40px 20px",
           textAlign: "center",
         }}
       >
-        <h2
+        <div className="valt-hero-content"><span className="valt-eyebrow">VALT-ON · SUA VITRINE DIGITAL</span><h2
           style={{
             color: "#222",
             fontSize: "30px",
@@ -1179,7 +1280,7 @@ function App() {
             marginBottom: "10px",
           }}
         >
-          Bem-vindo à VALT-ON
+          Descubra o que combina com você
         </h2>
 
         <p
@@ -1189,41 +1290,40 @@ function App() {
             fontWeight: "500",
           }}
         >
-          Encontre os melhores
-          produtos em um só lugar.
+          Uma seleção especial para explorar, favoritar e comprar com seus créditos CVT.
         </p>
 
         <button
           onClick={() => {
             window.scrollTo({
-              top: 500,
+              top: document.getElementById("produtos")?.getBoundingClientRect().top + window.scrollY,
               behavior: "smooth",
             });
           }}
         >
-          Comprar agora
-        </button>
+          Explorar produtos <span aria-hidden="true">→</span>
+        </button></div>
+        {produtosDestaque.length > 0 && (
+          <div className="valt-hero-visual valt-hero-carousel" aria-label="Produtos em destaque">
+            <img key={produtosDestaque[indiceDestaque % produtosDestaque.length]?.id ?? indiceDestaque} src={obterUrlImagem(produtosDestaque[indiceDestaque % produtosDestaque.length].imagem)} alt={produtosDestaque[indiceDestaque % produtosDestaque.length].nome || "Produto em destaque"} />
+            <span>ESCOLHAS PARA VOCÊ</span>
+          </div>
+        )}
       </section >
 
       {/* =================================================
           PRODUTOS
       ================================================= */}
 
-      < main
+      <main className="valt-main" id="produtos"
         style={{
           padding: "20px",
         }}
       >
-        <h2
-          style={{
-            color: "#222",
-            fontSize: "28px",
-            fontWeight: "700",
-            marginBottom: "20px",
-          }}
-        >
-          Produtos em destaque
-        </h2>
+        <div className="valt-section-heading"><div><span className="valt-kicker">EXPLORE A VALT-ON</span><h2>{mostrarFavoritos ? "Seus favoritos" : categoria === "Todos" ? "Produtos em destaque" : categoria}</h2><p>Encontre sua próxima escolha entre nossos produtos.</p></div><span className="valt-product-count">{produtosOrdenados.length} produtos</span></div>
+        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>♡ Favoritos ({favoritos.length})</button></div>
+        <section className="valt-advanced-filters" aria-label="Filtros de produtos"><div className="valt-filter-heading"><strong>Refine sua busca</strong><button type="button" onClick={()=>{setPrecoMinimo("");setPrecoMaximo("");setApenasDisponiveis(false);setCategoria("Todos");setPesquisa("");setMostrarFavoritos(false);}}>Limpar filtros</button></div><div className="valt-filter-fields"><label>Preço mínimo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="0" value={precoMinimo} onChange={e=>setPrecoMinimo(e.target.value)}/></label><label>Preço máximo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="Sem limite" value={precoMaximo} onChange={e=>setPrecoMaximo(e.target.value)}/></label><label className="valt-filter-check"><input type="checkbox" checked={apenasDisponiveis} onChange={e=>setApenasDisponiveis(e.target.checked)}/> Somente em estoque</label></div></section>
+        <div className="valt-toolbar"><span>{pesquisa ? `Resultados para “${pesquisa}”` : "Escolha seus favoritos"}</span><label>Ordenar por <select value={ordenacao} onChange={(evento) => setOrdenacao(evento.target.value)}><option value="destaques">Destaques</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="nome">Nome A–Z</option></select></label></div>
 
         {
           carregando && (
@@ -1251,8 +1351,7 @@ function App() {
           produtosFiltrados.length ===
           0 && (
             <p>
-              Nenhum produto encontrado
-              nesta categoria.
+              Nenhum produto corresponde aos filtros. Tente limpar a busca ou ampliar a faixa de preço.
             </p>
           )
         }
@@ -1264,9 +1363,10 @@ function App() {
             gap: "20px",
           }}
         >
-          {produtosFiltrados.map(
+          {produtosOrdenados.map(
             (produto) => (
               <div
+                className="valt-product-card"
                 key={produto.id}
                 onClick={() => abrirDetalhesProduto(produto)}
                 style={{
@@ -1279,6 +1379,7 @@ function App() {
                   cursor: "pointer",
                 }}
               >
+                <div className="valt-card-badges"><span>{produto.estoque > 0 ? "DISPONÍVEL" : "ESGOTADO"}</span><button type="button" className={favoritos.includes(produto.id) ? "valt-favorite active" : "valt-favorite"} aria-label={favoritos.includes(produto.id) ? `Remover ${produto.nome} dos favoritos` : `Favoritar ${produto.nome}`} aria-pressed={favoritos.includes(produto.id)} onClick={(evento) => { evento.stopPropagation(); alternarFavorito(produto.id); }}>{favoritos.includes(produto.id) ? "♥" : "♡"}</button></div>
                 {/* IMAGEM */}
 
                 <div
@@ -1291,6 +1392,8 @@ function App() {
                 >
                   {produto.imagem ? (
                     <img
+                      className="valt-product-image"
+                      loading="lazy"
                       src={obterUrlImagem(
                         produto.imagem
                       )}
@@ -1352,15 +1455,13 @@ function App() {
                     margin: "8px 0 12px 0",
                   }}
                 >
-                  CVT{" "}
-                  {Number(
-                    produto.preco
-                  ).toFixed(2)}
+                  {formatarCVT(produto.preco)}
                 </h3>
 
                 {/* COMPRAR */}
 
                 <button
+                  className="valt-buy-button"
                   onClick={(evento) => {
                     evento.stopPropagation();
 
@@ -1382,14 +1483,16 @@ function App() {
                 >
                   {produto.estoque >
                     0
-                    ? "🛒 Comprar"
+                    ? "Adicionar ao carrinho"
                     : "Sem estoque"}
                 </button>
               </div>
             )
           )}
         </div>
+        <section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Ver favoritos →</button></section>
       </main >
+      <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({behavior:"smooth"}); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
 
       {/* =================================================
           CARRINHO
@@ -1397,7 +1500,9 @@ function App() {
 
       {
         mostrarCarrinho && (
-          <div
+          <>
+          <div className="valt-cart-overlay" onClick={() => setMostrarCarrinho(false)} aria-hidden="true" />
+          <div className="valt-cart-drawer" role="dialog" aria-modal="true" aria-label="Meu carrinho"
             style={{
               position: "fixed",
               right: "20px",
@@ -1417,9 +1522,7 @@ function App() {
               zIndex: 1000,
             }}
           >
-            <h2 style={{ color: "#000000", fontWeight: "700", marginTop: "0" }}>
-              🛒 Meu Carrinho
-            </h2>
+            <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={()=>setMostrarCarrinho(false)}>✕</button></div>
 
             {carrinho.length ===
               0 ? (
@@ -1445,10 +1548,7 @@ function App() {
                       </strong>
 
                       <p>
-                        CVT{" "}
-                        {Number(
-                          item.preco
-                        ).toFixed(2)}
+                        {formatarCVT(item.preco)}
                       </p>
 
                       <div>
@@ -1579,19 +1679,16 @@ function App() {
                 </div>
 
                 {/* TOTAL */}
+                <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total será debitado do saldo CVT após a confirmação.</small></div>
                 <h3>
-                  Total: CVT{" "}
-                  {totalCarrinho.toFixed(
-                    2
-                  )}
+                  Total: {formatarCVT(totalCarrinho)}
                 </h3>
 
                 {/* FINALIZAR */}
 
                 <button
-                  onClick={
-                    finalizarCompra
-                  }
+                  onClick={finalizarCompra}
+                  disabled={finalizandoCompra}
                   style={{
                     padding: "14px 20px",
                     cursor: "pointer",
@@ -1606,7 +1703,7 @@ function App() {
                     borderRadius: "8px",
                   }}
                 >
-                  💳 Finalizar compra
+                  {finalizandoCompra ? "Processando..." : "💳 Finalizar compra"}
                 </button>
               </>
             )}
@@ -1636,6 +1733,7 @@ function App() {
               Fechar
             </button>
           </div>
+          </>
         )
       }
     </div >

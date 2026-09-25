@@ -34,6 +34,15 @@ class ClienteCreate(BaseModel):
     nome: str
     email: str
     senha: str
+    indicador_id: int | None = None
+
+
+class ReenviarConfirmacao(BaseModel):
+    email: str
+
+
+class PresencaPing(BaseModel):
+    sessao: str
 
 
 class ClienteLogin(BaseModel):

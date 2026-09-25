@@ -1,0 +1,11 @@
+/* Product image clearance: badges no longer cover the top of photos.
+   The image retains its full aspect ratio on desktop and mobile. */
+.valt-store .valt-main .produtos-grid>.valt-product-card{overflow:visible!important}
+.valt-store .valt-main .valt-product-card>.valt-card-badges{top:12px!important;left:12px!important;right:12px!important}
+.valt-store .valt-main .valt-product-card>div:nth-child(2){box-sizing:border-box!important;padding:44px 9px 9px!important;overflow:hidden!important;min-height:205px!important}
+.valt-store .valt-main .valt-product-card>div:nth-child(2) .valt-product-image{box-sizing:border-box!important;display:block!important;width:100%!important;height:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;padding:0!important;transform:none!important}
+.valt-store .valt-main .valt-product-card:hover>div:nth-child(2) .valt-product-image{transform:none!important}
+@media(max-width:680px){
+.valt-store .valt-main .valt-product-card>.valt-card-badges{top:10px!important;left:10px!important;right:10px!important}
+.valt-store .valt-main .valt-product-card>div:nth-child(2){height:180px!important;min-height:180px!important;padding:39px 5px 6px!important}
+}

@@ -7,6 +7,15 @@ function Login({ onLogin, onVoltar }) {
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState("");
+  const [emailNaoConfirmado, setEmailNaoConfirmado] = useState("");
+  const [mensagemReenvio, setMensagemReenvio] = useState("");
+  const [reenviando, setReenviando] = useState(false);
+  const reenviarConfirmacao = async () => {
+    setReenviando(true); setMensagemReenvio("");
+    try {const resposta=await fetch(`${API_URL}/reenviar-confirmacao-email`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:emailNaoConfirmado})});const dados=await resposta.json();setMensagemReenvio(resposta.ok?dados.mensagem:(dados.detail||"Tente novamente mais tarde."));}
+    catch {setMensagemReenvio("Não foi possível conectar. Tente novamente.");}
+    finally {setReenviando(false);}
+  };
 
   const [mostrarRecuperacao, setMostrarRecuperacao] = useState(false);
   const [emailRecuperacao, setEmailRecuperacao] = useState("");
@@ -18,6 +27,8 @@ function Login({ onLogin, onVoltar }) {
     evento.preventDefault();
 
     setErro("");
+    setEmailNaoConfirmado("");
+    setMensagemReenvio("");
 
     if (!email || !senha) {
       setErro("Digite seu e-mail e sua senha.");
@@ -55,6 +66,7 @@ function Login({ onLogin, onVoltar }) {
         dados = await resposta.json();
 
         if (!resposta.ok) {
+          if (resposta.status === 403 && String(dados.detail || "").includes("Confirme seu e-mail")) setEmailNaoConfirmado(email.trim());
           throw new Error(
             dados.detail || "E-mail ou senha inválidos."
           );
@@ -144,7 +156,7 @@ function Login({ onLogin, onVoltar }) {
 
   if (mostrarRecuperacao) {
     return (
-      <div
+      <div className="valt-login-screen"
         style={{
           minHeight: "100vh",
           display: "flex",
@@ -287,7 +299,7 @@ function Login({ onLogin, onVoltar }) {
   }
 
   return (
-    <div
+    <div className="valt-login-screen"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -340,6 +352,7 @@ function Login({ onLogin, onVoltar }) {
           </div>
         )}
 
+        {emailNaoConfirmado && <div style={{marginBottom:16,padding:12,background:"#fff7dd",border:"1px solid #ddc97f",borderRadius:8}}><p style={{color:"#27313b",marginTop:0}}>Seu e-mail ainda não foi confirmado. O link expirou ou não chegou?</p><button type="button" disabled={reenviando} onClick={reenviarConfirmacao} style={{background:"#f3d77e",color:"#27313b",border:"1px solid #d2b65c",padding:12,borderRadius:6,fontWeight:800}}>{reenviando?"Enviando...":"Reenviar link de confirmação"}</button>{mensagemReenvio&&<p role="status" style={{color:"#27313b"}}>{mensagemReenvio}</p>}</div>}
         <form onSubmit={fazerLogin}>
           <div style={{ marginBottom: "15px" }}>
             <label

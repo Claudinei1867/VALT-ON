@@ -76,6 +76,18 @@ class Cliente(Base):
 
 
 # =========================================================
+# INDICAÇÕES: uma recompensa por novo cliente confirmado
+# =========================================================
+
+class Indicacao(Base):
+    __tablename__ = "indicacoes"
+    id = Column(Integer, primary_key=True, index=True)
+    indicador_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, index=True)
+    indicado_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, unique=True, index=True)
+    creditada = Column(Integer, nullable=False, default=0)
+
+
+# =========================================================
 # PEDIDOS
 # =========================================================
 
@@ -496,3 +508,10 @@ class PagamentoCVT(Base):
         String,
         nullable=False
     )
+
+
+# Presença anônima por navegador; não guarda e-mail, nome ou IP.
+class PresencaVisitante(Base):
+    __tablename__ = "presenca_visitantes"
+    sessao = Column(String(64), primary_key=True)
+    ultima_atividade = Column(String(32), nullable=False, index=True)

@@ -65,7 +65,7 @@ export default function SugestoesAdmin({ usuario }) {
   }, []);
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div className="valt-admin-subpage valt-admin-suggestions" style={{ padding: "30px" }}>
       <h1>💡 Sugestões dos usuários</h1>
 
       {sugestoes.length === 0 ? (

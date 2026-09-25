@@ -3,6 +3,7 @@ import React from "react";
 export default function BotoesNavegacao({
   usuario,
   setMostrarConta,
+  onLogout,
   setMostrarLogin,
   setMostrarCadastro,
   setMostrarAdmin,
@@ -17,6 +18,12 @@ export default function BotoesNavegacao({
   setCategoria,
 }) {
   const [mostrarCategorias, setMostrarCategorias] = React.useState(false);
+  const [mostrarPerfil, setMostrarPerfil] = React.useState(false);
+  const [mostrarMenuMobile, setMostrarMenuMobile] = React.useState(false);
+  const fecharMenus = () => { setMostrarPerfil(false); setMostrarCategorias(false); setMostrarMenuMobile(false); };
+  const abrirConta = () => { fecharMenus(); setMostrarConta(true); };
+  const abrirAdmin = () => { fecharMenus(); setMostrarAdmin(true); };
+  const sair = () => { fecharMenus(); onLogout(); };
 
   const categorias = [
     "Todos",
@@ -36,7 +43,10 @@ export default function BotoesNavegacao({
 
   return (
     <>
+    <button type="button" className="valt-mobile-menu-toggle" aria-expanded={mostrarMenuMobile} aria-controls="valt-mobile-navigation" onClick={() => setMostrarMenuMobile((valor) => !valor)}>{mostrarMenuMobile ? "✕ Fechar menu" : "☰ Menu"}</button>
+    <nav id="valt-mobile-navigation" className={`valt-actions ${mostrarMenuMobile ? "valt-actions-open" : ""}`} aria-label="Navegação principal">
       <button
+        aria-expanded={mostrarCategorias}
         onClick={() => setMostrarCategorias(!mostrarCategorias)}
         style={{
           padding: "7px 10px",
@@ -95,72 +105,26 @@ export default function BotoesNavegacao({
         </div>
       )}
 
-      {/* LOGIN / MINHA CONTA */}
-
+      {/* Perfil acessível no desktop e no celular, com saída explícita. */}
       {usuario ? (
-        <button
-          onClick={() => setMostrarConta(true)}
-          style={{
-            padding: "7px 10px",
-            fontSize: "12px",
-            backgroundColor: "#000",
-            color: "#fff",
-            border: "1px solid #000",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          👤 {usuario.nome}
-        </button>
+        <div className="valt-profile-wrap">
+          <button type="button" className="valt-profile-trigger" aria-haspopup="true" aria-expanded={mostrarPerfil} aria-controls="valt-profile-menu" onClick={() => setMostrarPerfil((valor) => !valor)}>
+            👤 {usuario.nome || "Minha conta"} <span aria-hidden="true">▾</span>
+          </button>
+          {mostrarPerfil && (
+            <div id="valt-profile-menu" className="valt-profile-menu" role="group" aria-label="Opções da conta">
+              <button type="button" onClick={abrirConta}>👤 Minha conta</button>
+              {usuario.admin && <button type="button" onClick={abrirAdmin}>⚙️ Painel administrativo</button>}
+              <button type="button" onClick={fecharMenus}>🛍️ Continuar na loja</button>
+              <button type="button" className="valt-logout-button" onClick={sair}>↪ Sair da conta</button>
+            </div>
+          )}
+        </div>
       ) : (
-        <button
-          onClick={() => setMostrarLogin(true)}
-          style={{
-            padding: "7px 10px",
-            fontSize: "12px",
-            backgroundColor: "#000",
-            color: "#fff",
-            border: "1px solid #000",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          👤 Entrar
-        </button>
-      )}
-
-      <button
-        onClick={() => setMostrarCadastro(true)}
-        style={{
-          padding: "7px 10px",
-          fontSize: "12px",
-          backgroundColor: "#000",
-          color: "#fff",
-          border: "1px solid #000",
-          borderRadius: "6px",
-          cursor: "pointer",
-        }}
-      >
-        📋 Cadastro
-      </button>
-
-      {/* ADMIN */}
-
-      {usuario?.admin && (
-        <button
-          onClick={() => setMostrarAdmin(true)}
-          style={{
-            padding: "7px 10px",
-            fontSize: "12px",
-            backgroundColor: "#000",
-            color: "#fff",
-            border: "1px solid #000",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          ⚙️ Administrador
-        </button>
+        <>
+          <button type="button" onClick={() => { fecharMenus(); setMostrarLogin(true); }}>👤 Entrar</button>
+          <button type="button" onClick={() => { fecharMenus(); setMostrarCadastro(true); }}>📋 Criar conta</button>
+        </>
       )}
 
       {/* PRODUTOS USADOS */}
@@ -169,6 +133,7 @@ export default function BotoesNavegacao({
         onClick={() => {
           const novoEstado = !mostrarProdutosUsados;
 
+          fecharMenus();
           setMostrarProdutosUsados(novoEstado);
 
           if (novoEstado) {
@@ -191,7 +156,7 @@ export default function BotoesNavegacao({
       {/* SUGESTÕES */}
 
       <button
-        onClick={() => setMostrarSugestoes(true)}
+        onClick={() => { fecharMenus(); setMostrarSugestoes(true); }}
         style={{
           padding: "7px 10px",
           fontSize: "12px",
@@ -208,7 +173,8 @@ export default function BotoesNavegacao({
       {/* CARRINHO */}
 
       <button
-        onClick={() => setMostrarCarrinho(!mostrarCarrinho)}
+        aria-expanded={mostrarCarrinho}
+        onClick={() => { fecharMenus(); setMostrarCarrinho(!mostrarCarrinho); }}
         style={{
           padding: "7px 10px",
           fontSize: "12px",
@@ -221,6 +187,7 @@ export default function BotoesNavegacao({
       >
         🛒 Carrinho ({quantidadeCarrinho})
       </button>
-    </>
+    </nav>
+  </>
   );
 }

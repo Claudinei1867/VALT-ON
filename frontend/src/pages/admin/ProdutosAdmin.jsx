@@ -8,6 +8,7 @@ export default function ProdutosAdmin({
 }) {
   const [produtos, setProdutos] = useState([]);
   const [buscaProduto, setBuscaProduto] = useState("");
+  const [filtroEstoque,setFiltroEstoque]=useState("todos");
 
   const obterUrlImagem = (url) => {
     if (!url) {
@@ -79,9 +80,9 @@ export default function ProdutosAdmin({
   const produtosFiltrados = produtos.filter((produto) => {
     const texto = buscaProduto.toLowerCase().trim();
 
-    if (!texto) {
-      return true;
-    }
+    if(filtroEstoque==="baixo"&&!(Number(produto.estoque)>0&&Number(produto.estoque)<=5))return false;
+    if(filtroEstoque==="esgotado"&&Number(produto.estoque)>0)return false;
+    if (!texto) {return true;}
 
     return (
       (produto.nome || "").toLowerCase().includes(texto) ||
@@ -91,7 +92,7 @@ export default function ProdutosAdmin({
   });
 
   return (
-    <div
+    <div className="valt-admin-subpage valt-admin-products"
       style={{
         padding: "30px",
         maxWidth: "1100px",
@@ -136,6 +137,7 @@ export default function ProdutosAdmin({
         />
       </div>
 
+      <div className="valt-admin-filter"><label>Estoque <select value={filtroEstoque} onChange={e=>setFiltroEstoque(e.target.value)}><option value="todos">Todos</option><option value="baixo">Baixo (1–5)</option><option value="esgotado">Esgotados</option></select></label><button onClick={carregarProdutos}>Atualizar produtos</button></div>
       {produtos.length === 0 ? (
         <p>Nenhum produto cadastrado.</p>
       ) : produtosFiltrados.length === 0 ? (
