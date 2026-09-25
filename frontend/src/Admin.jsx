@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import SugestoesAdmin from "./pages/SugestoesAdmin";
 import PedidosAdmin from "./pages/admin/PedidosAdmin";
 import ProdutosAdmin from "./pages/admin/ProdutosAdmin";
+import { CATEGORIAS } from "./categorias";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -389,7 +390,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
     setNome(produto.nome || "");
     setDescricao(produto.descricao || "");
     setPreco(produto.preco ?? "");
-    setCategoria(produto.categoria || "Celulares");
+    setCategoria(produto.categoria === "Enfeites" ? "Decoração e Festas" : (produto.categoria || "Celulares"));
     setEstoque(produto.estoque ?? "");
     setPrazoEntregaDias(produto.prazo_entrega_dias ?? 3);
 
@@ -642,52 +643,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
               marginTop: "5px",
             }}
           >
-            <option value="Celulares">
-              Celulares
-            </option>
-
-            <option value="Informática">
-              Informática
-            </option>
-
-            <option value="Casa">
-              Casa
-            </option>
-
-            <option value="Moda">
-              Moda
-            </option>
-
-            <option value="Esportes">
-              Esportes
-            </option>
-
-            <option value="Pet">
-              Pet
-            </option>
-
-            <option value="Infantil">
-              Infantil
-            </option>
-            <option value="Enfeites">
-              Enfeites
-            </option>
-
-            <option value="Bebidas">
-              Bebidas
-            </option>
-
-            <option value="Alimentos">
-              Alimentos
-            </option>
-
-            <option value="Escritório">
-              Escritório
-            </option>
-
-            <option value="Ferramentas">
-              Ferramentas
-            </option>
+            {CATEGORIAS.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </div>
 

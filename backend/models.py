@@ -76,6 +76,18 @@ class Cliente(Base):
 
 
 # =========================================================
+# INDICAÇÕES: uma recompensa por novo cliente confirmado
+# =========================================================
+
+class Indicacao(Base):
+    __tablename__ = "indicacoes"
+    id = Column(Integer, primary_key=True, index=True)
+    indicador_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, index=True)
+    indicado_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, unique=True, index=True)
+    creditada = Column(Integer, nullable=False, default=0)
+
+
+# =========================================================
 # PEDIDOS
 # =========================================================
 

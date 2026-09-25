@@ -8,6 +8,7 @@ import "./correcoes-v6-contraste.css";
 import "./tema-v7-pastel.css";
 import "./mobile-account-menu.css";
 import "./fix-product-images.css";
+import "./melhorias-mobile.css";
 
 import Admin from "./Admin";
 import Login from "./Login";
@@ -17,6 +18,7 @@ import ProdutoDetalhes from "./ProdutoDetalhes";
 import RedefinirSenha from "./RedefinirSenha";
 import ProdutosUsados from "./pages/ProdutosUsados";
 import BotoesNavegacao from "./components/BotoesNavegacao";
+import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -80,7 +82,7 @@ function App() {
   const [precoMaximo,setPrecoMaximo]=useState("");
   const [apenasDisponiveis,setApenasDisponiveis]=useState(false);
   const formatarCVT = (valor) => `CVT ${Number(valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const categoriasDisponiveis = ["Todos", ...new Set(produtos.map((produto) => produto.categoria).filter(Boolean))];
+  const categoriasDisponiveis = ["Todos", ...CATEGORIAS, ...new Set(produtos.map((produto) => normalizarCategoria(produto.categoria)).filter(Boolean))].filter((item, index, lista) => lista.indexOf(item) === index);
   const alternarFavorito = (id) => setFavoritos((atual) => atual.includes(id) ? atual.filter((item) => item !== id) : [...atual, id]);
 
   const [carrinho, setCarrinho] = useState([]);
@@ -444,7 +446,7 @@ function App() {
     (produto) => {
       const correspondeCategoria =
         categoria === "Todos" ||
-        produto.categoria === categoria;
+        normalizarCategoria(produto.categoria) === categoria;
 
       const correspondePesquisa =
         produto.nome
