@@ -8,6 +8,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import shutil
+from ftplib import FTP
 import os
 import secrets
 import urllib.request
@@ -634,17 +635,21 @@ async def upload_imagem(file: UploadFile = File(...)):
 
         conteudo = await file.read()
 
-        supabase.storage.from_("produtos").upload(
-            nome_arquivo,
-            conteudo,
-            {
-                "content-type": file.content_type or "application/octet-stream",
-                "upsert": "true",
-            },
+        ftp = FTP()
+        ftp.connect(os.getenv("HOSTINGER_FTP_HOST"), 21, timeout=15)
+        ftp.login(
+            os.getenv("HOSTINGER_FTP_USER"),
+            os.getenv("HOSTINGER_FTP_PASSWORD"),
         )
+        ftp.cwd(os.getenv("HOSTINGER_FTP_PATH"))
+
+        from io import BytesIO
+        ftp.storbinary(f"STOR {nome_arquivo}", BytesIO(conteudo))
+        ftp.quit()
 
         url_publica = (
-            f"{SUPABASE_URL}/storage/v1/object/public/" f"produtos/{nome_arquivo}"
+            f"https://darkslategrey-gerbil-151298.hostingersite.com/"
+            f"produtos/{nome_arquivo}"
         )
 
         return {
