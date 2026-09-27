@@ -77,6 +77,8 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "https://valt-on.vercel.app",
         "https://darkslategrey-gerbil-151298.hostingersite.com",
+        "https://valt-on.com",
+        "https://www.valt-on.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
