@@ -115,6 +115,9 @@ function App() {
   const alternarFavorito = (id) => setFavoritos((atual) => atual.includes(id) ? atual.filter((item) => item !== id) : [...atual, id]);
 
   const [carrinho, setCarrinho] = useState([]);
+  const [ehPresente, setEhPresente] = useState(false);
+  const [destinatarioId, setDestinatarioId] = useState("");
+  const [mensagemPresente, setMensagemPresente] = useState("");
 
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
@@ -683,7 +686,7 @@ function App() {
     }
 
     // Verificar espaço selecionado
-    if (!espacoSelecionado) {
+    if (!ehPresente && !espacoSelecionado) {
       alert("❌ Selecione um espaço para realizar a compra.");
       return;
     }
@@ -698,6 +701,33 @@ function App() {
         quantidade: item.quantidade,
       }));
 
+      let espacoIdCompra = espacoSelecionado;
+
+      if (ehPresente) {
+        if (!destinatarioId) {
+          alert("Informe o número do cliente que receberá o presente.");
+          setFinalizandoCompra(false);
+          return;
+        }
+
+        const respostaEspacos = await fetch(
+          `${API_URL}/clientes/${Number(destinatarioId)}/espacos`
+        );
+
+        const espacosDestinatario = await respostaEspacos.json();
+
+        if (
+          !respostaEspacos.ok ||
+          !Array.isArray(espacosDestinatario) ||
+          espacosDestinatario.length === 0
+        ) {
+          alert("Não foi possível localizar um espaço para o destinatário.");
+          setFinalizandoCompra(false);
+          return;
+        }
+
+        espacoIdCompra = espacosDestinatario[0].id;
+      }
       // ---------------------------------------------------
       // ENVIAR CLIENTE + ITENS PARA O BACKEND
       // ---------------------------------------------------
@@ -705,8 +735,11 @@ function App() {
 
       const dadosCompra = {
         cliente_id: usuario.id,
-        espaco_id: espacoSelecionado,
+        espaco_id: espacoIdCompra,
         itens: itensCompra,
+        eh_presente: ehPresente,
+        destinatario_id: ehPresente ? Number(destinatarioId) : null,
+        mensagem_presente: ehPresente ? mensagemPresente : null,
       };
 
       console.log("USUÁRIO DA COMPRA:", usuario);
@@ -1643,6 +1676,96 @@ function App() {
                   )
                 )}
 
+                <div
+                  style={{
+                    marginTop: "15px",
+                    marginBottom: "15px",
+                    padding: "12px",
+                    border: "1px solid #ccc",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <label style={{ display: "block", fontWeight: "bold", marginBottom: "10px" }}>
+                    Como deseja fazer esta compra?
+                  </label>
+
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEhPresente(false);
+                        setDestinatarioId("");
+                        setMensagemPresente("");
+                      }}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "2px solid #000",
+                        cursor: "pointer",
+                        backgroundColor: !ehPresente ? "#000" : "#fff",
+                        color: !ehPresente ? "#fff" : "#000",
+                      }}
+                    >
+                      Comprar para mim
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setEhPresente(true)}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "2px solid #000",
+                        cursor: "pointer",
+                        backgroundColor: ehPresente ? "#000" : "#fff",
+                        color: ehPresente ? "#fff" : "#000",
+                      }}
+                    >
+                      🎁 Enviar como presente
+                    </button>
+                  </div>
+
+                  {ehPresente && (
+                    <div style={{ marginTop: "12px" }}>
+                      <label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>
+                        Número do cliente que receberá o presente:
+                      </label>
+
+                      <input
+                        type="number"
+                        value={destinatarioId}
+                        onChange={(e) => setDestinatarioId(e.target.value)}
+                        placeholder="Digite o número do cliente"
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          border: "1px solid #999",
+                          boxSizing: "border-box",
+                        }}
+                      />
+
+                      <label style={{ display: "block", fontWeight: "bold", marginTop: "10px", marginBottom: "6px" }}>
+                        Mensagem para acompanhar o presente:
+                      </label>
+
+                      <textarea
+                        value={mensagemPresente}
+                        onChange={(e) => setMensagemPresente(e.target.value)}
+                        placeholder="Ex.: Foi de coração, tomara que goste!"
+                        rows={3}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          border: "1px solid #999",
+                          boxSizing: "border-box",
+                          resize: "vertical",
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
                 {/* ESPAÇO DA COMPRA */}
                 <div
                   style={{

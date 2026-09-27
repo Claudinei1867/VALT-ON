@@ -76,6 +76,39 @@ function Pedidos({ cliente, voltar }) {
 
       {!carregando &&
         !erro &&
+        pedidos.some((pedido) => pedido.eh_presente) && (
+          <div
+            style={{
+              border: "2px solid #f0c14b",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "25px",
+              background: "#fff8dc",
+            }}
+          >
+            <h2>?? Voc? recebeu um presente!</h2>
+
+            {pedidos
+              .filter((pedido) => pedido.eh_presente)
+              .map((presente) => (
+                <div key={presente.id}>
+                  <p>
+                    <strong>De:</strong> Cliente n?{" "}
+                    {presente.remetente_id} ? {presente.remetente_nome}
+                  </p>
+
+                  {presente.mensagem_presente && (
+                    <p>
+                      ?? ?{presente.mensagem_presente}?
+                    </p>
+                  )}
+                </div>
+              ))}
+          </div>
+        )}
+
+      {!carregando &&
+        !erro &&
         pedidos.map((pedido) => (
           <div
             key={pedido.id}
