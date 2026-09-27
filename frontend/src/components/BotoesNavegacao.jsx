@@ -1,4 +1,5 @@
 import React from "react";
+import { CATEGORIAS } from "../categorias";
 
 export default function BotoesNavegacao({
   usuario,
@@ -25,26 +26,12 @@ export default function BotoesNavegacao({
   const abrirAdmin = () => { fecharMenus(); setMostrarAdmin(true); };
   const sair = () => { fecharMenus(); onLogout(); };
 
-  const categorias = [
-    "Todos",
-    "Celulares",
-    "Informática",
-    "Casa",
-    "Moda",
-    "Esportes",
-    "Pet",
-    "Infantil",
-    "Enfeites",
-    "Bebidas",
-    "Alimentos",
-    "Escritório",
-    "Ferramentas",
-  ];
+  const categorias = ["Todos", ...CATEGORIAS];
 
   return (
     <>
-    <button type="button" className="valt-mobile-menu-toggle" aria-expanded={mostrarMenuMobile} aria-controls="valt-mobile-navigation" onClick={() => setMostrarMenuMobile((valor) => !valor)}>{mostrarMenuMobile ? "✕ Fechar menu" : "☰ Menu"}</button>
-    <nav id="valt-mobile-navigation" className={`valt-actions ${mostrarMenuMobile ? "valt-actions-open" : ""}`} aria-label="Navegação principal">
+    <button type="button" className="valt-mobile-menu-toggle" aria-expanded={mostrarMenuMobile} aria-controls="valt-mobile-navigation" onClick={() => setMostrarMenuMobile((valor) => !valor)}>{mostrarMenuMobile ? "Ã¢Å“â€¢ Fechar menu" : "Ã¢ËœÂ° Menu"}</button>
+    <nav id="valt-mobile-navigation" className={`valt-actions ${mostrarMenuMobile ? "valt-actions-open" : ""}`} aria-label="NavegaÃƒÂ§ÃƒÂ£o principal">
       <button
         aria-expanded={mostrarCategorias}
         onClick={() => setMostrarCategorias(!mostrarCategorias)}
@@ -58,7 +45,7 @@ export default function BotoesNavegacao({
           cursor: "pointer",
         }}
       >
-        📂 Categorias
+        Ã°Å¸â€œâ€š Categorias
       </button>
 
       {mostrarCategorias && (
@@ -105,25 +92,25 @@ export default function BotoesNavegacao({
         </div>
       )}
 
-      {/* Perfil acessível no desktop e no celular, com saída explícita. */}
+      {/* Perfil acessÃƒÂ­vel no desktop e no celular, com saÃƒÂ­da explÃƒÂ­cita. */}
       {usuario ? (
         <div className="valt-profile-wrap">
           <button type="button" className="valt-profile-trigger" aria-haspopup="true" aria-expanded={mostrarPerfil} aria-controls="valt-profile-menu" onClick={() => setMostrarPerfil((valor) => !valor)}>
-            👤 {usuario.nome || "Minha conta"} <span aria-hidden="true">▾</span>
+            Ã°Å¸â€˜Â¤ {usuario.nome || "Minha conta"} <span aria-hidden="true">Ã¢â€“Â¾</span>
           </button>
           {mostrarPerfil && (
-            <div id="valt-profile-menu" className="valt-profile-menu" role="group" aria-label="Opções da conta">
-              <button type="button" onClick={abrirConta}>👤 Minha conta</button>
-              {usuario.admin && <button type="button" onClick={abrirAdmin}>⚙️ Painel administrativo</button>}
-              <button type="button" onClick={fecharMenus}>🛍️ Continuar na loja</button>
-              <button type="button" className="valt-logout-button" onClick={sair}>↪ Sair da conta</button>
+            <div id="valt-profile-menu" className="valt-profile-menu" role="group" aria-label="OpÃƒÂ§ÃƒÂµes da conta">
+              <button type="button" onClick={abrirConta}>Ã°Å¸â€˜Â¤ Minha conta</button>
+              {usuario.admin && <button type="button" onClick={abrirAdmin}>Ã¢Å¡â„¢Ã¯Â¸Â Painel administrativo</button>}
+              <button type="button" onClick={fecharMenus}>Ã°Å¸â€ºÂÃ¯Â¸Â Continuar na loja</button>
+              <button type="button" className="valt-logout-button" onClick={sair}>Ã¢â€ Âª Sair da conta</button>
             </div>
           )}
         </div>
       ) : (
         <>
-          <button type="button" onClick={() => { fecharMenus(); setMostrarLogin(true); }}>👤 Entrar</button>
-          <button type="button" onClick={() => { fecharMenus(); setMostrarCadastro(true); }}>📋 Criar conta</button>
+          <button type="button" onClick={() => { fecharMenus(); setMostrarLogin(true); }}>Ã°Å¸â€˜Â¤ Entrar</button>
+          <button type="button" onClick={() => { fecharMenus(); setMostrarCadastro(true); }}>Ã°Å¸â€œâ€¹ Criar conta</button>
         </>
       )}
 
@@ -150,10 +137,10 @@ export default function BotoesNavegacao({
           cursor: "pointer",
         }}
       >
-        🛒 Produtos Usados
+        Ã°Å¸â€ºâ€™ Produtos Usados
       </button>
 
-      {/* SUGESTÕES */}
+      {/* SUGESTÃƒâ€¢ES */}
 
       <button
         onClick={() => { fecharMenus(); setMostrarSugestoes(true); }}
@@ -167,7 +154,7 @@ export default function BotoesNavegacao({
           cursor: "pointer",
         }}
       >
-        💡 Sugestões
+        Ã°Å¸â€™Â¡ SugestÃƒÂµes
       </button>
 
       {/* CARRINHO */}
@@ -185,7 +172,7 @@ export default function BotoesNavegacao({
           cursor: "pointer",
         }}
       >
-        🛒 Carrinho ({quantidadeCarrinho})
+        Ã°Å¸â€ºâ€™ Carrinho ({quantidadeCarrinho})
       </button>
     </nav>
   </>
