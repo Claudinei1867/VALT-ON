@@ -20,6 +20,7 @@ import ProdutoDetalhes from "./ProdutoDetalhes";
 import RedefinirSenha from "./RedefinirSenha";
 import ProdutosUsados from "./pages/ProdutosUsados";
 import BotoesNavegacao from "./components/BotoesNavegacao";
+import Manual from "./Manual";
 import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
 const API_URL = "https://valt-on.onrender.com";
@@ -168,6 +169,7 @@ function App() {
   const [mostrarConta, setMostrarConta] =
     useState(false);
 
+  const [mostrarManual, setMostrarManual] = useState(false);
   const [mostrarSugestoes, setMostrarSugestoes] =
     useState(false);
 
@@ -782,6 +784,15 @@ function App() {
     } finally {setFinalizandoCompra(false);}
   };
   // =====================================================
+  // TELA MANUAL
+  // =====================================================
+
+  if (mostrarManual) {
+    return (
+      <Manual onVoltar={() => setMostrarManual(false)} />
+    );
+  }
+  // =====================================================
   // TELA ADMINISTRADOR
   // =====================================================
 
@@ -1104,6 +1115,7 @@ function App() {
             setMostrarLogin={setMostrarLogin}
             setMostrarCadastro={setMostrarCadastro}
             setMostrarAdmin={setMostrarAdmin}
+            setMostrarManual={setMostrarManual}
             mostrarProdutosUsados={mostrarProdutosUsados}
             setMostrarProdutosUsados={setMostrarProdutosUsados}
             carregarProdutosUsados={carregarProdutosUsados}
