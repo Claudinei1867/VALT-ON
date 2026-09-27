@@ -650,7 +650,7 @@ async def upload_imagem(file: UploadFile = File(...)):
         ftp.quit()
 
         url_publica = (
-            f"https://darkslategrey-gerbil-151298.hostingersite.com/"
+            f"https://www.valt-on.com/"
             f"produtos/{nome_arquivo}"
         )
 
