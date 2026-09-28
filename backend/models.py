@@ -3,6 +3,8 @@ from sqlalchemy import (  # type: ignore[import-not-found]
     Integer,
     String,
     Float,
+    Boolean,
+    Text,
     ForeignKey,
 )
 
@@ -130,6 +132,23 @@ class Pedido(Base):
     espaco_id = Column(
         Integer,
         ForeignKey("espacos_clientes.id"),
+        nullable=True
+    )
+
+    eh_presente = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    destinatario_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=True
+    )
+
+    mensagem_presente = Column(
+        Text,
         nullable=True
     )
 

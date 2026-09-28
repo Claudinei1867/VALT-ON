@@ -82,6 +82,9 @@ class CompraCreate(BaseModel):
     cliente_id: int | None = None
     espaco_id: int | None = None
     itens: list[ItemCompra]
+    eh_presente: bool = False
+    destinatario_id: int | None = None
+    mensagem_presente: str | None = None
 
 
 # =========================================================
