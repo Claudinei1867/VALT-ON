@@ -31,6 +31,7 @@ class Produto(Base):
         default=3
     )
     imagem = Column(String, nullable=True)
+    exclusiva = Column(Boolean, nullable=False, default=False)
 
 
 # =========================================================
@@ -78,7 +79,7 @@ class Cliente(Base):
 
 
 # =========================================================
-# INDICAÇÕES: uma recompensa por novo cliente confirmado
+# INDICAÃƒâ€¡Ãƒâ€¢ES: uma recompensa por novo cliente confirmado
 # =========================================================
 
 class Indicacao(Base):
@@ -186,7 +187,7 @@ class ItemPedido(Base):
 
 
 # =========================================================
-# ESPAÇOS DO CLIENTE
+# ESPAÃƒâ€¡OS DO CLIENTE
 # =========================================================
 
 class EspacoCliente(Base):
@@ -217,11 +218,11 @@ class EspacoCliente(Base):
 
     adquirido = Column(
         String,
-        default="Não"
+        default="NÃƒÂ£o"
     )
 
 # =========================================================
-# ITENS DOS ESPAÇOS DO CLIENTE
+# ITENS DOS ESPAÃƒâ€¡OS DO CLIENTE
 # =========================================================
 
 
@@ -529,7 +530,7 @@ class PagamentoCVT(Base):
     )
 
 
-# Presença anônima por navegador; não guarda e-mail, nome ou IP.
+# PresenÃƒÂ§a anÃƒÂ´nima por navegador; nÃƒÂ£o guarda e-mail, nome ou IP.
 class PresencaVisitante(Base):
     __tablename__ = "presenca_visitantes"
     sessao = Column(String(64), primary_key=True)

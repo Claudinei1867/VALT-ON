@@ -57,3 +57,9 @@
 .valt-account-screen .valt-account-favorites-grid button{border-radius:5px!important}
 @media(max-width:720px){.valt-related{margin:18px 12px!important;padding:15px!important}.valt-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.valt-related-grid>button>span{height:130px!important;max-height:130px!important}.valt-store .valt-cart-drawer{border-radius:0!important}}
 @media(max-width:380px){.valt-related-grid>button>span{height:110px!important;max-height:110px!important}}
+
+/* Figurinhas exclusivas: visual dourado */
+.valt-store .valt-main .produtos-grid > .valt-product-card.exclusiva {
+  background: #fff3c4 !important;
+  border-color: #d4af37 !important;
+}

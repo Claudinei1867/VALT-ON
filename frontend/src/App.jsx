@@ -23,7 +23,7 @@ import BotoesNavegacao from "./components/BotoesNavegacao";
 import Manual from "./Manual";
 import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "http://127.0.0.1:8000";
 
 // =====================================================
 // TRANSFORMAR URL DA IMAGEM
@@ -541,7 +541,7 @@ function App() {
             produto.estoque
           ) {
             alert(
-              `Quantidade máxima disponível: ${produto.estoque}`
+              `Quantidade m?xima dispon?vel: ${produto.estoque}`
             );
 
             return carrinhoAtual;
@@ -614,7 +614,7 @@ function App() {
               item.estoque
             ) {
               alert(
-                `Quantidade máxima disponível: ${item.estoque}`
+                `Quantidade m?xima dispon?vel: ${item.estoque}`
               );
 
               return item;
@@ -689,19 +689,19 @@ function App() {
     if (finalizandoCompra) return;
     // Verificar se está logado
     if (!usuario || !usuario.id) {
-      alert("❌ Você precisa estar logado para finalizar a compra.");
+      alert("❌ Voc? precisa estar logado para finalizar a compra.");
       return;
     }
 
     // Verificar carrinho
     if (carrinho.length === 0) {
-      alert("Seu carrinho está vazio.");
+      alert("Seu carrinho est? vazio.");
       return;
     }
 
     // Verificar espaço selecionado
     if (!ehPresente && !espacoSelecionado) {
-      alert("❌ Selecione um espaço para realizar a compra.");
+      alert("❌ Selecione um espa?o para realizar a compra.");
       return;
     }
 
@@ -719,7 +719,7 @@ function App() {
 
       if (ehPresente) {
         if (!destinatarioId) {
-          alert("Informe o número do cliente que receberá o presente.");
+          alert("Informe o n?mero do cliente que receber? o presente.");
           setFinalizandoCompra(false);
           return;
         }
@@ -735,7 +735,7 @@ function App() {
           !Array.isArray(espacosDestinatario) ||
           espacosDestinatario.length === 0
         ) {
-          alert("Não foi possível localizar um espaço para o destinatário.");
+          alert("N?o foi poss?vel localizar um espa?o para o destinat?rio.");
           setFinalizandoCompra(false);
           return;
         }
@@ -756,7 +756,7 @@ function App() {
         mensagem_presente: ehPresente ? mensagemPresente : null,
       };
 
-      console.log("USUÁRIO DA COMPRA:", usuario);
+      console.log("USU?RIO DA COMPRA:", usuario);
       console.log("ENVIANDO COMPRA:", dadosCompra);
 
       const resposta = await fetch(
@@ -783,7 +783,7 @@ function App() {
         );
       }
 
-      // ATUALIZAR SALDO DO USUÁRIO APÓS A COMPRA
+      // ATUALIZAR SALDO DO USU?RIO AP?S A COMPRA
       const usuarioAtualizado = {
         ...usuario,
         saldo_cvt: Number(dados.saldo_cvt),
@@ -1139,7 +1139,7 @@ function App() {
             className="valt-search"
             aria-label="Pesquisar produtos"
             type="search"
-            placeholder="ðŸ”Ž Pesquisar produto..."
+            placeholder="🔎 Pesquisar produto..."
             value={pesquisa}
             onChange={(e) =>
               setPesquisa(e.target.value)
@@ -1425,7 +1425,7 @@ function App() {
           {produtosPagina.map(
             (produto) => (
               <div
-                className="valt-product-card"
+                className={`valt-product-card${produto.exclusiva ? " exclusiva" : ""}`}
                 key={produto.id}
                 onClick={() => abrirDetalhesProduto(produto)}
                 style={{
@@ -1434,498 +1434,513 @@ function App() {
                   borderRadius:
                     "10px",
                   padding: "20px",
-                  background: "#fff",
+                  background: produto.exclusiva ? "#fff8df" : "#fff",
                   cursor: "pointer",
                 }}
               >
-                <div className="valt-card-badges"><span>{produto.estoque > 0 ? "DISPONÍVEL" : "ESGOTADO"}</span><button type="button" className={favoritos.includes(produto.id) ? "valt-favorite active" : "valt-favorite"} aria-label={favoritos.includes(produto.id) ? `Remover ${produto.nome} dos favoritos` : `Favoritar ${produto.nome}`} aria-pressed={favoritos.includes(produto.id)} onClick={(evento) => { evento.stopPropagation(); alternarFavorito(produto.id); }}>{favoritos.includes(produto.id) ? "♥" : "♡"}</button></div>
+                <div className="valt-card-badges">
+                  {produto.exclusiva && (
+                    <span
+                      style={{
+                        background: "#f3d36b",
+                        color: "#5a4300",
+                        fontWeight: "700",
+                        borderRadius: "6px",
+                        padding: "4px 8px",
+                        marginRight: "6px",
+                      }}
+                    >
+                      {"\u2B50 EXCLUSIVA"}
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    className={favoritos.includes(produto.id) ? "valt-favorite active" : "valt-favorite"}
+                    aria-label={favoritos.includes(produto.id) ? `Remover ${produto.nome} dos favoritos` : `Favoritar ${produto.nome}`}
+                    aria-pressed={favoritos.includes(produto.id)}
+                    onClick={(evento) => {
+                      evento.stopPropagation();
+                      alternarFavorito(produto.id);
+                    }}
+                  >
+                    {favoritos.includes(produto.id) ? "♥" : "♡"}
+                  </button>
+                </div>
+
                 {/* IMAGEM */}
 
                 <div
                   style={{
-                    textAlign:
-                      "center",
-                    marginBottom:
-                      "5px",
+                    textAlign: "center",
+                    marginBottom: "5px",
                   }}
                 >
                   {produto.imagem ? (
                     <img
                       className="valt-product-image"
                       loading="lazy"
-                      src={obterUrlImagem(
-                        produto.imagem
-                      )}
+                      src={obterUrlImagem(produto.imagem)}
                       alt={produto.nome}
-                      onError={(
-                        evento
-                      ) => {
-                        evento.currentTarget.style.display =
-                          "none";
+                      onError={(evento) => {
+                        evento.currentTarget.style.display = "none";
                       }}
                       style={{
                         width: "100%",
                         height: "90px",
-                        objectFit:
-                          "contain",
-                        borderRadius:
-                          "8px",
+                        objectFit: "contain",
+                        borderRadius: "8px",
                         transform: "scale(1.2)",
                       }}
                     />
                   ) : (
                     <div
                       style={{
-                        fontSize:
-                          "50px",
-                        textAlign:
-                          "center",
-                        height:
-                          "100px",
-                        display:
-                          "flex",
-                        alignItems:
-                          "center",
-                        justifyContent:
-                          "center",
+                        fontSize: "50px",
+                        textAlign: "center",
+                        height: "100px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      ðŸ–¼ï¸
+                      🖼️
                     </div>
                   )}
                 </div>
 
-                {/* NOME */}
+        {/* NOME */}
 
-                <h3
-                  style={{
-                    fontSize: "14px",
-                    margin: "8px 0",
-                  }}
-                >
-                  {produto.nome}
-                </h3>
+        <h3
+          style={{
+            fontSize: "14px",
+            margin: "8px 0",
+          }}
+        >
+          {produto.nome}
+        </h3>
 
-                {/* PREÇO */}
+        {/* PREÇO */}
 
-                <h3
-                  style={{
-                    fontSize: "14px",
-                    margin: "8px 0 12px 0",
-                  }}
-                >
-                  {formatarCVT(produto.preco)}
-                </h3>
+        <h3
+          style={{
+            fontSize: "14px",
+            margin: "8px 0 12px 0",
+          }}
+        >
+          {formatarCVT(produto.preco)}
+        </h3>
 
-                {/* COMPRAR */}
+        {/* COMPRAR */}
 
-                <button
-                  className="valt-buy-button"
-                  onClick={(evento) => {
-                    evento.stopPropagation();
+        <button
+          className="valt-buy-button"
+          onClick={(evento) => {
+            evento.stopPropagation();
 
-                    adicionarCarrinho(
-                      produto
-                    );
-                  }}
-                  disabled={
-                    produto.estoque <=
-                    0
-                  }
-                  style={{
-                    cursor:
-                      produto.estoque > 0
-                        ? "pointer"
-                        : "not-allowed",
-                    fontSize: "24px",
-                  }}
-                >
-                  {produto.estoque >
-                    0
-                    ? "Adicionar ao carrinho"
-                    : "Sem estoque"}
-                </button>
-              </div>
-            )
-          )}
-        </div>
-        {totalPaginas > 1 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "8px",
-              flexWrap: "wrap",
-              margin: "30px 0",
-            }}
+            adicionarCarrinho(
+              produto
+            );
+          }}
+          disabled={
+            produto.estoque <=
+            0
+          }
+          style={{
+            cursor:
+              produto.estoque > 0
+                ? "pointer"
+                : "not-allowed",
+            fontSize: "24px",
+          }}
+        >
+          {produto.estoque >
+            0
+            ? "Adicionar ao carrinho"
+            : "Sem estoque"}
+        </button>
+    </div>
+  )
+          )
+}
+              </div >
+  { totalPaginas > 1 && (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px",
+        flexWrap: "wrap",
+        margin: "30px 0",
+      }}
+    >
+      <button
+        onClick={() => setPaginaAtual((pagina) => Math.max(1, pagina - 1))}
+        disabled={paginaAtual === 1}
+      >
+        ? Anterior
+      </button>
+
+      {Array.from({ length: totalPaginas }, (_, index) => index + 1).map(
+        (pagina) => (
+          <button
+            key={pagina}
+            onClick={() => setPaginaAtual(pagina)}
           >
-            <button
-              onClick={() => setPaginaAtual((pagina) => Math.max(1, pagina - 1))}
-              disabled={paginaAtual === 1}
-            >
-              ? Anterior
-            </button>
+            {pagina}
+          </button>
+        )
+      )}
 
-            {Array.from({ length: totalPaginas }, (_, index) => index + 1).map(
-              (pagina) => (
-                <button
-                  key={pagina}
-                  onClick={() => setPaginaAtual(pagina)}
-                >
-                  {pagina}
-                </button>
-              )
-            )}
-
-            <button
-              onClick={() =>
-                setPaginaAtual((pagina) =>
-                  Math.min(totalPaginas, pagina + 1)
-                )
-              }
-              disabled={paginaAtual === totalPaginas}
-            >
-              Pr?xima ?
-            </button>
-          </div>
-        )}
-        <section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos →</button></section>
+      <button
+        onClick={() =>
+          setPaginaAtual((pagina) =>
+            Math.min(totalPaginas, pagina + 1)
+          )
+        }
+        disabled={paginaAtual === totalPaginas}
+      >
+        Pr?xima ?
+      </button>
+    </div>
+  )}
+<section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos →</button></section>
       </main >
-      <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
+  <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
 
-      {/* =================================================
+{/* =================================================
           CARRINHO
       ================================================= */}
 
-      {
-        mostrarCarrinho && (
+{
+  mostrarCarrinho && (
+    <>
+      <div className="valt-cart-overlay" onClick={() => setMostrarCarrinho(false)} aria-hidden="true" />
+      <div className="valt-cart-drawer" role="dialog" aria-modal="true" aria-label="Meu carrinho"
+        style={{
+          position: "fixed",
+          right: "20px",
+          top: "80px",
+          width: "350px",
+          maxWidth: "90%",
+          maxHeight: "80vh",
+          overflowY: "auto",
+          background: "#fff9d6",
+          border:
+            "1px solid #ccc",
+          borderRadius:
+            "10px",
+          padding: "20px",
+          boxShadow:
+            "0 4px 15px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+        }}
+      >
+        <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>✕</button></div>
+
+        {carrinho.length ===
+          0 ? (
+          <p>
+            Seu carrinho está
+            vazio.
+          </p>
+        ) : (
           <>
-            <div className="valt-cart-overlay" onClick={() => setMostrarCarrinho(false)} aria-hidden="true" />
-            <div className="valt-cart-drawer" role="dialog" aria-modal="true" aria-label="Meu carrinho"
-              style={{
-                position: "fixed",
-                right: "20px",
-                top: "80px",
-                width: "350px",
-                maxWidth: "90%",
-                maxHeight: "80vh",
-                overflowY: "auto",
-                background: "#fff9d6",
-                border:
-                  "1px solid #ccc",
-                borderRadius:
-                  "10px",
-                padding: "20px",
-                boxShadow:
-                  "0 4px 15px rgba(0,0,0,0.2)",
-                zIndex: 1000,
-              }}
-            >
-              <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>✕</button></div>
+            {carrinho.map(
+              (item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    borderBottom:
+                      "1px solid #ddd",
+                    padding:
+                      "10px 0",
+                  }}
+                >
+                  <strong>
+                    {item.nome}
+                  </strong>
 
-              {carrinho.length ===
-                0 ? (
-                <p>
-                  Seu carrinho está
-                  vazio.
-                </p>
-              ) : (
-                <>
-                  {carrinho.map(
-                    (item) => (
-                      <div
-                        key={item.id}
-                        style={{
-                          borderBottom:
-                            "1px solid #ddd",
-                          padding:
-                            "10px 0",
-                        }}
-                      >
-                        <strong>
-                          {item.nome}
-                        </strong>
+                  <p>
+                    {formatarCVT(item.preco)}
+                  </p>
 
-                        <p>
-                          {formatarCVT(item.preco)}
-                        </p>
-
-                        <div>
-                          <button
-                            onClick={() =>
-                              diminuirQuantidade(
-                                item.id
-                              )
-                            }
-                            style={{
-                              width: "42px",
-                              height: "42px",
-                              fontSize: "22px",
-                              fontWeight: "bold",
-                              cursor: "pointer",
-                              backgroundColor: "#e0e0e0",
-                              color: "#000000",
-                              border: "2px solid #000000",
-                              borderRadius: "8px",
-                            }}
-                          >
-                            −
-                          </button>
-
-                          <span
-                            style={{
-                              margin:
-                                "0 10px",
-                            }}
-                          >
-                            {
-                              item.quantidade
-                            }
-                          </span>
-
-                          <button
-                            onClick={() =>
-                              aumentarQuantidade(
-                                item.id
-                              )
-                            }
-                            style={{
-                              width: "42px",
-                              height: "42px",
-                              fontSize: "22px",
-                              fontWeight: "bold",
-                              cursor: "pointer",
-                              backgroundColor: "#e0e0e0",
-                              color: "#000000",
-                              border: "2px solid #000000",
-                              borderRadius: "8px",
-                            }}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            removerCarrinho(
-                              item.id
-                            )
-                          }
-                          style={{
-                            marginTop: "8px",
-                            padding: "10px 14px",
-                            fontSize: "15px",
-                            fontWeight: "bold",
-                            cursor: "pointer",
-                            width: "100%",
-                            backgroundColor: "#e0e0e0",
-                            color: "#000000",
-                            border: "2px solid #000000",
-                            borderRadius: "8px",
-                          }}
-                        >
-                          ðŸ—‘ï¸ Remover
-                        </button>
-                      </div>
-                    )
-                  )}
-
-                  <div
-                    style={{
-                      marginTop: "15px",
-                      marginBottom: "15px",
-                      padding: "12px",
-                      border: "1px solid #ccc",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    <label style={{ display: "block", fontWeight: "bold", marginBottom: "10px" }}>
-                      Como deseja fazer esta compra?
-                    </label>
-
-                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEhPresente(false);
-                          setDestinatarioId("");
-                          setMensagemPresente("");
-                        }}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: "8px",
-                          border: "2px solid #000",
-                          cursor: "pointer",
-                          backgroundColor: !ehPresente ? "#000" : "#fff",
-                          color: !ehPresente ? "#fff" : "#000",
-                        }}
-                      >
-                        Comprar para mim
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setEhPresente(true)}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: "8px",
-                          border: "2px solid #000",
-                          cursor: "pointer",
-                          backgroundColor: ehPresente ? "#000" : "#fff",
-                          color: ehPresente ? "#fff" : "#000",
-                        }}
-                      >
-                        ðŸŽ Enviar como presente
-                      </button>
-                    </div>
-
-                    {ehPresente && (
-                      <div style={{ marginTop: "12px" }}>
-                        <label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>
-                          Número do cliente que receberá o presente:
-                        </label>
-
-                        <input
-                          type="number"
-                          value={destinatarioId}
-                          onChange={(e) => setDestinatarioId(e.target.value)}
-                          placeholder="Digite o número do cliente"
-                          style={{
-                            width: "100%",
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1px solid #999",
-                            boxSizing: "border-box",
-                          }}
-                        />
-
-                        <label style={{ display: "block", fontWeight: "bold", marginTop: "10px", marginBottom: "6px" }}>
-                          Mensagem para acompanhar o presente:
-                        </label>
-
-                        <textarea
-                          value={mensagemPresente}
-                          onChange={(e) => setMensagemPresente(e.target.value)}
-                          placeholder="Ex.: Foi de coração, tomara que goste!"
-                          rows={3}
-                          style={{
-                            width: "100%",
-                            padding: "10px",
-                            borderRadius: "8px",
-                            border: "1px solid #999",
-                            boxSizing: "border-box",
-                            resize: "vertical",
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  {/* ESPAÇO DA COMPRA */}
-                  <div
-                    style={{
-                      marginTop: "15px",
-                      marginBottom: "15px",
-                    }}
-                  >
-                    <label
-                      style={{
-                        display: "block",
-                        fontWeight: "bold",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Escolha o espaço para esta compra:
-                    </label>
-
-                    <select
-                      value={espacoSelecionado}
-                      onChange={(e) =>
-                        setEspacoSelecionado(e.target.value)
+                  <div>
+                    <button
+                      onClick={() =>
+                        diminuirQuantidade(
+                          item.id
+                        )
                       }
                       style={{
-                        width: "100%",
-                        padding: "10px",
-                        fontSize: "16px",
+                        width: "42px",
+                        height: "42px",
+                        fontSize: "22px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
                         backgroundColor: "#e0e0e0",
                         color: "#000000",
                         border: "2px solid #000000",
                         borderRadius: "8px",
                       }}
                     >
-                      <option value="">
-                        Selecione um espaço
-                      </option>
+                      −
+                    </button>
 
-                      {espacos.map((espaco) => (
-                        <option
-                          key={espaco.id}
-                          value={espaco.id}
-                        >
-                          {espaco.nome}
-                        </option>
-                      ))}
-                    </select>
+                    <span
+                      style={{
+                        margin:
+                          "0 10px",
+                      }}
+                    >
+                      {
+                        item.quantidade
+                      }
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        aumentarQuantidade(
+                          item.id
+                        )
+                      }
+                      style={{
+                        width: "42px",
+                        height: "42px",
+                        fontSize: "22px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        backgroundColor: "#e0e0e0",
+                        color: "#000000",
+                        border: "2px solid #000000",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      +
+                    </button>
                   </div>
 
-                  {/* TOTAL */}
-                  <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total será debitado do saldo CVT após a confirmação.</small></div>
-                  <h3>
-                    Total: {formatarCVT(totalCarrinho)}
-                  </h3>
-
-                  {/* FINALIZAR */}
-
                   <button
-                    onClick={finalizarCompra}
-                    disabled={finalizandoCompra}
+                    onClick={() =>
+                      removerCarrinho(
+                        item.id
+                      )
+                    }
                     style={{
-                      padding: "14px 20px",
-                      cursor: "pointer",
-                      marginTop: "10px",
+                      marginTop: "8px",
+                      padding: "10px 14px",
+                      fontSize: "15px",
                       fontWeight: "bold",
-                      fontSize: "16px",
+                      cursor: "pointer",
                       width: "100%",
-                      minHeight: "48px",
                       backgroundColor: "#e0e0e0",
                       color: "#000000",
                       border: "2px solid #000000",
                       borderRadius: "8px",
                     }}
                   >
-                    {finalizandoCompra ? "Processando..." : "ðŸ’³ Finalizar compra"}
+                    ðŸ—‘ï¸ Remover
                   </button>
-                </>
+                </div>
+              )
+            )}
+
+            <div
+              style={{
+                marginTop: "15px",
+                marginBottom: "15px",
+                padding: "12px",
+                border: "1px solid #ccc",
+                borderRadius: "10px",
+              }}
+            >
+              <label style={{ display: "block", fontWeight: "bold", marginBottom: "10px" }}>
+                Como deseja fazer esta compra?
+              </label>
+
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEhPresente(false);
+                    setDestinatarioId("");
+                    setMensagemPresente("");
+                  }}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    border: "2px solid #000",
+                    cursor: "pointer",
+                    backgroundColor: !ehPresente ? "#000" : "#fff",
+                    color: !ehPresente ? "#fff" : "#000",
+                  }}
+                >
+                  Comprar para mim
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEhPresente(true)}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    border: "2px solid #000",
+                    cursor: "pointer",
+                    backgroundColor: ehPresente ? "#000" : "#fff",
+                    color: ehPresente ? "#fff" : "#000",
+                  }}
+                >
+                  ðŸŽ Enviar como presente
+                </button>
+              </div>
+
+              {ehPresente && (
+                <div style={{ marginTop: "12px" }}>
+                  <label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>
+                    Número do cliente que receberá o presente:
+                  </label>
+
+                  <input
+                    type="number"
+                    value={destinatarioId}
+                    onChange={(e) => setDestinatarioId(e.target.value)}
+                    placeholder="Digite o número do cliente"
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #999",
+                      boxSizing: "border-box",
+                    }}
+                  />
+
+                  <label style={{ display: "block", fontWeight: "bold", marginTop: "10px", marginBottom: "6px" }}>
+                    Mensagem para acompanhar o presente:
+                  </label>
+
+                  <textarea
+                    value={mensagemPresente}
+                    onChange={(e) => setMensagemPresente(e.target.value)}
+                    placeholder="Ex.: Foi de coração, tomara que goste!"
+                    rows={3}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #999",
+                      boxSizing: "border-box",
+                      resize: "vertical",
+                    }}
+                  />
+                </div>
               )}
+            </div>
+            {/* ESPAÇO DA COMPRA */}
+            <div
+              style={{
+                marginTop: "15px",
+                marginBottom: "15px",
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontWeight: "bold",
+                  marginBottom: "8px",
+                }}
+              >
+                Escolha o espaço para esta compra:
+              </label>
 
-              {/* FECHAR */}
-
-              <button
-                onClick={() =>
-                  setMostrarCarrinho(
-                    false
-                  )
+              <select
+                value={espacoSelecionado}
+                onChange={(e) =>
+                  setEspacoSelecionado(e.target.value)
                 }
                 style={{
-                  marginTop: "10px",
                   width: "100%",
-                  padding: "12px 20px",
+                  padding: "10px",
                   fontSize: "16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  minHeight: "46px",
                   backgroundColor: "#e0e0e0",
                   color: "#000000",
                   border: "2px solid #000000",
                   borderRadius: "8px",
                 }}
               >
-                Fechar
-              </button>
+                <option value="">
+                  Selecione um espaço
+                </option>
+
+                {espacos.map((espaco) => (
+                  <option
+                    key={espaco.id}
+                    value={espaco.id}
+                  >
+                    {espaco.nome}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* TOTAL */}
+            <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total será debitado do saldo CVT após a confirmação.</small></div>
+            <h3>
+              Total: {formatarCVT(totalCarrinho)}
+            </h3>
+
+            {/* FINALIZAR */}
+
+            <button
+              onClick={finalizarCompra}
+              disabled={finalizandoCompra}
+              style={{
+                padding: "14px 20px",
+                cursor: "pointer",
+                marginTop: "10px",
+                fontWeight: "bold",
+                fontSize: "16px",
+                width: "100%",
+                minHeight: "48px",
+                backgroundColor: "#e0e0e0",
+                color: "#000000",
+                border: "2px solid #000000",
+                borderRadius: "8px",
+              }}
+            >
+              {finalizandoCompra ? "Processando..." : "ðŸ’³ Finalizar compra"}
+            </button>
           </>
-        )
-      }
+        )}
+
+        {/* FECHAR */}
+
+        <button
+          onClick={() =>
+            setMostrarCarrinho(
+              false
+            )
+          }
+          style={{
+            marginTop: "10px",
+            width: "100%",
+            padding: "12px 20px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            minHeight: "46px",
+            backgroundColor: "#e0e0e0",
+            color: "#000000",
+            border: "2px solid #000000",
+            borderRadius: "8px",
+          }}
+        >
+          Fechar
+        </button>
+      </div>
+    </>
+  )
+}
     </div >
   );
 }
