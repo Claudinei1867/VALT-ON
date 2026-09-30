@@ -392,7 +392,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
     } catch (erro) {
       console.error(erro);
 
-      setMensagem("âŒ Erro ao salvar produto.");
+      setMensagem("ERRO: " + (erro?.message || String(erro)));
     }
   };
 
