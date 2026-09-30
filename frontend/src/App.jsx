@@ -189,7 +189,7 @@ function App() {
     useState("");
 
   const [sugestaoTipo, setSugestaoTipo] =
-    useState("Sugest?o");
+    useState("Sugestão");
 
   const [sugestaoMensagem, setSugestaoMensagem] =
     useState("");
@@ -312,11 +312,6 @@ function App() {
 
       const dados =
         await resposta.json();
-
-      console.log(
-        "PRODUTOS RECEBIDOS:",
-        dados
-      );
 
       setProdutos(dados);
       setErro("");
@@ -689,7 +684,7 @@ function App() {
     if (finalizandoCompra) return;
     // Verificar se está logado
     if (!usuario || !usuario.id) {
-      alert("❌ Voc? precisa estar logado para finalizar a compra.");
+      alert("❌ Você precisa estar logado para finalizar a compra.");
       return;
     }
 
@@ -701,7 +696,7 @@ function App() {
 
     // Verificar espaço selecionado
     if (!ehPresente && !espacoSelecionado) {
-      alert("❌ Selecione um espa?o para realizar a compra.");
+      alert("❌ Selecione um espaço para realizar a compra.");
       return;
     }
 
@@ -801,9 +796,9 @@ function App() {
       // ---------------------------------------------------
       alert(
         `✅ Compra realizada com sucesso!\n\n` +
-        `ðŸ“¦ Pedido: #${dados.pedido_id}\n` +
-        `ðŸ‘¤ Cliente: ${usuario.nome}\n` +
-        `ðŸ’° Total: ${formatarCVT(dados.total)}`
+        `📦 Pedido: #${dados.pedido_id}\n` +
+        `👤 Cliente: ${usuario.nome}\n` +
+        `💰 Total: ${formatarCVT(dados.total)}`
       );
 
       // ---------------------------------------------------
@@ -872,7 +867,7 @@ function App() {
               borderRadius: "8px",
             }}
           >
-            ← Voltar para a loja
+            → Voltar para a loja
           </button>
         </div>
       </div>
@@ -1095,7 +1090,7 @@ function App() {
             <img src="/logo-valt-on.png" alt="VALT-ON" className="valt-welcome-logo" />
             <h2 id="valt-welcome-title">Bem-vindo à VALT-ON!</h2>
             <p id="valt-welcome-description">Um simulador de compras online. Todas as compras são fictícias: não há compras, pagamentos nem entregas reais.</p>
-            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e começar a navegar →</button>
+            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e começar a navegar â†’</button>
           </section>
         </div>
       )}
@@ -1380,7 +1375,7 @@ function App() {
         }}
       >
         <div className="valt-section-heading"><div><span className="valt-kicker">EXPLORE A VALT-ON</span><h2>{mostrarFavoritos ? "Seus favoritos" : categoria === "Todos" ? "Produtos em destaque" : categoria}</h2><p>Encontre sua próxima escolha entre nossos produtos.</p></div><span className="valt-product-count">{produtosOrdenados.length} produtos</span></div>
-        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>♡ Favoritos ({favoritos.length})</button></div>
+        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>â™¡ Favoritos ({favoritos.length})</button></div>
         <section className="valt-advanced-filters" aria-label="Filtros de produtos"><div className="valt-filter-heading"><strong>Refine sua busca</strong><button type="button" onClick={() => { setPrecoMinimo(""); setPrecoMaximo(""); setApenasDisponiveis(false); setCategoria("Todos"); setPesquisa(""); setMostrarFavoritos(false); }}>Limpar filtros</button></div><div className="valt-filter-fields"><label>Preço mínimo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="0" value={precoMinimo} onChange={e => setPrecoMinimo(e.target.value)} /></label><label>Preço máximo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="Sem limite" value={precoMaximo} onChange={e => setPrecoMaximo(e.target.value)} /></label><label className="valt-filter-check"><input type="checkbox" checked={apenasDisponiveis} onChange={e => setApenasDisponiveis(e.target.checked)} /> Somente em estoque</label></div></section>
         <div className="valt-toolbar"><span>{pesquisa ? `Resultados para “${pesquisa}”` : "Escolha seus favoritos"}</span><label>Ordenar por <select value={ordenacao} onChange={(evento) => setOrdenacao(evento.target.value)}><option value="destaques">Destaques</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="nome">Nome A–Z</option></select></label></div>
 
@@ -1605,7 +1600,7 @@ function App() {
       </button>
     </div>
   )}
-<section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos →</button></section>
+<section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos â†’</button></section>
       </main >
   <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
 
@@ -1637,7 +1632,7 @@ function App() {
           zIndex: 1000,
         }}
       >
-        <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>✕</button></div>
+        <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>âœ•</button></div>
 
         {carrinho.length ===
           0 ? (
@@ -1740,7 +1735,7 @@ function App() {
                       borderRadius: "8px",
                     }}
                   >
-                    ðŸ—‘ï¸ Remover
+                    🗑️ Remover
                   </button>
                 </div>
               )
@@ -1791,7 +1786,7 @@ function App() {
                     color: ehPresente ? "#fff" : "#000",
                   }}
                 >
-                  ðŸŽ Enviar como presente
+                  🎁 Enviar como presente
                 </button>
               </div>
 
@@ -1908,7 +1903,7 @@ function App() {
                 borderRadius: "8px",
               }}
             >
-              {finalizandoCompra ? "Processando..." : "ðŸ’³ Finalizar compra"}
+              {finalizandoCompra ? "Processando..." : "💳 Finalizar compra"}
             </button>
           </>
         )}
