@@ -26,8 +26,39 @@ def _sincronizar_exclusivas(db: Session):
             .order_by(models.ItemEspacoCliente.id.desc())
             .first()
         )
+        # Pedidos marcados manualmente como Entregue no admin antigo nao criavam
+        # ItemEspacoCliente. Recupera a figurinha a partir do ultimo pedido entregue.
+        if not item_atual:
+            pedido_entregue = (
+                db.query(models.Pedido)
+                .join(models.ItemPedido, models.ItemPedido.pedido_id == models.Pedido.id)
+                .filter(
+                    models.ItemPedido.produto_id == produto.id,
+                    models.Pedido.status == "Entregue",
+                    models.Pedido.espaco_id.isnot(None),
+                )
+                .order_by(models.Pedido.id.desc())
+                .first()
+            )
+            if pedido_entregue:
+                espaco = (
+                    db.query(models.EspacoCliente)
+                    .filter(models.EspacoCliente.id == pedido_entregue.espaco_id)
+                    .first()
+                )
+                if espaco:
+                    item_atual = models.ItemEspacoCliente(
+                        espaco_id=espaco.id,
+                        produto_id=produto.id,
+                        data_entrada=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    )
+                    db.add(item_atual)
+                    db.flush()
+                    alterou = True
+
         if not item_atual:
             continue
+
         reg = db.query(FigurinhaExclusiva).filter(FigurinhaExclusiva.produto_id == produto.id).first()
         if not reg:
             reg = FigurinhaExclusiva(
