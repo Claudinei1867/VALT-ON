@@ -13,6 +13,9 @@ const formatarPreco = (valor) => {
 
 function ProdutoDetalhes({
   produto,
+  usuario,
+  espacos = [],
+  API_URL,
   quantidade,
   setQuantidade,
   onVoltar,
@@ -23,6 +26,26 @@ function ProdutoDetalhes({
   favorito = false,
   onAlternarFavorito,
 }) {
+  const [exclusivaAtual, setExclusivaAtual] = React.useState(null);
+  const [valorOferta, setValorOferta] = React.useState("");
+  const [casaOferta, setCasaOferta] = React.useState("");
+  const [enviandoOferta, setEnviandoOferta] = React.useState(false);
+
+  React.useEffect(() => {
+    setExclusivaAtual(null); setValorOferta(""); setCasaOferta("");
+    if (!produto?.exclusiva || !API_URL) return;
+    fetch(`${API_URL}/figurinhas-exclusivas/mercado`).then(r => r.ok ? r.json() : []).then(itens => setExclusivaAtual(itens.find(i => Number(i.produto_id) === Number(produto.id)) || null)).catch(() => setExclusivaAtual(null));
+  }, [produto?.id, produto?.exclusiva, API_URL]);
+
+  const enviarOfertaExclusiva = async () => {
+    if (!usuario) return alert("Entre na sua conta para fazer uma oferta.");
+    if (!exclusivaAtual) return alert("Proprietário atual não encontrado.");
+    if (Number(exclusivaAtual.dono_id) === Number(usuario.id)) return alert("Esta figurinha já é sua.");
+    if (!casaOferta || Number(valorOferta) <= 0) return alert("Informe o valor da oferta e a casa de destino.");
+    setEnviandoOferta(true);
+    try { const r=await fetch(`${API_URL}/figurinhas-exclusivas/ofertar`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({comprador_id:usuario.id,item_espaco_id:exclusivaAtual.item_id,valor_oferta:Number(valorOferta),espaco_id:Number(casaOferta)})}); const d=await r.json(); if(!r.ok) throw new Error(d.detail||"Não foi possível enviar a oferta."); alert("Oferta enviada ao proprietário!"); setValorOferta(""); setCasaOferta(""); } catch(e){ alert(e.message); } finally { setEnviandoOferta(false); }
+  };
+
   // =====================================================
   // VERIFICAR PRODUTO
   // =====================================================
@@ -176,7 +199,8 @@ function ProdutoDetalhes({
                   src={obterUrlImagem(produto.imagem)}
                   alt={produto.nome}
                   onError={(evento) => {
-                    evento.currentTarget.style.display = "none";
+                    evento.currentTarget.onerror = null;
+                    evento.currentTarget.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23fff8df'/><text x='50%' y='46%' text-anchor='middle' font-size='72'>⭐</text><text x='50%' y='62%' text-anchor='middle' font-family='Arial' font-size='22' fill='%235a4300'>Imagem indisponível</text></svg>`);
                   }}
                   style={{
                     width: "100%",
@@ -415,7 +439,12 @@ function ProdutoDetalhes({
                 COMPRAR
             ================================================= */}
 
-            <button
+            {produto.exclusiva && produto.estoque <= 0 ? (
+              <div style={{margin:"20px 0",padding:"18px",background:"#fff8df",border:"2px solid #e4bd38",borderRadius:"10px"}}>
+                <h3 style={{marginTop:0}}>⭐ Figurinha exclusiva</h3>
+                {exclusivaAtual ? <><p>Ela já tem dono: <strong>{exclusivaAtual.dono_nome}</strong>. Faça uma oferta para tentar comprá-la.</p>{Number(exclusivaAtual.dono_id)!==Number(usuario?.id)?<><input type="number" min="0.01" step="0.01" value={valorOferta} onChange={e=>setValorOferta(e.target.value)} placeholder="Valor da oferta em CVT" style={{width:"100%",padding:"12px",boxSizing:"border-box",marginBottom:"10px"}}/><select value={casaOferta} onChange={e=>setCasaOferta(e.target.value)} style={{width:"100%",padding:"12px",marginBottom:"10px"}}><option value="">Casa de destino</option>{espacos.map(e=><option key={e.id} value={e.id}>{e.nome}</option>)}</select><button type="button" onClick={enviarOfertaExclusiva} disabled={enviandoOferta} style={{width:"100%",padding:"14px",fontWeight:"bold"}}>{enviandoOferta?"Enviando...":"Fazer oferta"}</button></>:<p><strong>Esta figurinha é sua.</strong> As ofertas recebidas aparecem na sua casa.</p>}</>:<p>Carregando proprietário atual...</p>}
+              </div>
+            ) : <button
               onClick={onComprar}
               disabled={produto.estoque <= 0}
               style={{
@@ -443,7 +472,7 @@ function ProdutoDetalhes({
               {produto.estoque > 0
                 ? "🛒 Comprar agora"
                 : "Sem estoque"}
-            </button>
+            </button>}
 
             {/* =================================================
                 INFORMAÇÕES EXTRAS
