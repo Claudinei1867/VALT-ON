@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PresenteRecebido from "./presente/PresenteRecebido";
 
 const API_URL = "https://valt-on.onrender.com";
 
@@ -9,7 +10,7 @@ function Pedidos({ cliente, voltar }) {
 
   useEffect(() => {
     if (!cliente || !cliente.id) {
-      setErro("Cliente não identificado.");
+      setErro("Cliente nÃ£o identificado.");
       setCarregando(false);
       return;
     }
@@ -17,7 +18,7 @@ function Pedidos({ cliente, voltar }) {
     fetch(`${API_URL}/clientes/${cliente.id}/pedidos`)
       .then((resposta) => {
         if (!resposta.ok) {
-          throw new Error("Não foi possível carregar os pedidos.");
+          throw new Error("NÃ£o foi possÃ­vel carregar os pedidos.");
         }
 
         return resposta.json();
@@ -51,10 +52,10 @@ function Pedidos({ cliente, voltar }) {
           marginBottom: "20px",
         }}
       >
-        ← Voltar para a loja
+        â† Voltar para a loja
       </button>
 
-      <h1>📦 Meus Pedidos</h1>
+      <h1>ðŸ“¦ Meus Pedidos</h1>
 
       <p>
         Cliente: <strong>{cliente?.nome}</strong>
@@ -64,19 +65,19 @@ function Pedidos({ cliente, voltar }) {
 
       {erro && (
         <p style={{ color: "red" }}>
-          ❌ {erro}
+          âŒ {erro}
         </p>
       )}
 
       {!carregando && !erro && pedidos.length === 0 && (
         <div>
-          <p>Você ainda não possui pedidos.</p>
+          <p>VocÃª ainda nÃ£o possui pedidos.</p>
         </div>
       )}
 
       {!carregando &&
         !erro &&
-        pedidos.some((pedido) => pedido.eh_presente) && (
+        pedidos.some((pedido) => pedido.eh_presente && pedido.remetente_id) && (
           <div
             style={{
               border: "2px solid #f0c14b",
@@ -86,23 +87,18 @@ function Pedidos({ cliente, voltar }) {
               background: "#fff8dc",
             }}
           >
-            <h2>?? Voc? recebeu um presente!</h2>
+            <h2>Você recebeu um presente!</h2>
 
             {pedidos
-              .filter((pedido) => pedido.eh_presente)
+              .filter((pedido) => pedido.eh_presente && pedido.remetente_id)
               .map((presente) => (
-                <div key={presente.id}>
-                  <p>
-                    <strong>De:</strong> Cliente n?{" "}
-                    {presente.remetente_id} ? {presente.remetente_nome}
-                  </p>
-
-                  {presente.mensagem_presente && (
-                    <p>
-                      ?? ?{presente.mensagem_presente}?
-                    </p>
-                  )}
-                </div>
+                <PresenteRecebido
+                  key={presente.pedido_id}
+                  embalagemPresente={presente.embalagem_presente}
+                  itens={presente.itens}
+                  mensagemPresente={presente.mensagem_presente}
+                  remetenteNome={presente.remetente_nome}
+                />
               ))}
           </div>
         )}
@@ -121,7 +117,7 @@ function Pedidos({ cliente, voltar }) {
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             }}
           >
-            <h2>📦 Pedido #{pedido.id}</h2>
+            <h2>ðŸ“¦ Pedido #{pedido.id}</h2>
 
             <p>
               <strong>Status:</strong>{" "}
@@ -153,7 +149,7 @@ function Pedidos({ cliente, voltar }) {
                   </p>
 
                   <p>
-                    Preço unitário: CVT{" "}
+                    PreÃ§o unitÃ¡rio: CVT{" "}
                     {Number(
                       item.preco_unitario
                     ).toFixed(2)}

@@ -86,10 +86,11 @@ class CompraCreate(BaseModel):
     eh_presente: bool = False
     destinatario_id: int | None = None
     mensagem_presente: str | None = None
+    embalagem_presente: str | None = None
 
 
 # =========================================================
-# CASAS / ESPAÃ‡OS
+# CASAS / ESPAÃƒâ€¡OS
 # =========================================================
 
 class CasaCompra(BaseModel):
@@ -140,7 +141,7 @@ class OfertaUsadoAceitarCriar(BaseModel):
     comprador_id: int
     espaco_id: int
 # =========================================================
-# SUGESTÃ•ES DOS CLIENTES
+# SUGESTÃƒâ€¢ES DOS CLIENTES
 # =========================================================
 
 class SugestaoCriar(BaseModel):
@@ -156,3 +157,13 @@ class SugestaoCriar(BaseModel):
 class CompraCVT(BaseModel):
     cliente_id: int
     quantidade_cvt: int
+
+# =========================================================
+# OFERTAS DE FIGURINHAS EXCLUSIVAS
+# =========================================================
+
+class OfertaFigurinhaExclusivaCriar(BaseModel):
+    comprador_id: int
+    produto_id: int
+    valor_oferta: float
+    espaco_id: int

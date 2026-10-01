@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 import "./modernizacao.css";
@@ -23,7 +23,7 @@ import BotoesNavegacao from "./components/BotoesNavegacao";
 import Manual from "./Manual";
 import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "http://127.0.0.1:8000";
 
 // =====================================================
 // TRANSFORMAR URL DA IMAGEM
@@ -96,7 +96,7 @@ function App() {
   const [favoritos, setFavoritos] = useState([]);
   const [favoritosCarregados, setFavoritosCarregados] = useState(false);
   const [usuarioFavoritos, setUsuarioFavoritos] = useState(null);
-  // Favoritos ficam isolados por conta neste navegador. SincronizaÃ§Ã£o remota exige sessÃ£o autenticada.
+  // Favoritos ficam isolados por conta neste navegador. Sincronização remota exige sessão autenticada.
   useEffect(() => {
     const chave = usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
     try { const dados = JSON.parse(localStorage.getItem(chave) || "[]"); setFavoritos(Array.isArray(dados) ? dados : []); } catch { setFavoritos([]); }
@@ -105,7 +105,7 @@ function App() {
   useEffect(() => {
     if (!favoritosCarregados) return;
     const chave = usuarioFavoritos ? `valt-favoritos-cliente-${usuarioFavoritos}` : "valt-favoritos-anonimos";
-    try { localStorage.setItem(chave, JSON.stringify(favoritos)); } catch (erro) { console.warn("Favoritos nÃ£o salvos", erro); }
+    try { localStorage.setItem(chave, JSON.stringify(favoritos)); } catch (erro) { console.warn("Favoritos não salvos", erro); }
   }, [favoritos, favoritosCarregados, usuarioFavoritos]);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [ordenacao, setOrdenacao] = useState("destaques");
@@ -129,7 +129,7 @@ function App() {
     useState(false);
 
   const posicaoScrollVitrine = useRef(null);
-  // Congela a vitrine sob o drawer e restaura a posiÃ§Ã£o no fechamento.
+  // Congela a vitrine sob o drawer e restaura a posição no fechamento.
   useEffect(() => {
     if (!mostrarCarrinho) return;
     const y = window.scrollY;
@@ -189,7 +189,7 @@ function App() {
     useState("");
 
   const [sugestaoTipo, setSugestaoTipo] =
-    useState("SugestÃ£o");
+    useState("Sugestão");
 
   const [sugestaoMensagem, setSugestaoMensagem] =
     useState("");
@@ -682,9 +682,9 @@ function App() {
   const [finalizandoCompra, setFinalizandoCompra] = useState(false);
   const finalizarCompra = async () => {
     if (finalizandoCompra) return;
-    // Verificar se estÃ¡ logado
+    // Verificar se está logado
     if (!usuario || !usuario.id) {
-      alert("âŒ VocÃª precisa estar logado para finalizar a compra.");
+      alert("❌ Você precisa estar logado para finalizar a compra.");
       return;
     }
 
@@ -694,9 +694,9 @@ function App() {
       return;
     }
 
-    // Verificar espaÃ§o selecionado
+    // Verificar espaço selecionado
     if (!ehPresente && !espacoSelecionado) {
-      alert("âŒ Selecione um espaÃ§o para realizar a compra.");
+      alert("❌ Selecione um espaço para realizar a compra.");
       return;
     }
 
@@ -795,10 +795,10 @@ function App() {
       // COMPRA REALIZADA
       // ---------------------------------------------------
       alert(
-        `âœ… Compra realizada com sucesso!\n\n` +
-        `ðŸ“¦ Pedido: #${dados.pedido_id}\n` +
-        `ðŸ‘¤ Cliente: ${usuario.nome}\n` +
-        `ðŸ’° Total: ${formatarCVT(dados.total)}`
+        `✅ Compra realizada com sucesso!\n\n` +
+        `📦 Pedido: #${dados.pedido_id}\n` +
+        `👤 Cliente: ${usuario.nome}\n` +
+        `💰 Total: ${formatarCVT(dados.total)}`
       );
 
       // ---------------------------------------------------
@@ -821,7 +821,7 @@ function App() {
       );
 
       alert(
-        `âŒ ${error.message || "NÃ£o foi possÃ­vel finalizar a compra."}`
+        `❌ ${error.message || "Não foi possível finalizar a compra."}`
       );
     } finally { setFinalizandoCompra(false); }
   };
@@ -867,7 +867,7 @@ function App() {
               borderRadius: "8px",
             }}
           >
-            â†’ Voltar para a loja
+            → Voltar para a loja
           </button>
         </div>
       </div>
@@ -875,7 +875,7 @@ function App() {
   }
 
   // =====================================================
-  // TELA DE RECUPERAÃ‡ÃƒO DE SENHA
+  // TELA DE RECUPERAÇÃO DE SENHA
   // =====================================================
 
   if (
@@ -1045,7 +1045,7 @@ function App() {
       !sugestaoEmail.trim() ||
       !sugestaoMensagem.trim()
     ) {
-      alert("Preencha todos os campos obrigatÃ³rios.");
+      alert("Preencha todos os campos obrigatórios.");
       return;
     }
 
@@ -1065,18 +1065,18 @@ function App() {
       });
 
       if (!resposta.ok) {
-        throw new Error("Erro ao enviar sugestÃ£o.");
+        throw new Error("Erro ao enviar sugestão.");
       }
 
-      alert("SugestÃ£o enviada com sucesso!");
+      alert("Sugestão enviada com sucesso!");
 
       setSugestaoNome("");
       setSugestaoEmail("");
-      setSugestaoTipo("SugestÃ£o");
+      setSugestaoTipo("Sugestão");
       setSugestaoMensagem("");
       setMostrarSugestoes(false);
     } catch (erro) {
-      alert("NÃ£o foi possÃ­vel enviar a sugestÃ£o.");
+      alert("Não foi possível enviar a sugestão.");
       console.error(erro);
     }
   };
@@ -1086,11 +1086,11 @@ function App() {
       {mostrarBoasVindas && (
         <div className="valt-welcome-backdrop" role="presentation" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) fecharBoasVindas(); }}>
           <section className="valt-welcome-dialog" role="dialog" aria-modal="true" aria-labelledby="valt-welcome-title" aria-describedby="valt-welcome-description">
-            <button type="button" className="valt-welcome-close" onClick={fecharBoasVindas} aria-label="Fechar aviso">Ã—</button>
+            <button type="button" className="valt-welcome-close" onClick={fecharBoasVindas} aria-label="Fechar aviso">×</button>
             <img src="/logo-valt-on.png" alt="VALT-ON" className="valt-welcome-logo" />
-            <h2 id="valt-welcome-title">Bem-vindo Ã  VALT-ON!</h2>
-            <p id="valt-welcome-description">Um simulador de compras online. Todas as compras sÃ£o fictÃ­cias: nÃ£o hÃ¡ compras, pagamentos nem entregas reais.</p>
-            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e comeÃ§ar a navegar â†’</button>
+            <h2 id="valt-welcome-title">Bem-vindo à VALT-ON!</h2>
+            <p id="valt-welcome-description">Um simulador de compras online. Todas as compras são fictícias: não há compras, pagamentos nem entregas reais.</p>
+            <button type="button" className="valt-welcome-start" onClick={fecharBoasVindas} autoFocus>Fechar e começar a navegar →</button>
           </section>
         </div>
       )}
@@ -1134,7 +1134,7 @@ function App() {
             className="valt-search"
             aria-label="Pesquisar produtos"
             type="search"
-            placeholder="ðŸ”Ž Pesquisar produto..."
+            placeholder="🔎 Pesquisar produto..."
             value={pesquisa}
             onChange={(e) =>
               setPesquisa(e.target.value)
@@ -1195,12 +1195,12 @@ function App() {
                 color: "#000",
               }}
             >
-              ðŸ’¡ SugestÃµes
+              💡 Sugestões
             </h2>
 
             <p>
-              Envie sua sugestÃ£o, informe um problema ou conte
-              para nÃ³s como podemos melhorar a VALT-ON.
+              Envie sua sugestão, informe um problema ou conte
+              para nós como podemos melhorar a VALT-ON.
             </p>
 
             <label>Nome</label>
@@ -1248,7 +1248,7 @@ function App() {
                 boxSizing: "border-box",
               }}
             >
-              <option>SugestÃ£o</option>
+              <option>Sugestão</option>
               <option>Problema/erro</option>
               <option>Melhoria</option>
               <option>Outro</option>
@@ -1303,7 +1303,7 @@ function App() {
                   cursor: "pointer",
                 }}
               >
-                ðŸ“¤ Enviar sugestÃ£o
+                📤 Enviar sugestão
               </button>
             </div>
           </div>
@@ -1313,7 +1313,7 @@ function App() {
 
 
       <div className="valt-benefits" aria-label="Diferenciais da loja">
-        <span>âœ¦ Curadoria de produtos</span><span>â—ˆ Compra com crÃ©ditos CVT</span><span>â™¡ Seus favoritos em um sÃ³ lugar</span>
+        <span>✦ Curadoria de produtos</span><span>◈ Compra com créditos CVT</span><span>♡ Seus favoritos em um só lugar</span>
       </div>
 
       {/* =================================================
@@ -1326,7 +1326,7 @@ function App() {
           textAlign: "center",
         }}
       >
-        <div className="valt-hero-content"><span className="valt-eyebrow">VALT-ON Â· SUA VITRINE DIGITAL</span><h2
+        <div className="valt-hero-content"><span className="valt-eyebrow">VALT-ON · SUA VITRINE DIGITAL</span><h2
           style={{
             color: "#222",
             fontSize: "30px",
@@ -1334,7 +1334,7 @@ function App() {
             marginBottom: "10px",
           }}
         >
-          Descubra o que combina com vocÃª
+          Descubra o que combina com você
         </h2>
 
           <p
@@ -1344,7 +1344,7 @@ function App() {
               fontWeight: "500",
             }}
           >
-            Uma seleÃ§Ã£o especial para explorar, favoritar e comprar com seus crÃ©ditos CVT.
+            Uma seleção especial para explorar, favoritar e comprar com seus créditos CVT.
           </p>
 
           <button
@@ -1355,12 +1355,12 @@ function App() {
               });
             }}
           >
-            Explorar produtos <span aria-hidden="true">â†’</span>
+            Explorar produtos <span aria-hidden="true">→</span>
           </button></div>
         {produtosDestaque.length > 0 && (
           <div className="valt-hero-visual valt-hero-carousel" aria-label="Produtos em destaque">
             <img key={produtosDestaque[indiceDestaque % produtosDestaque.length]?.id ?? indiceDestaque} src={obterUrlImagem(produtosDestaque[indiceDestaque % produtosDestaque.length].imagem)} alt={produtosDestaque[indiceDestaque % produtosDestaque.length].nome || "Produto em destaque"} />
-            <span>ESCOLHAS PARA VOCÃŠ</span>
+            <span>ESCOLHAS PARA VOCÊ</span>
           </div>
         )}
       </section >
@@ -1374,10 +1374,10 @@ function App() {
           padding: "20px",
         }}
       >
-        <div className="valt-section-heading"><div><span className="valt-kicker">EXPLORE A VALT-ON</span><h2>{mostrarFavoritos ? "Seus favoritos" : categoria === "Todos" ? "Produtos em destaque" : categoria}</h2><p>Encontre sua prÃ³xima escolha entre nossos produtos.</p></div><span className="valt-product-count">{produtosOrdenados.length} produtos</span></div>
-        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>â™¡ Favoritos ({favoritos.length})</button></div>
-        <section className="valt-advanced-filters" aria-label="Filtros de produtos"><div className="valt-filter-heading"><strong>Refine sua busca</strong><button type="button" onClick={() => { setPrecoMinimo(""); setPrecoMaximo(""); setApenasDisponiveis(false); setCategoria("Todos"); setPesquisa(""); setMostrarFavoritos(false); }}>Limpar filtros</button></div><div className="valt-filter-fields"><label>PreÃ§o mÃ­nimo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="0" value={precoMinimo} onChange={e => setPrecoMinimo(e.target.value)} /></label><label>PreÃ§o mÃ¡ximo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="Sem limite" value={precoMaximo} onChange={e => setPrecoMaximo(e.target.value)} /></label><label className="valt-filter-check"><input type="checkbox" checked={apenasDisponiveis} onChange={e => setApenasDisponiveis(e.target.checked)} /> Somente em estoque</label></div></section>
-        <div className="valt-toolbar"><span>{pesquisa ? `Resultados para "${pesquisa}"` : "Escolha seus favoritos"}</span><label>Ordenar por <select value={ordenacao} onChange={(evento) => setOrdenacao(evento.target.value)}><option value="destaques">Destaques</option><option value="menor-preco">Menor preÃ§o</option><option value="maior-preco">Maior preÃ§o</option><option value="nome">Nome Aâ€“Z</option></select></label></div>
+        <div className="valt-section-heading"><div><span className="valt-kicker">EXPLORE A VALT-ON</span><h2>{mostrarFavoritos ? "Seus favoritos" : categoria === "Todos" ? "Produtos em destaque" : categoria}</h2><p>Encontre sua próxima escolha entre nossos produtos.</p></div><span className="valt-product-count">{produtosOrdenados.length} produtos</span></div>
+        <div className="valt-category-strip" aria-label="Filtrar por categoria">{categoriasDisponiveis.map((nome) => <button key={nome} className={categoria === nome && !mostrarFavoritos ? "active" : ""} onClick={() => { setCategoria(nome); setMostrarFavoritos(false); }} aria-pressed={categoria === nome && !mostrarFavoritos}>{nome}</button>)}<button className={mostrarFavoritos ? "active" : ""} onClick={() => setMostrarFavoritos((atual) => !atual)} aria-pressed={mostrarFavoritos}>♡ Favoritos ({favoritos.length})</button></div>
+        <section className="valt-advanced-filters" aria-label="Filtros de produtos"><div className="valt-filter-heading"><strong>Refine sua busca</strong><button type="button" onClick={() => { setPrecoMinimo(""); setPrecoMaximo(""); setApenasDisponiveis(false); setCategoria("Todos"); setPesquisa(""); setMostrarFavoritos(false); }}>Limpar filtros</button></div><div className="valt-filter-fields"><label>Preço mínimo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="0" value={precoMinimo} onChange={e => setPrecoMinimo(e.target.value)} /></label><label>Preço máximo (CVT)<input type="number" min="0" inputMode="decimal" placeholder="Sem limite" value={precoMaximo} onChange={e => setPrecoMaximo(e.target.value)} /></label><label className="valt-filter-check"><input type="checkbox" checked={apenasDisponiveis} onChange={e => setApenasDisponiveis(e.target.checked)} /> Somente em estoque</label></div></section>
+        <div className="valt-toolbar"><span>{pesquisa ? `Resultados para "${pesquisa}"` : "Escolha seus favoritos"}</span><label>Ordenar por <select value={ordenacao} onChange={(evento) => setOrdenacao(evento.target.value)}><option value="destaques">Destaques</option><option value="menor-preco">Menor preço</option><option value="maior-preco">Maior preço</option><option value="nome">Nome A–Z</option></select></label></div>
 
         {
           carregando && (
@@ -1405,7 +1405,7 @@ function App() {
           produtosFiltrados.length ===
           0 && (
             <p>
-              Nenhum produto corresponde aos filtros. Tente limpar a busca ou ampliar a faixa de preÃ§o.
+              Nenhum produto corresponde aos filtros. Tente limpar a busca ou ampliar a faixa de preço.
             </p>
           )
         }
@@ -1459,7 +1459,7 @@ function App() {
                       alternarFavorito(produto.id);
                     }}
                   >
-                    {favoritos.includes(produto.id) ? "â™¥" : "â™¡"}
+                    {favoritos.includes(produto.id) ? "♥" : "♡"}
                   </button>
                 </div>
 
@@ -1499,7 +1499,7 @@ function App() {
                         justifyContent: "center",
                       }}
                     >
-                      ðŸ–¼ï¸
+                      🖼️
                     </div>
                   )}
                 </div>
@@ -1515,7 +1515,7 @@ function App() {
           {produto.nome}
         </h3>
 
-        {/* PREÃ‡O */}
+        {/* PREÇO */}
 
         <h3
           style={{
@@ -1600,9 +1600,9 @@ function App() {
       </button>
     </div>
   )}
-<section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos â†’</button></section>
+<section className="valt-bottom-cta"><div><span className="valt-kicker">MAIS POSSIBILIDADES</span><h2>Encontrou algo que gostou?</h2><p>Salve seus produtos favoritos e volte quando quiser.</p></div><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Ver favoritos →</button></section>
       </main >
-  <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestÃ£o</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>Â© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
+  <footer className="valt-footer"><div><strong>VALT-ON</strong><p>Sua vitrine digital para descobrir e comprar.</p></div><div><strong>Explore</strong><button onClick={() => { setMostrarFavoritos(false); setCategoria("Todos"); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Todos os produtos</button><button onClick={() => { setMostrarFavoritos(true); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); }}>Meus favoritos</button></div><div><strong>Atendimento</strong><button onClick={() => setMostrarSugestoes(true)}>Enviar sugestão</button><button onClick={() => setMostrarCarrinho(true)}>Meu carrinho</button></div><small>© {new Date().getFullYear()} VALT-ON. Todos os direitos reservados.</small></footer>
 
 {/* =================================================
           CARRINHO
@@ -1632,12 +1632,12 @@ function App() {
           zIndex: 1000,
         }}
       >
-        <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>âœ•</button></div>
+        <div className="valt-cart-title"><h2>Meu carrinho <span>({quantidadeCarrinho})</span></h2><button aria-label="Fechar carrinho" onClick={() => setMostrarCarrinho(false)}>✕</button></div>
 
         {carrinho.length ===
           0 ? (
           <p>
-            Seu carrinho estÃ¡
+            Seu carrinho está
             vazio.
           </p>
         ) : (
@@ -1680,7 +1680,7 @@ function App() {
                         borderRadius: "8px",
                       }}
                     >
-                      âˆ’
+                      −
                     </button>
 
                     <span
@@ -1735,7 +1735,7 @@ function App() {
                       borderRadius: "8px",
                     }}
                   >
-                    ðŸ—‘ï¸ Remover
+                    🗑️ Remover
                   </button>
                 </div>
               )
@@ -1786,21 +1786,21 @@ function App() {
                     color: ehPresente ? "#fff" : "#000",
                   }}
                 >
-                  ðŸŽ Enviar como presente
+                  🎁 Enviar como presente
                 </button>
               </div>
 
               {ehPresente && (
                 <div style={{ marginTop: "12px" }}>
                   <label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>
-                    NÃºmero do cliente que receberÃ¡ o presente:
+                    Número do cliente que receberá o presente:
                   </label>
 
                   <input
                     type="number"
                     value={destinatarioId}
                     onChange={(e) => setDestinatarioId(e.target.value)}
-                    placeholder="Digite o nÃºmero do cliente"
+                    placeholder="Digite o número do cliente"
                     style={{
                       width: "100%",
                       padding: "10px",
@@ -1817,7 +1817,7 @@ function App() {
                   <textarea
                     value={mensagemPresente}
                     onChange={(e) => setMensagemPresente(e.target.value)}
-                    placeholder="Ex.: Foi de coraÃ§Ã£o, tomara que goste!"
+                    placeholder="Ex.: Foi de coração, tomara que goste!"
                     rows={3}
                     style={{
                       width: "100%",
@@ -1831,7 +1831,7 @@ function App() {
                 </div>
               )}
             </div>
-            {/* ESPAÃ‡O DA COMPRA */}
+            {/* ESPAÇO DA COMPRA */}
             <div
               style={{
                 marginTop: "15px",
@@ -1845,7 +1845,7 @@ function App() {
                   marginBottom: "8px",
                 }}
               >
-                Escolha o espaÃ§o para esta compra:
+                Escolha o espaço para esta compra:
               </label>
 
               <select
@@ -1864,7 +1864,7 @@ function App() {
                 }}
               >
                 <option value="">
-                  Selecione um espaÃ§o
+                  Selecione um espaço
                 </option>
 
                 {espacos.map((espaco) => (
@@ -1879,7 +1879,7 @@ function App() {
             </div>
 
             {/* TOTAL */}
-            <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total serÃ¡ debitado do saldo CVT apÃ³s a confirmaÃ§Ã£o.</small></div>
+            <div className="valt-cart-summary"><strong>Resumo do pedido</strong><small>O total será debitado do saldo CVT após a confirmação.</small></div>
             <h3>
               Total: {formatarCVT(totalCarrinho)}
             </h3>
@@ -1903,7 +1903,7 @@ function App() {
                 borderRadius: "8px",
               }}
             >
-              {finalizandoCompra ? "Processando..." : "ðŸ’³ Finalizar compra"}
+              {finalizandoCompra ? "Processando..." : "💳 Finalizar compra"}
             </button>
           </>
         )}
@@ -1941,4 +1941,3 @@ function App() {
 }
 
 export default App;
-

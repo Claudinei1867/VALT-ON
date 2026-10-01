@@ -35,3 +35,47 @@ class FigurinhaExclusiva(Base):
         nullable=False,
         default="ATIVA"
     )
+
+class OfertaFigurinhaExclusiva(Base):
+    __tablename__ = "ofertas_figurinhas_exclusivas"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    produto_id = Column(
+        Integer,
+        ForeignKey("produtos.id"),
+        nullable=False
+    )
+
+    proprietario_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    comprador_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    espaco_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=False
+    )
+
+    valor_oferta = Column(
+        Float,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="PENDENTE"
+    )

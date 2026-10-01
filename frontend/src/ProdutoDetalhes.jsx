@@ -1,4 +1,5 @@
 ﻿import React from "react";
+import OfertaFigurinhaExclusiva from "./pages/OfertaFigurinhaExclusiva";
 
 const formatarPreco = (valor) => {
   return `CVT ${Number(valor || 0).toLocaleString("pt-BR", {
@@ -22,6 +23,13 @@ function ProdutoDetalhes({
   onVerRelacionado,
   favorito = false,
   onAlternarFavorito,
+  espacos = [],
+  espacoSelecionado = "",
+  setEspacoSelecionado,
+  valorOferta = "",
+  setValorOferta,
+  onEnviarOferta,
+  onCancelarOferta,
 }) {
   // =====================================================
   // VERIFICAR PRODUTO
@@ -444,6 +452,19 @@ function ProdutoDetalhes({
                 ? "🛒 Comprar agora"
                 : "Sem estoque"}
             </button>
+
+            {produto.exclusiva && (
+              <OfertaFigurinhaExclusiva
+                produto={produto}
+                espacos={espacos}
+                espacoSelecionado={espacoSelecionado}
+                setEspacoSelecionado={setEspacoSelecionado}
+                valorOferta={valorOferta}
+                setValorOferta={setValorOferta}
+                onEnviar={onEnviarOferta}
+                onCancelar={onCancelarOferta}
+              />
+            )}
 
             {/* =================================================
                 INFORMAÇÕES EXTRAS
