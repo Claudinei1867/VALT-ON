@@ -35,3 +35,12 @@ class FigurinhaExclusiva(Base):
         nullable=False,
         default="ATIVA"
     )
+
+
+class RendimentoExclusiva(Base):
+    __tablename__ = "rendimentos_figurinhas_exclusivas"
+    id = Column(Integer, primary_key=True, index=True)
+    figurinha_exclusiva_id = Column(Integer, ForeignKey("figurinhas_exclusivas.id"), nullable=False, index=True)
+    cliente_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, index=True)
+    semana = Column(String, nullable=False, index=True)
+    valor = Column(Float, nullable=False)
