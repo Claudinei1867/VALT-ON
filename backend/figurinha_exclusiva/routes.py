@@ -81,6 +81,20 @@ def mercado(db:Session=Depends(get_db)):
     _sincronizar_exclusivas(db)
     rows=(db.query(FigurinhaExclusiva,models.ItemEspacoCliente,models.EspacoCliente,models.Produto,models.Cliente).join(models.ItemEspacoCliente,models.ItemEspacoCliente.id==FigurinhaExclusiva.item_espaco_id).join(models.EspacoCliente,models.EspacoCliente.id==models.ItemEspacoCliente.espaco_id).join(models.Produto,models.Produto.id==FigurinhaExclusiva.produto_id).join(models.Cliente,models.Cliente.id==models.EspacoCliente.cliente_id).filter(FigurinhaExclusiva.status=="ATIVA",models.ItemEspacoCliente.status!="EXCLUIDO").all())
     return [{"item_id":i.id,"produto_id":p.id,"nome":p.nome,"imagem":p.imagem,"valor_original":e.valor_original,"dono_id":c.id,"dono_nome":c.nome} for e,i,esp,p,c in rows]
+
+@router.get("/produto/{produto_id}")
+def exclusiva_por_produto(produto_id:int, db:Session=Depends(get_db)):
+    _sincronizar_exclusivas(db)
+    row=(db.query(FigurinhaExclusiva,models.ItemEspacoCliente,models.EspacoCliente,models.Produto,models.Cliente)
+         .join(models.ItemEspacoCliente,models.ItemEspacoCliente.id==FigurinhaExclusiva.item_espaco_id)
+         .join(models.EspacoCliente,models.EspacoCliente.id==models.ItemEspacoCliente.espaco_id)
+         .join(models.Produto,models.Produto.id==FigurinhaExclusiva.produto_id)
+         .join(models.Cliente,models.Cliente.id==models.EspacoCliente.cliente_id)
+         .filter(FigurinhaExclusiva.produto_id==produto_id,FigurinhaExclusiva.status=="ATIVA",models.ItemEspacoCliente.status!="EXCLUIDO").first())
+    if not row: raise HTTPException(404,"Proprietario atual ainda nao encontrado para esta exclusiva.")
+    e,i,esp,p,c=row
+    return {"item_id":i.id,"produto_id":p.id,"nome":p.nome,"imagem":p.imagem,"valor_original":e.valor_original,"dono_id":c.id,"dono_nome":c.nome}
+
 @router.post("/ofertar")
 def ofertar(d:OfertaDireta,db:Session=Depends(get_db)):
     if d.valor_oferta<=0: raise HTTPException(400,"Oferta deve ser maior que zero.")
