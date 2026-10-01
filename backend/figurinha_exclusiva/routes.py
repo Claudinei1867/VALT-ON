@@ -11,8 +11,43 @@ class OfertaDireta(BaseModel):
     item_espaco_id:int
     valor_oferta:float
     espaco_id:int
+def _sincronizar_exclusivas(db: Session):
+    """Garante que exclusivas antigas/revendidas apontem para o dono atual."""
+    produtos = db.query(models.Produto).filter(models.Produto.exclusiva == True).all()
+    alterou = False
+    for produto in produtos:
+        item_atual = (
+            db.query(models.ItemEspacoCliente)
+            .join(models.EspacoCliente, models.EspacoCliente.id == models.ItemEspacoCliente.espaco_id)
+            .filter(
+                models.ItemEspacoCliente.produto_id == produto.id,
+                models.ItemEspacoCliente.status != "EXCLUIDO",
+            )
+            .order_by(models.ItemEspacoCliente.id.desc())
+            .first()
+        )
+        if not item_atual:
+            continue
+        reg = db.query(FigurinhaExclusiva).filter(FigurinhaExclusiva.produto_id == produto.id).first()
+        if not reg:
+            reg = FigurinhaExclusiva(
+                produto_id=produto.id,
+                item_espaco_id=item_atual.id,
+                valor_original=produto.preco,
+                status="ATIVA",
+            )
+            db.add(reg)
+            alterou = True
+        elif reg.item_espaco_id != item_atual.id or reg.status != "ATIVA":
+            reg.item_espaco_id = item_atual.id
+            reg.status = "ATIVA"
+            alterou = True
+    if alterou:
+        db.commit()
+
 @router.get("/mercado")
 def mercado(db:Session=Depends(get_db)):
+    _sincronizar_exclusivas(db)
     rows=(db.query(FigurinhaExclusiva,models.ItemEspacoCliente,models.EspacoCliente,models.Produto,models.Cliente).join(models.ItemEspacoCliente,models.ItemEspacoCliente.id==FigurinhaExclusiva.item_espaco_id).join(models.EspacoCliente,models.EspacoCliente.id==models.ItemEspacoCliente.espaco_id).join(models.Produto,models.Produto.id==FigurinhaExclusiva.produto_id).join(models.Cliente,models.Cliente.id==models.EspacoCliente.cliente_id).filter(FigurinhaExclusiva.status=="ATIVA",models.ItemEspacoCliente.status!="EXCLUIDO").all())
     return [{"item_id":i.id,"produto_id":p.id,"nome":p.nome,"imagem":p.imagem,"valor_original":e.valor_original,"dono_id":c.id,"dono_nome":c.nome} for e,i,esp,p,c in rows]
 @router.post("/ofertar")
