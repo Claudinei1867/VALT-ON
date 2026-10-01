@@ -1535,27 +1535,23 @@ function App() {
           className="valt-buy-button"
           onClick={(evento) => {
             evento.stopPropagation();
-
-            adicionarCarrinho(
-              produto
-            );
+            if (produto.exclusiva && produto.estoque <= 0) {
+              abrirDetalhesProduto(produto);
+              return;
+            }
+            adicionarCarrinho(produto);
           }}
-          disabled={
-            produto.estoque <=
-            0
-          }
+          disabled={produto.estoque <= 0 && !produto.exclusiva}
           style={{
-            cursor:
-              produto.estoque > 0
-                ? "pointer"
-                : "not-allowed",
+            cursor: (produto.estoque > 0 || produto.exclusiva) ? "pointer" : "not-allowed",
             fontSize: "24px",
           }}
         >
-          {produto.estoque >
-            0
+          {produto.estoque > 0
             ? "Adicionar ao carrinho"
-            : "Sem estoque"}
+            : produto.exclusiva
+              ? "Fazer oferta"
+              : "Sem estoque"}
         </button>
     </div>
   )
