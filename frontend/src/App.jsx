@@ -1005,6 +1005,9 @@ function App() {
         favorito={favoritos.includes(produtoSelecionado.id)}
         onAlternarFavorito={() => alternarFavorito(produtoSelecionado.id)}
         obterUrlImagem={obterUrlImagem}
+        usuario={usuario}
+        espacos={espacos}
+        API_URL={API_URL}
       />
     );
   }
