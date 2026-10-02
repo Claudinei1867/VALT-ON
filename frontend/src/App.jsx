@@ -20,6 +20,7 @@ import ProdutoDetalhes from "./ProdutoDetalhes";
 import RedefinirSenha from "./RedefinirSenha";
 import ProdutosUsados from "./pages/ProdutosUsados";
 import BotoesNavegacao from "./components/BotoesNavegacao";
+import EscolhaEmbalagemPresente from "./presente/EscolhaEmbalagemPresente";
 import Manual from "./Manual";
 import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
@@ -124,6 +125,7 @@ function App() {
   const [ehPresente, setEhPresente] = useState(false);
   const [destinatarioId, setDestinatarioId] = useState("");
   const [mensagemPresente, setMensagemPresente] = useState("");
+  const [embalagemPresente, setEmbalagemPresente] = useState("");
 
   const [mostrarCarrinho, setMostrarCarrinho] =
     useState(false);
@@ -749,6 +751,7 @@ function App() {
         eh_presente: ehPresente,
         destinatario_id: ehPresente ? Number(destinatarioId) : null,
         mensagem_presente: ehPresente ? mensagemPresente : null,
+        embalagem_presente: ehPresente ? embalagemPresente : null,
       };
 
       console.log("USU?RIO DA COMPRA:", usuario);
@@ -1827,6 +1830,11 @@ function App() {
                       boxSizing: "border-box",
                       resize: "vertical",
                     }}
+                  />
+
+                  <EscolhaEmbalagemPresente
+                    embalagemSelecionada={embalagemPresente}
+                    onSelecionar={setEmbalagemPresente}
                   />
                 </div>
               )}
