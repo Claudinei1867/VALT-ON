@@ -2,9 +2,11 @@
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from database import get_db, SessionLocal
+from database import SessionLocal
+from dependencies import get_db
 import models
-from .models import FigurinhaExclusiva, RendimentoExclusiva
+from .models import FigurinhaExclusiva, RendimentoExclusiva, OfertaFigurinhaExclusiva
+from . import schemas, services
 router=APIRouter(prefix="/figurinhas-exclusivas",tags=["figurinhas-exclusivas"])
 class OfertaDireta(BaseModel):
     comprador_id:int
@@ -144,13 +146,13 @@ from sqlalchemy.orm import Session
 
 
 
-# router jÃ¡ definido acima
+# router jÃƒÆ’Ã‚Â¡ definido acima
 
 
 # OFERTA DE FIGURINHA EXCLUSIVA
 # =========================================================
 
-@router.post("/ofertar")
+@router.post("/ofertar-exclusiva")
 def enviar_oferta_figurinha_exclusiva(
     dados: schemas.OfertaFigurinhaExclusivaCriar,
     db: Session = Depends(get_db),
@@ -173,12 +175,12 @@ def enviar_oferta_figurinha_exclusiva(
 
     figurinha = (
         db.query(
-            figurinha_exclusiva.models.FigurinhaExclusiva
+            FigurinhaExclusiva
         )
         .filter(
-            figurinha_exclusiva.models.FigurinhaExclusiva.produto_id
+            FigurinhaExclusiva.produto_id
             == dados.produto_id,
-            figurinha_exclusiva.models.FigurinhaExclusiva.status
+            FigurinhaExclusiva.status
             == "ATIVA",
         )
         .first()
@@ -218,7 +220,7 @@ def enviar_oferta_figurinha_exclusiva(
         )
 
     proprietario_id = (
-        figurinha_exclusiva.services.obter_proprietario_exclusiva(
+        services.obter_proprietario_exclusiva(
             db,
             figurinha,
         )
@@ -243,7 +245,7 @@ def enviar_oferta_figurinha_exclusiva(
         )
 
     oferta = (
-        figurinha_exclusiva.models.OfertaFigurinhaExclusiva(
+        OfertaFigurinhaExclusiva(
             produto_id=dados.produto_id,
             proprietario_id=proprietario_id,
             comprador_id=dados.comprador_id,
@@ -282,10 +284,10 @@ def aceitar_oferta_figurinha_exclusiva(
 
     oferta = (
         db.query(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva
+            OfertaFigurinhaExclusiva
         )
         .filter(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva.id
+            OfertaFigurinhaExclusiva.id
             == oferta_id
         )
         .first()
@@ -305,12 +307,12 @@ def aceitar_oferta_figurinha_exclusiva(
 
     figurinha = (
         db.query(
-            figurinha_exclusiva.models.FigurinhaExclusiva
+            FigurinhaExclusiva
         )
         .filter(
-            figurinha_exclusiva.models.FigurinhaExclusiva.produto_id
+            FigurinhaExclusiva.produto_id
             == oferta.produto_id,
-            figurinha_exclusiva.models.FigurinhaExclusiva.status
+            FigurinhaExclusiva.status
             == "ATIVA",
         )
         .first()
@@ -323,7 +325,7 @@ def aceitar_oferta_figurinha_exclusiva(
         )
 
     proprietario_atual = (
-        figurinha_exclusiva.services.obter_proprietario_exclusiva(
+        services.obter_proprietario_exclusiva(
             db,
             figurinha,
         )
@@ -467,10 +469,10 @@ def recusar_oferta_figurinha_exclusiva(
 
     oferta = (
         db.query(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva
+            OfertaFigurinhaExclusiva
         )
         .filter(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva.id
+            OfertaFigurinhaExclusiva.id
             == oferta_id
         )
         .first()
@@ -509,7 +511,7 @@ def recusar_oferta_figurinha_exclusiva(
 # LISTAR OFERTAS DE FIGURINHAS EXCLUSIVAS
 # =========================================================
 
-@router.get("/ofertas/{proprietario_id}")
+@router.get("/ofertas-exclusivas/{proprietario_id}")
 def listar_ofertas_figurinhas_exclusivas(
     proprietario_id: int,
     db: Session = Depends(get_db),
@@ -517,12 +519,12 @@ def listar_ofertas_figurinhas_exclusivas(
 
     ofertas = (
         db.query(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva
+            OfertaFigurinhaExclusiva
         )
         .filter(
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva.proprietario_id
+            OfertaFigurinhaExclusiva.proprietario_id
             == proprietario_id,
-            figurinha_exclusiva.models.OfertaFigurinhaExclusiva.status
+            OfertaFigurinhaExclusiva.status
             == "PENDENTE",
         )
         .all()
@@ -540,3 +542,12 @@ def listar_ofertas_figurinhas_exclusivas(
         }
         for oferta in ofertas
     ]
+
+
+
+
+
+
+
+
+
