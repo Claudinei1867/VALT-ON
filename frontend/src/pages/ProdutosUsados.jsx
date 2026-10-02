@@ -2,6 +2,7 @@ import CompraProdutoUsado from "./produtos-usados/CompraProdutoUsado";
 import FazerOferta from "./produtos-usados/FazerOferta";
 import ListaProdutosUsados from "./produtos-usados/ListaProdutosUsados";
 import OfertasRecebidas from "./produtos-usados/OfertasRecebidas";
+import MercadoExclusivas from "./produtos-usados/MercadoExclusivas";
 
 export default function ProdutosUsados({
   usuario,
@@ -52,6 +53,7 @@ export default function ProdutosUsados({
         ← Voltar para a loja
       </button>
 
+      <MercadoExclusivas usuario={usuario} espacos={espacos} API_URL={API_URL} obterUrlImagem={obterUrlImagem} />
       <CompraProdutoUsado
         usuario={usuario}
         espacos={espacos}

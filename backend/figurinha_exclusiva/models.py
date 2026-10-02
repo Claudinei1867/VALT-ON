@@ -1,4 +1,4 @@
-﻿from sqlalchemy import Column, Integer, Float, String, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from database import Base
 
 
@@ -35,6 +35,7 @@ class FigurinhaExclusiva(Base):
         nullable=False,
         default="ATIVA"
     )
+
 
 class OfertaFigurinhaExclusiva(Base):
     __tablename__ = "ofertas_figurinhas_exclusivas"
@@ -78,4 +79,39 @@ class OfertaFigurinhaExclusiva(Base):
         String,
         nullable=False,
         default="PENDENTE"
+    )
+
+
+class RendimentoExclusiva(Base):
+    __tablename__ = "rendimentos_figurinhas_exclusivas"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    figurinha_exclusiva_id = Column(
+        Integer,
+        ForeignKey("figurinhas_exclusivas.id"),
+        nullable=False,
+        index=True
+    )
+
+    cliente_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False,
+        index=True
+    )
+
+    semana = Column(
+        String,
+        nullable=False,
+        index=True
+    )
+
+    valor = Column(
+        Float,
+        nullable=False
     )

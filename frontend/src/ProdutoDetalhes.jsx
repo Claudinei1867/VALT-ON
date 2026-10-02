@@ -1,5 +1,4 @@
-﻿import React from "react";
-import OfertaFigurinhaExclusiva from "./pages/OfertaFigurinhaExclusiva";
+import React from "react";
 
 const formatarPreco = (valor) => {
   return `CVT ${Number(valor || 0).toLocaleString("pt-BR", {
@@ -9,11 +8,14 @@ const formatarPreco = (valor) => {
 };
 
 // =====================================================
-// PÁGINA DE DETALHES DO PRODUTO
+// PÃGINA DE DETALHES DO PRODUTO
 // =====================================================
 
 function ProdutoDetalhes({
   produto,
+  usuario,
+  espacos = [],
+  API_URL,
   quantidade,
   setQuantidade,
   onVoltar,
@@ -23,14 +25,27 @@ function ProdutoDetalhes({
   onVerRelacionado,
   favorito = false,
   onAlternarFavorito,
-  espacos = [],
-  espacoSelecionado = "",
-  setEspacoSelecionado,
-  valorOferta = "",
-  setValorOferta,
-  onEnviarOferta,
-  onCancelarOferta,
 }) {
+  const [exclusivaAtual, setExclusivaAtual] = React.useState(null);
+  const [valorOferta, setValorOferta] = React.useState("");
+  const [casaOferta, setCasaOferta] = React.useState("");
+  const [enviandoOferta, setEnviandoOferta] = React.useState(false);
+
+  React.useEffect(() => {
+    setExclusivaAtual(null); setValorOferta(""); setCasaOferta("");
+    if (!produto?.exclusiva || !API_URL) return;
+    fetch(`${API_URL}/figurinhas-exclusivas/produto/${produto.id}`, { cache: "no-store" }).then(async r => { if (!r.ok) throw new Error((await r.json().catch(()=>({}))).detail || "ProprietÃ¡rio nÃ£o encontrado"); return r.json(); }).then(setExclusivaAtual).catch(() => setExclusivaAtual(null));
+  }, [produto?.id, produto?.exclusiva, API_URL]);
+
+  const enviarOfertaExclusiva = async () => {
+    if (!usuario) return alert("Entre na sua conta para fazer uma oferta.");
+    if (!exclusivaAtual) return alert("ProprietÃ¡rio atual nÃ£o encontrado.");
+    if (Number(exclusivaAtual.dono_id) === Number(usuario.id)) return alert("Esta figurinha jÃ¡ Ã© sua.");
+    if (!casaOferta || Number(valorOferta) <= 0) return alert("Informe o valor da oferta e a casa de destino.");
+    setEnviandoOferta(true);
+    try { const r=await fetch(`${API_URL}/figurinhas-exclusivas/ofertar`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({comprador_id:usuario.id,item_espaco_id:exclusivaAtual.item_id,valor_oferta:Number(valorOferta),espaco_id:Number(casaOferta)})}); const d=await r.json(); if(!r.ok) throw new Error(d.detail||"NÃ£o foi possÃ­vel enviar a oferta."); alert("Oferta enviada ao proprietÃ¡rio!"); setValorOferta(""); setCasaOferta(""); } catch(e){ alert(e.message); } finally { setEnviandoOferta(false); }
+  };
+
   // =====================================================
   // VERIFICAR PRODUTO
   // =====================================================
@@ -56,7 +71,7 @@ function ProdutoDetalhes({
             boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
           }}
         >
-          <h2>Produto não encontrado.</h2>
+          <h2>Produto nÃ£o encontrado.</h2>
 
           <button
             onClick={onVoltar}
@@ -70,7 +85,7 @@ function ProdutoDetalhes({
               fontWeight: "bold",
             }}
           >
-            ← Voltar para a loja
+            â† Voltar para a loja
           </button>
         </div>
       </div>
@@ -98,7 +113,7 @@ function ProdutoDetalhes({
   };
 
   // =====================================================
-  // PREÇO TOTAL
+  // PREÃ‡O TOTAL
   // =====================================================
 
   const totalProduto = Number(produto.preco) * quantidade;
@@ -139,7 +154,7 @@ function ProdutoDetalhes({
             fontSize: "15px",
           }}
         >
-          ← Voltar para a loja
+          â† Voltar para a loja
         </button>
 
         {/* =================================================
@@ -184,7 +199,8 @@ function ProdutoDetalhes({
                   src={obterUrlImagem(produto.imagem)}
                   alt={produto.nome}
                   onError={(evento) => {
-                    evento.currentTarget.style.display = "none";
+                    evento.currentTarget.onerror = null;
+                    evento.currentTarget.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23fff8df'/><text x='50%' y='46%' text-anchor='middle' font-size='72'>â­</text><text x='50%' y='62%' text-anchor='middle' font-family='Arial' font-size='22' fill='%235a4300'>Imagem indisponÃ­vel</text></svg>`);
                   }}
                   style={{
                     width: "100%",
@@ -199,12 +215,12 @@ function ProdutoDetalhes({
                     fontSize: "100px",
                   }}
                 >
-                  🛍️
+                  ðŸ›ï¸
                 </div>
               )}
             </div>
 
-            {/* INFORMAÇÃO ABAIXO DA IMAGEM */}
+            {/* INFORMAÃ‡ÃƒO ABAIXO DA IMAGEM */}
 
             <div
               style={{
@@ -219,7 +235,7 @@ function ProdutoDetalhes({
           </div>
 
           {/* =================================================
-              INFORMAÇÕES DO PRODUTO
+              INFORMAÃ‡Ã•ES DO PRODUTO
           ================================================= */}
 
           <div>
@@ -233,7 +249,7 @@ function ProdutoDetalhes({
                 fontSize: "15px",
               }}
             >
-              🏷️ {produto.categoria}
+              ðŸ·ï¸ {produto.categoria}
             </p>
 
             {/* NOME */}
@@ -249,9 +265,9 @@ function ProdutoDetalhes({
               {produto.nome}
             </h1>
 
-            <button className="valt-detail-favorite" onClick={onAlternarFavorito} aria-pressed={favorito}>{favorito?"♥ Salvo nos favoritos":"♡ Adicionar aos favoritos"}</button>
+            <button className="valt-detail-favorite" onClick={onAlternarFavorito} aria-pressed={favorito}>{favorito?"â™¥ Salvo nos favoritos":"â™¡ Adicionar aos favoritos"}</button>
 
-            {/* DESCRIÇÃO */}
+            {/* DESCRIÃ‡ÃƒO */}
 
             <div
               style={{
@@ -275,7 +291,7 @@ function ProdutoDetalhes({
                 }}
               >
                 {produto.descricao ||
-                  "Descrição não informada."}
+                  "DescriÃ§Ã£o nÃ£o informada."}
               </p>
             </div>
 
@@ -287,7 +303,7 @@ function ProdutoDetalhes({
               }}
             />
 
-            {/* PREÇO */}
+            {/* PREÃ‡O */}
 
             <p
               style={{
@@ -338,8 +354,8 @@ function ProdutoDetalhes({
               }}
             >
               {produto.estoque > 0
-                ? `📦 Estoque disponível: ${produto.estoque}`
-                : "❌ Produto sem estoque"}
+                ? `ðŸ“¦ Estoque disponÃ­vel: ${produto.estoque}`
+                : "âŒ Produto sem estoque"}
             </p>
 
             {/* =================================================
@@ -377,7 +393,7 @@ function ProdutoDetalhes({
                         : "#eee",
                   }}
                 >
-                  −
+                  âˆ’
                 </button>
 
                 <span
@@ -423,7 +439,12 @@ function ProdutoDetalhes({
                 COMPRAR
             ================================================= */}
 
-            <button
+            {produto.exclusiva && produto.estoque <= 0 ? (
+              <div style={{margin:"20px 0",padding:"18px",background:"#fff8df",border:"2px solid #e4bd38",borderRadius:"10px"}}>
+                <h3 style={{marginTop:0}}>â­ Figurinha exclusiva</h3>
+                {exclusivaAtual ? <><p>Ela jÃ¡ tem dono: <strong>{exclusivaAtual.dono_nome}</strong>. FaÃ§a uma oferta para tentar comprÃ¡-la.</p>{Number(exclusivaAtual.dono_id)!==Number(usuario?.id)?<><label style={{display:"block",fontWeight:"bold",marginBottom:"6px"}}>Quanto vocÃª quer oferecer?</label><input type="number" min="0.01" step="0.01" inputMode="decimal" value={valorOferta} onChange={e=>setValorOferta(e.target.value)} placeholder="Ex.: 15,00 CVT" style={{width:"100%",padding:"14px",boxSizing:"border-box",marginBottom:"10px",fontSize:"18px"}}/><label style={{display:"block",fontWeight:"bold",marginBottom:"6px"}}>Onde receber se a oferta for aceita?</label><select value={casaOferta} onChange={e=>setCasaOferta(e.target.value)} style={{width:"100%",padding:"14px",marginBottom:"10px",fontSize:"16px"}}><option value="">Selecione sua casa</option>{espacos.map(e=><option key={e.id} value={e.id}>{e.nome}</option>)}</select><button type="button" onClick={enviarOfertaExclusiva} disabled={enviandoOferta} style={{width:"100%",padding:"15px",fontWeight:"bold",fontSize:"18px"}}>{enviandoOferta?"Enviando...":"Enviar oferta"}</button></>:<p><strong>Esta figurinha Ã© sua.</strong> As ofertas recebidas aparecem na sua casa.</p>}</>:<p>NÃ£o foi possÃ­vel localizar o dono desta exclusiva. Atualize a pÃ¡gina; se continuar assim, o vÃ­nculo da compra precisa ser corrigido.</p>}
+              </div>
+            ) : <button
               onClick={onComprar}
               disabled={produto.estoque <= 0}
               style={{
@@ -449,25 +470,12 @@ function ProdutoDetalhes({
               }}
             >
               {produto.estoque > 0
-                ? "🛒 Comprar agora"
+                ? "ðŸ›’ Comprar agora"
                 : "Sem estoque"}
-            </button>
-
-            {produto.exclusiva && (
-              <OfertaFigurinhaExclusiva
-                produto={produto}
-                espacos={espacos}
-                espacoSelecionado={espacoSelecionado}
-                setEspacoSelecionado={setEspacoSelecionado}
-                valorOferta={valorOferta}
-                setValorOferta={setValorOferta}
-                onEnviar={onEnviarOferta}
-                onCancelar={onCancelarOferta}
-              />
-            )}
+            </button>}
 
             {/* =================================================
-                INFORMAÇÕES EXTRAS
+                INFORMAÃ‡Ã•ES EXTRAS
             ================================================= */}
 
             <div
@@ -486,7 +494,7 @@ function ProdutoDetalhes({
                   marginTop: "0",
                 }}
               >
-                🚚{" "}
+                ðŸšš{" "}
                 <strong>
                   Prazo de entrega:
                 </strong>{" "}
@@ -496,17 +504,17 @@ function ProdutoDetalhes({
               </p>
 
               <p>
-                📦{" "}
+                ðŸ“¦{" "}
                 <strong>
                   Disponibilidade:
                 </strong>{" "}
                 {produto.estoque > 0
-                  ? "Produto disponível em estoque"
+                  ? "Produto disponÃ­vel em estoque"
                   : "Produto sem estoque"}
               </p>
 
               <p>
-                🔒{" "}
+                ðŸ”’{" "}
                 <strong>
                   Compra segura
                 </strong>
@@ -517,7 +525,7 @@ function ProdutoDetalhes({
                   marginBottom: "0",
                 }}
               >
-                🛍️{" "}
+                ðŸ›ï¸{" "}
                 <strong>
                   Produto vendido pela VALT-ON
                 </strong>
@@ -527,7 +535,7 @@ function ProdutoDetalhes({
         </div>
 
         {/* =================================================
-            RODAPÉ DA PÁGINA
+            RODAPÃ‰ DA PÃGINA
         ================================================= */}
 
         <div
@@ -538,10 +546,10 @@ function ProdutoDetalhes({
             fontSize: "14px",
           }}
         >
-          VALT-ON • Sua loja online
+          VALT-ON â€¢ Sua loja online
         </div>
       </div>
-      {relacionados.length>0&&<section className="valt-related"><h2>Você também pode gostar</h2><div className="valt-related-grid">{relacionados.map((item)=><button key={item.id} onClick={()=>onVerRelacionado?.(item)}><span>{item.imagem?<img src={obterUrlImagem(item.imagem)} alt="" loading="lazy"/>:"🛍️"}</span><strong>{item.nome}</strong><small>{formatarPreco(item.preco)}</small></button>)}</div></section>}
+      {relacionados.length>0&&<section className="valt-related"><h2>VocÃª tambÃ©m pode gostar</h2><div className="valt-related-grid">{relacionados.map((item)=><button key={item.id} onClick={()=>onVerRelacionado?.(item)}><span>{item.imagem?<img src={obterUrlImagem(item.imagem)} alt="" loading="lazy"/>:"ðŸ›ï¸"}</span><strong>{item.nome}</strong><small>{formatarPreco(item.preco)}</small></button>)}</div></section>}
     </div>
   );
 }

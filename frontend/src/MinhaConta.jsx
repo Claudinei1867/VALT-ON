@@ -76,8 +76,10 @@ function MinhaConta({
   const [espacoAberto, setEspacoAberto] =
     useState(null);
 
-  const [figurinhaSelecionada, setFigurinhaSelecionada] =
-    useState(null);
+  const [figurinhaSelecionada, setFigurinhaSelecionada] = useState(null);
+  const [ofertasExclusiva,setOfertasExclusiva]=useState([]);
+  useEffect(()=>{if(!figurinhaSelecionada?.exclusiva||!usuario?.id){setOfertasExclusiva([]);return;}fetch(API_URL+"/figurinhas-exclusivas/ofertas/"+usuario.id).then(r=>r.ok?r.json():[]).then(d=>setOfertasExclusiva(d.filter(o=>o.item_id===figurinhaSelecionada.id))).catch(()=>setOfertasExclusiva([]));},[figurinhaSelecionada,usuario]);
+  const responderExclusiva=async(o,aceitar)=>{const r=await fetch(API_URL+"/figurinhas-exclusivas/ofertas/"+o.oferta_id+"/responder?dono_id="+usuario.id+"&aceitar="+aceitar,{method:"POST"});const d=await r.json();if(!r.ok)return alert(d.detail||"Erro.");alert(aceitar?"Oferta aceita!":"Oferta recusada.");setOfertasExclusiva(a=>a.filter(x=>x.oferta_id!==o.oferta_id));};
 
   const [mostrarCompraCasa, setMostrarCompraCasa] =
     useState(false);
@@ -1454,9 +1456,8 @@ function MinhaConta({
                   textAlign: "center",
                 }}
               >
-                <h3>
-                  {figurinhaSelecionada.nome}
-                </h3>
+                <h3>{figurinhaSelecionada.exclusiva ? "⭐ " : ""}{figurinhaSelecionada.nome}</h3>
+                {figurinhaSelecionada.exclusiva&&<div style={{padding:12,background:"#fff3bf",borderRadius:8,marginBottom:12}}><strong>⭐ Exclusiva — rende 3% do valor original toda quarta às 00:00</strong>{ofertasExclusiva.length===0?<p>Nenhuma oferta pendente.</p>:ofertasExclusiva.map(o=><div key={o.oferta_id} style={{background:"#fff",padding:10,marginTop:8}}>{o.comprador_nome} ofereceu <strong>{Number(o.valor_oferta).toFixed(2)} CVT</strong><br/><button onClick={()=>responderExclusiva(o,true)}>Aceitar</button> <button onClick={()=>responderExclusiva(o,false)}>Recusar</button></div>)}</div>}
 
                 <button
                   onClick={excluirFigurinha}
