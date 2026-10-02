@@ -256,9 +256,19 @@ function App() {
         return;
       }
 
+      const clienteIdCasas = ehPresente
+        ? Number(destinatarioId)
+        : usuario.id;
+
+      if (ehPresente && !destinatarioId) {
+        setEspacos([]);
+        setEspacoSelecionado("");
+        return;
+      }
+
       try {
         const resposta = await fetch(
-          `${API_URL}/clientes/${usuario.id}/espacos`
+          `${API_URL}/clientes/${clienteIdCasas}/espacos`
         );
 
         if (!resposta.ok) {
@@ -276,9 +286,10 @@ function App() {
 
         setEspacos(dados);
 
-        // Selecionar automaticamente o primeiro espa?o
         if (dados.length > 0) {
           setEspacoSelecionado(String(dados[0].id));
+        } else {
+          setEspacoSelecionado("");
         }
       } catch (error) {
         console.error(
@@ -292,8 +303,7 @@ function App() {
     };
 
     carregarEspacos();
-  }, [usuario]);
-
+  }, [usuario, ehPresente, destinatarioId]);
   // =====================================================
   // CARREGAR PRODUTOS
   // =====================================================
@@ -737,7 +747,17 @@ function App() {
           return;
         }
 
-        espacoIdCompra = espacosDestinatario[0].id;
+        const espacoValido = espacosDestinatario.some(
+          (espaco) => String(espaco.id) === String(espacoSelecionado)
+        );
+
+        if (!espacoValido) {
+          alert("Selecione um espaço do destinatário.");
+          setFinalizandoCompra(false);
+          return;
+        }
+
+        espacoIdCompra = espacoSelecionado;
       }
       // ---------------------------------------------------
       // ENVIAR CLIENTE + ITENS PARA O BACKEND
