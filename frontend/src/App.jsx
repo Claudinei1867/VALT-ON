@@ -24,7 +24,7 @@ import EscolhaEmbalagemPresente from "./presente/EscolhaEmbalagemPresente";
 import Manual from "./Manual";
 import { CATEGORIAS, normalizarCategoria } from "./categorias";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://valt-on.onrender.com";
 
 // =====================================================
 // TRANSFORMAR URL DA IMAGEM
