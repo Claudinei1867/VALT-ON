@@ -8,7 +8,7 @@ const formatarPreco = (valor) => {
 };
 
 // =====================================================
-// PÁGINA DE DETALHES DO PRODUTO
+// PÃƒÂGINA DE DETALHES DO PRODUTO
 // =====================================================
 
 function ProdutoDetalhes({
@@ -34,16 +34,23 @@ function ProdutoDetalhes({
   React.useEffect(() => {
     setExclusivaAtual(null); setValorOferta(""); setCasaOferta("");
     if (!produto?.exclusiva || !API_URL) return;
-    fetch(`${API_URL}/figurinhas-exclusivas/produto/${produto.id}`, { cache: "no-store" }).then(async r => { if (!r.ok) throw new Error((await r.json().catch(()=>({}))).detail || "Proprietário não encontrado"); return r.json(); }).then(setExclusivaAtual).catch(() => setExclusivaAtual(null));
+    fetch(`${API_URL}/figurinhas-exclusivas/produto/${produto.id}`, { cache: "no-store" }).then(async r => { if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || "ProprietÃƒÂ¡rio nÃƒÂ£o encontrado"); return r.json(); }).then(setExclusivaAtual).catch(() => setExclusivaAtual(null));
   }, [produto?.id, produto?.exclusiva, API_URL]);
 
   const enviarOfertaExclusiva = async () => {
+    console.log("TESTE OFERTA:", {
+      casaOferta,
+      valorOferta,
+      usuarioId: usuario?.id,
+      itemId: exclusivaAtual?.item_id,
+      espacos,
+    });
     if (!usuario) return alert("Entre na sua conta para fazer uma oferta.");
-    if (!exclusivaAtual) return alert("Proprietário atual não encontrado.");
-    if (Number(exclusivaAtual.dono_id) === Number(usuario.id)) return alert("Esta figurinha já é sua.");
+    if (!exclusivaAtual) return alert("ProprietÃƒÂ¡rio atual nÃƒÂ£o encontrado.");
+    if (Number(exclusivaAtual.dono_id) === Number(usuario.id)) return alert("Esta figurinha jÃƒÂ¡ ÃƒÂ© sua.");
     if (!casaOferta || Number(valorOferta) <= 0) return alert("Informe o valor da oferta e a casa de destino.");
     setEnviandoOferta(true);
-    try { const r=await fetch(`${API_URL}/figurinhas-exclusivas/ofertar`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({comprador_id:usuario.id,item_espaco_id:exclusivaAtual.item_id,valor_oferta:Number(valorOferta),espaco_id:Number(casaOferta)})}); const d=await r.json(); if(!r.ok) throw new Error(d.detail||"Não foi possível enviar a oferta."); alert("Oferta enviada ao proprietário!"); setValorOferta(""); setCasaOferta(""); } catch(e){ alert(e.message); } finally { setEnviandoOferta(false); }
+    try { const r = await fetch(`${API_URL}/figurinhas-exclusivas/ofertar-exclusiva`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ comprador_id: usuario.id, produto_id: produto.id, valor_oferta: Number(valorOferta), espaco_id: Number(casaOferta) }) }); const d = await r.json(); console.log("RESPOSTA OFERTA:", r.status, d); if (!r.ok) throw new Error(d.detail || "NÃƒÂ£o foi possÃƒÂ­vel enviar a oferta."); alert("Oferta enviada ao proprietÃƒÂ¡rio!"); setValorOferta(""); setCasaOferta(""); } catch (e) { console.log("ERRO OFERTA:", e, e?.message, typeof e); alert(typeof e === "string" ? e : JSON.stringify(e)); } finally { setEnviandoOferta(false); }
   };
 
   // =====================================================
@@ -71,7 +78,7 @@ function ProdutoDetalhes({
             boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
           }}
         >
-          <h2>Produto não encontrado.</h2>
+          <h2>Produto nÃƒÂ£o encontrado.</h2>
 
           <button
             onClick={onVoltar}
@@ -85,7 +92,7 @@ function ProdutoDetalhes({
               fontWeight: "bold",
             }}
           >
-            ← Voltar para a loja
+            Ã¢â€ Â Voltar para a loja
           </button>
         </div>
       </div>
@@ -113,7 +120,7 @@ function ProdutoDetalhes({
   };
 
   // =====================================================
-  // PREÇO TOTAL
+  // PREÃƒâ€¡O TOTAL
   // =====================================================
 
   const totalProduto = Number(produto.preco) * quantidade;
@@ -154,7 +161,7 @@ function ProdutoDetalhes({
             fontSize: "15px",
           }}
         >
-          ← Voltar para a loja
+          Ã¢â€ Â Voltar para a loja
         </button>
 
         {/* =================================================
@@ -200,7 +207,7 @@ function ProdutoDetalhes({
                   alt={produto.nome}
                   onError={(evento) => {
                     evento.currentTarget.onerror = null;
-                    evento.currentTarget.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23fff8df'/><text x='50%' y='46%' text-anchor='middle' font-size='72'>⭐</text><text x='50%' y='62%' text-anchor='middle' font-family='Arial' font-size='22' fill='%235a4300'>Imagem indisponível</text></svg>`);
+                    evento.currentTarget.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23fff8df'/><text x='50%' y='46%' text-anchor='middle' font-size='72'>Ã¢Â­Â</text><text x='50%' y='62%' text-anchor='middle' font-family='Arial' font-size='22' fill='%235a4300'>Imagem indisponÃƒÂ­vel</text></svg>`);
                   }}
                   style={{
                     width: "100%",
@@ -215,12 +222,12 @@ function ProdutoDetalhes({
                     fontSize: "100px",
                   }}
                 >
-                  🛍️
+                  Ã°Å¸â€ºÂÃ¯Â¸Â
                 </div>
               )}
             </div>
 
-            {/* INFORMAÇÃO ABAIXO DA IMAGEM */}
+            {/* INFORMAÃƒâ€¡ÃƒÆ’O ABAIXO DA IMAGEM */}
 
             <div
               style={{
@@ -235,7 +242,7 @@ function ProdutoDetalhes({
           </div>
 
           {/* =================================================
-              INFORMAÇÕES DO PRODUTO
+              INFORMAÃƒâ€¡Ãƒâ€¢ES DO PRODUTO
           ================================================= */}
 
           <div>
@@ -249,7 +256,7 @@ function ProdutoDetalhes({
                 fontSize: "15px",
               }}
             >
-              🏷️ {produto.categoria}
+              Ã°Å¸ÂÂ·Ã¯Â¸Â {produto.categoria}
             </p>
 
             {/* NOME */}
@@ -265,9 +272,9 @@ function ProdutoDetalhes({
               {produto.nome}
             </h1>
 
-            <button className="valt-detail-favorite" onClick={onAlternarFavorito} aria-pressed={favorito}>{favorito?"♥ Salvo nos favoritos":"♡ Adicionar aos favoritos"}</button>
+            <button className="valt-detail-favorite" onClick={onAlternarFavorito} aria-pressed={favorito}>{favorito ? "Ã¢â„¢Â¥ Salvo nos favoritos" : "Ã¢â„¢Â¡ Adicionar aos favoritos"}</button>
 
-            {/* DESCRIÇÃO */}
+            {/* DESCRIÃƒâ€¡ÃƒÆ’O */}
 
             <div
               style={{
@@ -291,7 +298,7 @@ function ProdutoDetalhes({
                 }}
               >
                 {produto.descricao ||
-                  "Descrição não informada."}
+                  "DescriÃƒÂ§ÃƒÂ£o nÃƒÂ£o informada."}
               </p>
             </div>
 
@@ -303,7 +310,7 @@ function ProdutoDetalhes({
               }}
             />
 
-            {/* PREÇO */}
+            {/* PREÃƒâ€¡O */}
 
             <p
               style={{
@@ -354,8 +361,8 @@ function ProdutoDetalhes({
               }}
             >
               {produto.estoque > 0
-                ? `📦 Estoque disponível: ${produto.estoque}`
-                : "❌ Produto sem estoque"}
+                ? `Ã°Å¸â€œÂ¦ Estoque disponÃƒÂ­vel: ${produto.estoque}`
+                : "Ã¢ÂÅ’ Produto sem estoque"}
             </p>
 
             {/* =================================================
@@ -393,7 +400,7 @@ function ProdutoDetalhes({
                         : "#eee",
                   }}
                 >
-                  −
+                  Ã¢Ë†â€™
                 </button>
 
                 <span
@@ -418,14 +425,14 @@ function ProdutoDetalhes({
                     fontSize: "22px",
                     cursor:
                       quantidade <
-                      produto.estoque
+                        produto.estoque
                         ? "pointer"
                         : "not-allowed",
                     borderRadius: "8px",
                     border: "1px solid #ccc",
                     background:
                       quantidade <
-                      produto.estoque
+                        produto.estoque
                         ? "white"
                         : "#eee",
                   }}
@@ -440,9 +447,9 @@ function ProdutoDetalhes({
             ================================================= */}
 
             {produto.exclusiva && produto.estoque <= 0 ? (
-              <div style={{margin:"20px 0",padding:"18px",background:"#fff8df",border:"2px solid #e4bd38",borderRadius:"10px"}}>
-                <h3 style={{marginTop:0}}>⭐ Figurinha exclusiva</h3>
-                {exclusivaAtual ? <><p>Ela já tem dono: <strong>{exclusivaAtual.dono_nome}</strong>. Faça uma oferta para tentar comprá-la.</p>{Number(exclusivaAtual.dono_id)!==Number(usuario?.id)?<><label style={{display:"block",fontWeight:"bold",marginBottom:"6px"}}>Quanto você quer oferecer?</label><input type="number" min="0.01" step="0.01" inputMode="decimal" value={valorOferta} onChange={e=>setValorOferta(e.target.value)} placeholder="Ex.: 15,00 CVT" style={{width:"100%",padding:"14px",boxSizing:"border-box",marginBottom:"10px",fontSize:"18px"}}/><label style={{display:"block",fontWeight:"bold",marginBottom:"6px"}}>Onde receber se a oferta for aceita?</label><select value={casaOferta} onChange={e=>setCasaOferta(e.target.value)} style={{width:"100%",padding:"14px",marginBottom:"10px",fontSize:"16px"}}><option value="">Selecione sua casa</option>{espacos.map(e=><option key={e.id} value={e.id}>{e.nome}</option>)}</select><button type="button" onClick={enviarOfertaExclusiva} disabled={enviandoOferta} style={{width:"100%",padding:"15px",fontWeight:"bold",fontSize:"18px"}}>{enviandoOferta?"Enviando...":"Enviar oferta"}</button></>:<p><strong>Esta figurinha é sua.</strong> As ofertas recebidas aparecem na sua casa.</p>}</>:<p>Não foi possível localizar o dono desta exclusiva. Atualize a página; se continuar assim, o vínculo da compra precisa ser corrigido.</p>}
+              <div style={{ margin: "20px 0", padding: "18px", background: "#fff8df", border: "2px solid #e4bd38", borderRadius: "10px" }}>
+                <h3 style={{ marginTop: 0 }}>Ã¢Â­Â Figurinha exclusiva</h3>
+                {exclusivaAtual ? <><p>Ela jÃƒÂ¡ tem dono: <strong>{exclusivaAtual.dono_nome}</strong>. FaÃƒÂ§a uma oferta para tentar comprÃƒÂ¡-la.</p>{Number(exclusivaAtual.dono_id) !== Number(usuario?.id) ? <><label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>Quanto vocÃƒÂª quer oferecer?</label><input type="number" min="0.01" step="0.01" inputMode="decimal" value={valorOferta} onChange={e => setValorOferta(e.target.value)} placeholder="Ex.: 15,00 CVT" style={{ width: "100%", padding: "14px", boxSizing: "border-box", marginBottom: "10px", fontSize: "18px" }} /><label style={{ display: "block", fontWeight: "bold", marginBottom: "6px" }}>Onde receber se a oferta for aceita?</label><select value={casaOferta} onChange={e => setCasaOferta(e.target.value)} style={{ width: "100%", padding: "14px", marginBottom: "10px", fontSize: "16px" }}><option value="">Selecione sua casa</option>{espacos.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}</select><button type="button" onClick={enviarOfertaExclusiva} disabled={enviandoOferta} style={{ width: "100%", padding: "15px", fontWeight: "bold", fontSize: "18px" }}>{enviandoOferta ? "Enviando..." : "Enviar oferta"}</button></> : <p><strong>Esta figurinha ÃƒÂ© sua.</strong> As ofertas recebidas aparecem na sua casa.</p>}</> : <p>NÃƒÂ£o foi possÃƒÂ­vel localizar o dono desta exclusiva. Atualize a pÃƒÂ¡gina; se continuar assim, o vÃƒÂ­nculo da compra precisa ser corrigido.</p>}
               </div>
             ) : <button
               onClick={onComprar}
@@ -470,12 +477,12 @@ function ProdutoDetalhes({
               }}
             >
               {produto.estoque > 0
-                ? "🛒 Comprar agora"
+                ? "Ã°Å¸â€ºâ€™ Comprar agora"
                 : "Sem estoque"}
             </button>}
 
             {/* =================================================
-                INFORMAÇÕES EXTRAS
+                INFORMAÃƒâ€¡Ãƒâ€¢ES EXTRAS
             ================================================= */}
 
             <div
@@ -494,7 +501,7 @@ function ProdutoDetalhes({
                   marginTop: "0",
                 }}
               >
-                🚚{" "}
+                Ã°Å¸Å¡Å¡{" "}
                 <strong>
                   Prazo de entrega:
                 </strong>{" "}
@@ -504,17 +511,17 @@ function ProdutoDetalhes({
               </p>
 
               <p>
-                📦{" "}
+                Ã°Å¸â€œÂ¦{" "}
                 <strong>
                   Disponibilidade:
                 </strong>{" "}
                 {produto.estoque > 0
-                  ? "Produto disponível em estoque"
+                  ? "Produto disponÃƒÂ­vel em estoque"
                   : "Produto sem estoque"}
               </p>
 
               <p>
-                🔒{" "}
+                Ã°Å¸â€â€™{" "}
                 <strong>
                   Compra segura
                 </strong>
@@ -525,7 +532,7 @@ function ProdutoDetalhes({
                   marginBottom: "0",
                 }}
               >
-                🛍️{" "}
+                Ã°Å¸â€ºÂÃ¯Â¸Â{" "}
                 <strong>
                   Produto vendido pela VALT-ON
                 </strong>
@@ -535,7 +542,7 @@ function ProdutoDetalhes({
         </div>
 
         {/* =================================================
-            RODAPÉ DA PÁGINA
+            RODAPÃƒâ€° DA PÃƒÂGINA
         ================================================= */}
 
         <div
@@ -546,12 +553,16 @@ function ProdutoDetalhes({
             fontSize: "14px",
           }}
         >
-          VALT-ON • Sua loja online
+          VALT-ON Ã¢â‚¬Â¢ Sua loja online
         </div>
       </div>
-      {relacionados.length>0&&<section className="valt-related"><h2>Você também pode gostar</h2><div className="valt-related-grid">{relacionados.map((item)=><button key={item.id} onClick={()=>onVerRelacionado?.(item)}><span>{item.imagem?<img src={obterUrlImagem(item.imagem)} alt="" loading="lazy"/>:"🛍️"}</span><strong>{item.nome}</strong><small>{formatarPreco(item.preco)}</small></button>)}</div></section>}
+      {relacionados.length > 0 && <section className="valt-related"><h2>VocÃƒÂª tambÃƒÂ©m pode gostar</h2><div className="valt-related-grid">{relacionados.map((item) => <button key={item.id} onClick={() => onVerRelacionado?.(item)}><span>{item.imagem ? <img src={obterUrlImagem(item.imagem)} alt="" loading="lazy" /> : "Ã°Å¸â€ºÂÃ¯Â¸Â"}</span><strong>{item.nome}</strong><small>{formatarPreco(item.preco)}</small></button>)}</div></section>}
     </div>
   );
 }
 
 export default ProdutoDetalhes;
+
+
+
+

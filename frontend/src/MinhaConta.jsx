@@ -78,8 +78,8 @@ function MinhaConta({
 
   const [figurinhaSelecionada, setFigurinhaSelecionada] = useState(null);
   const [ofertasExclusiva,setOfertasExclusiva]=useState([]);
-  useEffect(()=>{if(!figurinhaSelecionada?.exclusiva||!usuario?.id){setOfertasExclusiva([]);return;}fetch(API_URL+"/figurinhas-exclusivas/ofertas/"+usuario.id).then(r=>r.ok?r.json():[]).then(d=>setOfertasExclusiva(d.filter(o=>o.item_id===figurinhaSelecionada.id))).catch(()=>setOfertasExclusiva([]));},[figurinhaSelecionada,usuario]);
-  const responderExclusiva=async(o,aceitar)=>{const r=await fetch(API_URL+"/figurinhas-exclusivas/ofertas/"+o.oferta_id+"/responder?dono_id="+usuario.id+"&aceitar="+aceitar,{method:"POST"});const d=await r.json();if(!r.ok)return alert(d.detail||"Erro.");alert(aceitar?"Oferta aceita!":"Oferta recusada.");setOfertasExclusiva(a=>a.filter(x=>x.oferta_id!==o.oferta_id));};
+  useEffect(()=>{if(!figurinhaSelecionada?.exclusiva||!usuario?.id){setOfertasExclusiva([]);return;}fetch(API_URL+"/figurinhas-exclusivas/ofertas-exclusivas/"+usuario.id).then(r=>r.ok?r.json():[]).then(d=>setOfertasExclusiva(d.filter(o=>o.produto_id===figurinhaSelecionada.produto_id))).catch(()=>setOfertasExclusiva([]));},[figurinhaSelecionada,usuario]);
+  const responderExclusiva=async(o,aceitar)=>{const r=await fetch(API_URL+"/figurinhas-exclusivas/ofertas-exclusivas/"+o.oferta_id+"/responder?dono_id="+usuario.id+"&aceitar="+aceitar,{method:"POST"});const d=await r.json();if(!r.ok)return alert(d.detail||"Erro.");alert(aceitar?"Oferta aceita!":"Oferta recusada.");setOfertasExclusiva(a=>a.filter(x=>x.oferta_id!==o.oferta_id));};
 
   const [mostrarCompraCasa, setMostrarCompraCasa] =
     useState(false);
@@ -1410,7 +1410,7 @@ function MinhaConta({
                       (figurinha) => (
                         <div
                           key={figurinha.id}
-                          onClick={() => setFigurinhaSelecionada(figurinha)}
+                          onClick={() => { console.log('FIGURINHA SELECIONADA:', figurinha); setFigurinhaSelecionada(figurinha); }}
                           style={{
                             width: "180px",
                             border: "1px solid #ddd",
@@ -2168,3 +2168,6 @@ function MinhaConta({
 }
 
 export default MinhaConta;
+
+
+

@@ -1,4 +1,4 @@
-﻿from sqlalchemy import Column, Integer, Float, String, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from database import Base
 
 
@@ -37,10 +37,81 @@ class FigurinhaExclusiva(Base):
     )
 
 
+class OfertaFigurinhaExclusiva(Base):
+    __tablename__ = "ofertas_figurinhas_exclusivas"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    produto_id = Column(
+        Integer,
+        ForeignKey("produtos.id"),
+        nullable=False
+    )
+
+    proprietario_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    comprador_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    espaco_id = Column(
+        Integer,
+        ForeignKey("espacos_clientes.id"),
+        nullable=False
+    )
+
+    valor_oferta = Column(
+        Float,
+        nullable=False
+    )
+
+    status = Column(
+        String,
+        nullable=False,
+        default="PENDENTE"
+    )
+
+
 class RendimentoExclusiva(Base):
     __tablename__ = "rendimentos_figurinhas_exclusivas"
-    id = Column(Integer, primary_key=True, index=True)
-    figurinha_exclusiva_id = Column(Integer, ForeignKey("figurinhas_exclusivas.id"), nullable=False, index=True)
-    cliente_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, index=True)
-    semana = Column(String, nullable=False, index=True)
-    valor = Column(Float, nullable=False)
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    figurinha_exclusiva_id = Column(
+        Integer,
+        ForeignKey("figurinhas_exclusivas.id"),
+        nullable=False,
+        index=True
+    )
+
+    cliente_id = Column(
+        Integer,
+        ForeignKey("clientes.id"),
+        nullable=False,
+        index=True
+    )
+
+    semana = Column(
+        String,
+        nullable=False,
+        index=True
+    )
+
+    valor = Column(
+        Float,
+        nullable=False
+    )

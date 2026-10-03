@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
 
 import models
 from .models import FigurinhaExclusiva
@@ -35,4 +35,28 @@ def registrar_entrega_exclusiva(
     )
 
     db.add(registro)
-    
+
+
+def obter_proprietario_exclusiva(
+    db: Session,
+    figurinha: FigurinhaExclusiva,
+):
+    item = (
+        db.query(models.ItemEspacoCliente)
+        .filter(models.ItemEspacoCliente.id == figurinha.item_espaco_id)
+        .first()
+    )
+
+    if not item:
+        return None
+
+    espaco = (
+        db.query(models.EspacoCliente)
+        .filter(models.EspacoCliente.id == item.espaco_id)
+        .first()
+    )
+
+    if not espaco:
+        return None
+
+    return espaco.cliente_id

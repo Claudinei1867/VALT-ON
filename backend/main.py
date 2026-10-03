@@ -1381,6 +1381,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
         eh_presente=compra.eh_presente,
         destinatario_id=compra.destinatario_id,
         mensagem_presente=compra.mensagem_presente,
+        embalagem_presente=compra.embalagem_presente,
         status="Pago",
         total=total,
         prazo_entrega=prazo_entrega,
@@ -1534,6 +1535,11 @@ def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
                 ),
                 "mensagem_presente": (
                     pedido.mensagem_presente
+                    if pedido.eh_presente and pedido.status == "Entregue"
+                    else None
+                ),
+                "embalagem_presente": (
+                    pedido.embalagem_presente
                     if pedido.eh_presente and pedido.status == "Entregue"
                     else None
                 ),

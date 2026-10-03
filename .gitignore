@@ -34,3 +34,8 @@ __pycache__/
 
 # Projeto Java separado
 valt-on/
+
+# Arquivos temporários de trabalho
+*.backup-*
+*.antes-*
+*.patch

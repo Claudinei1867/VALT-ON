@@ -79,7 +79,7 @@ class Cliente(Base):
 
 
 # =========================================================
-# INDICAÃƒâ€¡Ãƒâ€¢ES: uma recompensa por novo cliente confirmado
+# INDICAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã¢â‚¬Â¢ES: uma recompensa por novo cliente confirmado
 # =========================================================
 
 class Indicacao(Base):
@@ -153,6 +153,11 @@ class Pedido(Base):
         nullable=True
     )
 
+    embalagem_presente = Column(
+        String,
+        nullable=True
+    )
+
 # =========================================================
 # ITENS DO PEDIDO
 # =========================================================
@@ -187,7 +192,7 @@ class ItemPedido(Base):
 
 
 # =========================================================
-# ESPAÃƒâ€¡OS DO CLIENTE
+# ESPAÃƒÆ’Ã¢â‚¬Â¡OS DO CLIENTE
 # =========================================================
 
 class EspacoCliente(Base):
@@ -218,11 +223,11 @@ class EspacoCliente(Base):
 
     adquirido = Column(
         String,
-        default="NÃƒÂ£o"
+        default="NÃƒÆ’Ã‚Â£o"
     )
 
 # =========================================================
-# ITENS DOS ESPAÃƒâ€¡OS DO CLIENTE
+# ITENS DOS ESPAÃƒÆ’Ã¢â‚¬Â¡OS DO CLIENTE
 # =========================================================
 
 
@@ -530,7 +535,7 @@ class PagamentoCVT(Base):
     )
 
 
-# PresenÃƒÂ§a anÃƒÂ´nima por navegador; nÃƒÂ£o guarda e-mail, nome ou IP.
+# PresenÃƒÆ’Ã‚Â§a anÃƒÆ’Ã‚Â´nima por navegador; nÃƒÆ’Ã‚Â£o guarda e-mail, nome ou IP.
 class PresencaVisitante(Base):
     __tablename__ = "presenca_visitantes"
     sessao = Column(String(64), primary_key=True)
