@@ -116,6 +116,40 @@ export default function Manual({ onVoltar }) {
       </section>
 
       <section>
+        <h2>🎁 Presentes</h2>
+        <p>
+          Você pode comprar produtos para presentear outro cliente do
+          VALT-ON.
+        </p>
+        <ul>
+          <li>O comprador escolhe o cliente que receberá o presente.</li>
+          <li>O presente é destinado à casa do cliente que irá recebê-lo.</li>
+          <li>É possível escolher uma embalagem para o presente.</li>
+          <li>O comprador pode adicionar uma mensagem para o destinatário.</li>
+          <li>O presente fica vinculado ao destinatário para que ele possa recebê-lo.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>⭐ Figurinhas Exclusivas</h2>
+        <p>
+          As Figurinhas Exclusivas são itens especiais do VALT-ON,
+          identificados como exclusivos e disponibilizados em quantidade
+          limitada.
+        </p>
+        <ul>
+          <li>Uma figurinha exclusiva possui estoque limitado.</li>
+          <li>O valor original da figurinha é mantido para referência.</li>
+          <li>Quando adquirida, a figurinha passa a fazer parte da casa do comprador.</li>
+          <li>O proprietário pode receber propostas para transferência da figurinha.</li>
+          <li>O proprietário pode aceitar ou rejeitar uma proposta.</li>
+          <li>O crédito semanal corresponde a 3% do valor original da figurinha.</li>
+          <li>Esse crédito é calculado às quartas-feiras, às 00h00.</li>
+        </ul>
+      </section>
+
+
+      <section>
         <h2>📦 Acompanhamento das compras</h2>
         <p>As compras podem passar pelos seguintes status:</p>
         <ol>
