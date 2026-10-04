@@ -40,7 +40,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # =========================================================
-# CONFIGURA«√O DA API
+# CONFIGURA√á√ÉO DA API
 # =========================================================
 app = FastAPI(title="VALT-ON API")
 app.include_router(recuperacao_senha_router)
@@ -55,18 +55,18 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 # =========================================================
-# CONFIGURA«√O DAS CASAS
+# CONFIGURA√á√ÉO DAS CASAS
 # =========================================================
 
 CASAS_CONFIG = {
     "pequena": {"nome": "Casa Pequena", "valor": 0.0, "capacidade": 30},
-    "media": {"nome": "Casa MÈdia", "valor": 3000.0, "capacidade": 80},
+    "media": {"nome": "Casa M√©dia", "valor": 3000.0, "capacidade": 80},
     "grande": {"nome": "Casa Grande", "valor": 5000.0, "capacidade": 150},
     "mansao": {"nome": "Manso Pro", "valor": 10000.0, "capacidade": 500},
 }
 
 # =========================================================
-# CONFIGURA«√O DAS IMAGENS
+# CONFIGURA√á√ÉO DAS IMAGENS
 # =========================================================
 
 UPLOAD_DIR = Path("uploads")
@@ -103,7 +103,7 @@ Base.metadata.create_all(bind=engine)
 
 
 # =========================================================
-# CONEX√O COM O BANCO
+# CONEX√ÉO COM O BANCO
 # =========================================================
 
 
@@ -117,7 +117,7 @@ def get_db():
 
 
 # =========================================================
-# CR…DITO SEMANAL CVT
+# CR√âDITO SEMANAL CVT
 # =========================================================
 
 
@@ -149,7 +149,7 @@ def conceder_credito_semanal(db: Session):
             creditos += 1
 
     print(
-        f"CrÈdito semanal CVT processado: "
+        f"Cr√©dito semanal CVT processado: "
         f"{data_domingo} | "
         f"Clientes creditados: {creditos}"
     )
@@ -273,7 +273,7 @@ def atualizar_status_pedidos_automaticamente(db):
             novo_status = "Pago"
 
         # -------------------------------------------------
-        # N√O FAZER NADA SE O STATUS J¡ ESTIVER CORRETO
+        # N√ÉO FAZER NADA SE O STATUS J√Å ESTIVER CORRETO
         # -------------------------------------------------
 
         if pedido.status == novo_status:
@@ -341,7 +341,7 @@ def atualizar_status_pedidos_automaticamente(db):
                             db.add(registro_exclusivo)
 
         # -------------------------------------------------
-        # SALVAR ALTERA«√O DO PEDIDO
+        # SALVAR ALTERA√á√ÉO DO PEDIDO
         # -------------------------------------------------
 
         db.commit()
@@ -365,11 +365,11 @@ def atualizar_status_pedidos_automaticamente(db):
 
             enviar_email(
                 cliente.email,
-                f"AtualizaÁ„o do pedido #{pedido.id} - VALT-ON",
+                f"Atualiza√ß√£o do pedido #{pedido.id} - VALT-ON",
                 (
-                    f"Ol·, {cliente.nome}!\n\n"
+                    f"Ol√°, {cliente.nome}!\n\n"
                     f"Seu pedido #{pedido.id} "
-                    "teve uma atualizaÁ„o.\n\n"
+                    "teve uma atualiza√ß√£o.\n\n"
                     f"Status anterior: "
                     f"{status_anterior}\n"
                     f"Novo status: "
@@ -384,7 +384,7 @@ def atualizar_status_pedidos_automaticamente(db):
 
 
 # =========================================================
-# FUN«√O AUTOM¡TICA DO CR…DITO
+# FUN√á√ÉO AUTOM√ÅTICA DO CR√âDITO
 # =========================================================
 
 
@@ -400,7 +400,7 @@ def executar_credito_automatico():
 
         db.rollback()
 
-        print(f"Erro no crÈdito semanal CVT: {erro}")
+        print(f"Erro no cr√©dito semanal CVT: {erro}")
 
     finally:
 
@@ -408,7 +408,7 @@ def executar_credito_automatico():
 
 
 # =========================================================
-# FUN«√O AUTOM¡TICA DOS PEDIDOS
+# FUN√á√ÉO AUTOM√ÅTICA DOS PEDIDOS
 # =========================================================
 
 
@@ -425,7 +425,7 @@ def executar_status_pedidos_automatico():
 
         db.rollback()
 
-        print("Erro na atualizaÁ„o autom·tica " f"dos pedidos: {erro}")
+        print("Erro na atualiza√ß√£o autom√°tica " f"dos pedidos: {erro}")
 
     finally:
 
@@ -440,8 +440,8 @@ scheduler = BackgroundScheduler()
 
 
 # ---------------------------------------------------------
-# CRÈDITO SEMANAL
-# DOMINGO ¿S 00:00
+# CR√©DITO SEMANAL
+# DOMINGO √ÄS 00:00
 # ---------------------------------------------------------
 
 scheduler.add_job(
@@ -451,7 +451,7 @@ scheduler.add_job(pagar_rendimento_semanal, "cron", day_of_week="wed", hour=0, m
 
 
 # ---------------------------------------------------------
-# ATUALIZA«√O DOS PEDIDOS
+# ATUALIZA√á√ÉO DOS PEDIDOS
 # A CADA 1 MINUTO
 # ---------------------------------------------------------
 
@@ -462,7 +462,7 @@ scheduler.start()
 
 
 # =========================================================
-# P¡GINA INICIAL
+# P√ÅGINA INICIAL
 # =========================================================
 
 
@@ -508,7 +508,7 @@ def buscar_produto(produto_id: int, db: Session = Depends(get_db)):
 
     if produto is None:
 
-        raise HTTPException(status_code=404, detail="Produto n„o encontrado")
+        raise HTTPException(status_code=404, detail="Produto n√£o encontrado")
 
     return produto
 
@@ -561,7 +561,7 @@ def alterar_produto(
 
     if produto is None:
 
-        raise HTTPException(status_code=404, detail="Produto n„o encontrado")
+        raise HTTPException(status_code=404, detail="Produto n√£o encontrado")
 
     if dados.exclusiva and dados.estoque > 1:
         raise HTTPException(
@@ -596,13 +596,13 @@ def excluir_produto(produto_id: int, db: Session = Depends(get_db)):
 
     if produto is None:
 
-        raise HTTPException(status_code=404, detail="Produto n„o encontrado")
+        raise HTTPException(status_code=404, detail="Produto n√£o encontrado")
 
     db.delete(produto)
 
     db.commit()
 
-    return {"mensagem": "Produto excluÌdo com sucesso"}
+    return {"mensagem": "Produto exclu√≠do com sucesso"}
 
 
 # =========================================================
@@ -618,7 +618,7 @@ async def upload_imagem(file: UploadFile = File(...)):
     extensao = Path(file.filename or "").suffix.lower()
 
     if extensao not in extensoes_permitidas:
-        raise HTTPException(status_code=400, detail="Formato de imagem n„o permitido.")
+        raise HTTPException(status_code=400, detail="Formato de imagem n√£o permitido.")
 
     nome_arquivo = Path(file.filename or "imagem").name
 
@@ -672,21 +672,21 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
 
     if cliente_existente:
 
-        raise HTTPException(status_code=400, detail="E-mail j· cadastrado.")
+        raise HTTPException(status_code=400, detail="E-mail j√° cadastrado.")
 
     if cliente.indicador_id is not None:
         if cliente.indicador_id <= 0:
-            raise HTTPException(status_code=400, detail="N˙mero do indicador inv·lido.")
+            raise HTTPException(status_code=400, detail="N√∫mero do indicador inv√°lido.")
         indicador = db.query(models.Cliente).filter(models.Cliente.id == cliente.indicador_id, models.Cliente.email_confirmado == 1).first()
         if indicador is None:
-            raise HTTPException(status_code=400, detail="Cliente indicador n„o encontrado ou e-mail ainda n„o confirmado.")
+            raise HTTPException(status_code=400, detail="Cliente indicador n√£o encontrado ou e-mail ainda n√£o confirmado.")
 
     # -----------------------------------------------------
     # CRIAR CLIENTE
     # -----------------------------------------------------
 
-    # O saldo inicial È definido automaticamente
-    # pelo models.py atravÈs de default=1000.0
+    # O saldo inicial √© definido automaticamente
+    # pelo models.py atrav√©s de default=1000.0
 
     agora = datetime.now()
     dias_desde_domingo = (agora.weekday() + 1) % 7
@@ -731,7 +731,7 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
     db.commit()
 
     # -----------------------------------------------------
-    # ENVIAR E-MAIL DE CONFIRMA«√O
+    # ENVIAR E-MAIL DE CONFIRMA√á√ÉO
     # -----------------------------------------------------
 
     link_confirmacao = (
@@ -739,23 +739,23 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
     )
 
     mensagem_confirmacao = (
-        f"Ol·, {novo_cliente.nome}!\n\n"
+        f"Ol√°, {novo_cliente.nome}!\n\n"
         "Sua conta no VALT-ON foi criada com sucesso.\n\n"
-        "Para confirmar seu endereÁo de e-mail, "
+        "Para confirmar seu endere√ßo de e-mail, "
         "acesse o link abaixo:\n\n"
         f"{link_confirmacao}\n\n"
-        "Este link È v·lido por 24 horas.\n\n"
-        "Se vocÍ n„o criou esta conta, ignore este e-mail.\n\n"
+        "Este link √© v√°lido por 24 horas.\n\n"
+        "Se voc√™ n√£o criou esta conta, ignore este e-mail.\n\n"
         "VALT-ON"
     )
 
     url_segura = html.escape(link_confirmacao, quote=True)
     html_confirmacao = (
-        f"<p>Ol·, {html.escape(novo_cliente.nome)}!</p>"
+        f"<p>Ol√°, {html.escape(novo_cliente.nome)}!</p>"
         "<p>Sua conta no VALT-ON foi criada. Confirme seu e-mail:</p>"
         f'<p><a href="{url_segura}" style="display:inline-block;padding:12px 20px;background:#f3d77e;color:#27313b;font-weight:bold;text-decoration:none;border-radius:6px">Confirmar meu e-mail</a></p>'
-        f'<p>Ou copie este endereÁo: <a href="{url_segura}">{url_segura}</a></p>'
-        "<p>O link È v·lido por 24 horas. Se n„o criou a conta, ignore esta mensagem.</p>"
+        f'<p>Ou copie este endere√ßo: <a href="{url_segura}">{url_segura}</a></p>'
+        "<p>O link √© v√°lido por 24 horas. Se n√£o criou a conta, ignore esta mensagem.</p>"
     )
     enviar_email(
         novo_cliente.email, "Confirme seu e-mail - VALT-ON", mensagem_confirmacao, html_confirmacao
@@ -765,13 +765,13 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
 
 
 
-# Reenvio p˙blico por e-mail: resposta neutra para n„o revelar contas.
-# Contagem aproximada de navegadores ativos nos ˙ltimos 2 minutos.
+# Reenvio p√∫blico por e-mail: resposta neutra para n√£o revelar contas.
+# Contagem aproximada de navegadores ativos nos √∫ltimos 2 minutos.
 @app.post("/presenca/ping")
 def registrar_presenca(dados: schemas.PresencaPing, db: Session = Depends(get_db)):
     sessao = dados.sessao
     if not isinstance(sessao, str) or len(sessao) != 36 or any(c not in "0123456789abcdef-" for c in sessao.lower()):
-        raise HTTPException(status_code=422, detail="Sess„o inv·lida.")
+        raise HTTPException(status_code=422, detail="Sess√£o inv√°lida.")
     agora = datetime.now()
     limite = (agora - timedelta(minutes=2)).isoformat()
     db.query(models.PresencaVisitante).filter(models.PresencaVisitante.ultima_atividade < limite).delete(synchronize_session=False)
@@ -784,7 +784,7 @@ def registrar_presenca(dados: schemas.PresencaPing, db: Session = Depends(get_db
     return {"ok": True}
 
 # =========================================================
-# RECUPERA«√O DE SENHA
+# RECUPERA√á√ÉO DE SENHA
 # ========================================================
 
 
@@ -797,25 +797,25 @@ def confirmar_email(token: str, db: Session = Depends(get_db)):
     )
 
     if cliente is None:
-        raise HTTPException(status_code=400, detail="Token de confirmaÁ„o inv·lido.")
+        raise HTTPException(status_code=400, detail="Token de confirma√ß√£o inv√°lido.")
 
     if cliente.email_confirmado == 1:
-        return {"mensagem": "E-mail j· confirmado."}
+        return {"mensagem": "E-mail j√° confirmado."}
 
     if cliente.token_confirmacao_expira_em is None:
-        raise HTTPException(status_code=400, detail="Token de confirmaÁ„o inv·lido.")
+        raise HTTPException(status_code=400, detail="Token de confirma√ß√£o inv√°lido.")
 
     try:
         expiracao = datetime.fromisoformat(cliente.token_confirmacao_expira_em)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Token de confirmaÁ„o inv·lido.")
+        raise HTTPException(status_code=400, detail="Token de confirma√ß√£o inv√°lido.")
 
     if datetime.now() > expiracao:
-        raise HTTPException(status_code=400, detail="Token de confirmaÁ„o expirado.")
+        raise HTTPException(status_code=400, detail="Token de confirma√ß√£o expirado.")
 
     cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente.id).with_for_update().one()
     if cliente.email_confirmado == 1:
-        return {"mensagem": "E-mail j· confirmado."}
+        return {"mensagem": "E-mail j√° confirmado."}
     indicacao = db.query(models.Indicacao).filter(models.Indicacao.indicado_id == cliente.id, models.Indicacao.creditada == 0).with_for_update().first()
     if indicacao is not None:
         indicador = db.query(models.Cliente).filter(models.Cliente.id == indicacao.indicador_id).with_for_update().first()
@@ -844,7 +844,7 @@ def login(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
     )
 
     if cliente is None:
-        raise HTTPException(status_code=401, detail="E-mail ou senha inv·lidos.")
+        raise HTTPException(status_code=401, detail="E-mail ou senha inv√°lidos.")
 
     if cliente.email_confirmado != 1:
         raise HTTPException(
@@ -852,16 +852,16 @@ def login(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
         )
 
     if cliente.senha != dados.senha:
-        raise HTTPException(status_code=401, detail="E-mail ou senha inv·lidos.")
+        raise HTTPException(status_code=401, detail="E-mail ou senha inv√°lidos.")
 
     # =====================================================
-    # VERIFICAR CR…DITO SEMANAL
+    # VERIFICAR CR√âDITO SEMANAL
     # =====================================================
 
     conceder_credito_semanal(db)
 
-    # Atualizar os dados do cliente apÛs
-    # possÌvel crÈdito
+    # Atualizar os dados do cliente ap√≥s
+    # poss√≠vel cr√©dito
 
     db.refresh(cliente)
 
@@ -904,7 +904,7 @@ def login_admin(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
 
     if administrador is None:
         raise HTTPException(
-            status_code=401, detail="E-mail ou senha de administrador inv·lidos."
+            status_code=401, detail="E-mail ou senha de administrador inv√°lidos."
         )
 
     senha_correta = bcrypt.checkpw(
@@ -913,7 +913,7 @@ def login_admin(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
 
     if not senha_correta:
         raise HTTPException(
-            status_code=401, detail="E-mail ou senha de administrador inv·lidos."
+            status_code=401, detail="E-mail ou senha de administrador inv√°lidos."
         )
 
     return {
@@ -926,7 +926,7 @@ def login_admin(dados: schemas.ClienteLogin, db: Session = Depends(get_db)):
 
 
 # =========================================================
-# ESTATÕSTICAS DO ADMINISTRADOR
+# ESTAT√çSTICAS DO ADMINISTRADOR
 # =========================================================
 
 
@@ -997,17 +997,17 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
 
     if cliente is None:
 
-        raise HTTPException(status_code=404, detail="Cliente n„o encontrado.")
+        raise HTTPException(status_code=404, detail="Cliente n√£o encontrado.")
 
     # -----------------------------------------------------
-    # VERIFICAR ESPA«O DO CLIENTE
+    # VERIFICAR ESPA√áO DO CLIENTE
     # -----------------------------------------------------
 
     if compra.eh_presente:
         if compra.destinatario_id is None:
             raise HTTPException(
                 status_code=400,
-                detail="… necess·rio informar o destinat·rio do presente.",
+                detail="√â necess√°rio informar o destinat√°rio do presente.",
             )
 
         destinatario = (
@@ -1019,7 +1019,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
         if destinatario is None:
             raise HTTPException(
                 status_code=404,
-                detail="Destinat·rio n„o encontrado.",
+                detail="Destinat√°rio n√£o encontrado.",
             )
     else:
         destinatario = None
@@ -1027,7 +1027,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
     if compra.espaco_id is None:
         raise HTTPException(
             status_code=400,
-            detail="… necess·rio selecionar um espaÁo para realizar a compra.",
+            detail="√â necess√°rio selecionar um espa√ßo para realizar a compra.",
         )
 
     cliente_espaco_id = (
@@ -1047,7 +1047,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
 
     if espaco is None:
         raise HTTPException(
-            status_code=400, detail="EspaÁo inv·lido ou n„o pertence ao cliente."
+            status_code=400, detail="Espa√ßo inv√°lido ou n√£o pertence ao cliente."
         )
 
     # -----------------------------------------------------
@@ -1070,7 +1070,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
 
         if quantidade <= 0:
 
-            raise HTTPException(status_code=400, detail="Quantidade inv·lida.")
+            raise HTTPException(status_code=400, detail="Quantidade inv√°lida.")
 
         produto = (
             db.query(models.Produto).filter(models.Produto.id == produto_id).first()
@@ -1079,7 +1079,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
         if produto is None:
 
             raise HTTPException(
-                status_code=404, detail=(f"Produto {produto_id} " "n„o encontrado.")
+                status_code=404, detail=(f"Produto {produto_id} " "n√£o encontrado.")
             )
 
         if produto.exclusiva and quantidade != 1:
@@ -1100,7 +1100,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
                 detail=(
                     f"Estoque insuficiente para "
                     f"{produto.nome}. "
-                    f"DisponÌ≠vel: "
+                    f"Dispon√≠¬≠vel: "
                     f"{produto.estoque}"
                 ),
             )
@@ -1121,7 +1121,7 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
             status_code=400,
             detail=(
                 "Saldo CVT insuficiente. "
-                f"Saldo disponÌ≠vel: "
+                f"Saldo dispon√≠¬≠vel: "
                 f"{cliente.saldo_cvt:.2f} CVT. "
                 f"Total da compra: "
                 f"{total:.2f} CVT."
@@ -1218,7 +1218,7 @@ def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
     if cliente is None:
 
-        raise HTTPException(status_code=404, detail="Cliente n„o encontrado.")
+        raise HTTPException(status_code=404, detail="Cliente n√£o encontrado.")
 
     # -----------------------------------------------------
     # BUSCAR PEDIDOS
@@ -1268,7 +1268,7 @@ def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
             itens_resultado.append(
                 {
                     "produto_id": item.produto_id,
-                    "nome": (produto.nome if produto else "Produto n„o encontrado"),
+                    "nome": (produto.nome if produto else "Produto n√£o encontrado"),
                     "imagem": (produto.imagem if produto else None),
                     "quantidade": item.quantidade,
                     "preco_unitario": item.preco_unitario,
@@ -1330,7 +1330,7 @@ def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get
 
     if pedido is None:
 
-        raise HTTPException(status_code=404, detail="Pedido n„o encontrado.")
+        raise HTTPException(status_code=404, detail="Pedido n√£o encontrado.")
 
     # -----------------------------------------------------
     # PEGAR NOVO STATUS
@@ -1340,7 +1340,7 @@ def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get
 
     if not novo_status:
 
-        raise HTTPException(status_code=400, detail="O status do pedido È obrigatÛrio.")
+        raise HTTPException(status_code=400, detail="O status do pedido √© obrigat√≥rio.")
 
     # -----------------------------------------------------
     # STATUS PERMITIDOS
@@ -1357,7 +1357,7 @@ def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get
 
     if novo_status not in status_permitidos:
 
-        raise HTTPException(status_code=400, detail="Status inv·lido.")
+        raise HTTPException(status_code=400, detail="Status inv√°lido.")
 
     # -----------------------------------------------------
     # ALTERAR STATUS
@@ -1388,10 +1388,10 @@ def alterar_status_pedido(pedido_id: int, dados: dict, db: Session = Depends(get
 
             enviar_email(
                 cliente.email,
-                f"AtualizaÁ„o do pedido #{pedido.id} - VALT-ON",
+                f"Atualiza√ß√£o do pedido #{pedido.id} - VALT-ON",
                 (
-                    f"Ol·, {cliente.nome}!\n\n"
-                    f"Seu pedido #{pedido.id} teve uma atualizaÁ„o.\n\n"
+                    f"Ol√°, {cliente.nome}!\n\n"
+                    f"Seu pedido #{pedido.id} teve uma atualiza√ß√£o.\n\n"
                     f"Status anterior: {status_anterior}\n"
                     f"Novo status: {novo_status}\n"
                     f"Total do pedido: {pedido.total:.2f} CVT\n\n"
@@ -1435,7 +1435,7 @@ def listar_todos_pedidos(db: Session = Depends(get_db)):
             {
                 "pedido_id": pedido.id,
                 "cliente_id": pedido.cliente_id,
-                "cliente_nome": (cliente.nome if cliente else "Cliente n„o encontrado"),
+                "cliente_nome": (cliente.nome if cliente else "Cliente n√£o encontrado"),
                 "cliente_email": cliente.email if cliente else "",
                 "status": pedido.status,
                 "total": pedido.total,
@@ -1447,7 +1447,7 @@ def listar_todos_pedidos(db: Session = Depends(get_db)):
 
 
 # =========================================================
-# ESPA«OS DO CLIENTE
+# ESPA√áOS DO CLIENTE
 # =========================================================
 
 
@@ -1463,7 +1463,7 @@ def comprar_casa(
     cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
     if cliente is None:
-        raise HTTPException(status_code=404, detail="Cliente n„o encontrado.")
+        raise HTTPException(status_code=404, detail="Cliente n√£o encontrado.")
 
     # -----------------------------------------------------
     # VERIFICAR CLIENTE INFORMADO
@@ -1472,7 +1472,7 @@ def comprar_casa(
     if casa.cliente_id != cliente_id:
         raise HTTPException(
             status_code=400,
-            detail="Cliente informado n„o corresponde ao cliente da rota.",
+            detail="Cliente informado n√£o corresponde ao cliente da rota.",
         )
 
     # -----------------------------------------------------
@@ -1482,7 +1482,7 @@ def comprar_casa(
     config = CASAS_CONFIG.get(casa.tipo)
 
     if config is None:
-        raise HTTPException(status_code=400, detail="Tipo de casa inv·lido.")
+        raise HTTPException(status_code=400, detail="Tipo de casa inv√°lido.")
 
     # -----------------------------------------------------
     # VERIFICAR SALDO
@@ -1495,7 +1495,7 @@ def comprar_casa(
             status_code=400,
             detail=(
                 "Saldo CVT insuficiente. "
-                f"Saldo disponÌ≠vel: {cliente.saldo_cvt:.2f} CVT. "
+                f"Saldo dispon√≠¬≠vel: {cliente.saldo_cvt:.2f} CVT. "
                 f"Valor da casa: {valor:.2f} CVT."
             ),
         )
@@ -1536,7 +1536,7 @@ def comprar_casa(
 
 
 # =========================================================
-# ESPA«OS DO CLIENTE
+# ESPA√áOS DO CLIENTE
 # =========================================================
 
 
@@ -1551,10 +1551,10 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
     if cliente is None:
 
-        raise HTTPException(status_code=404, detail="Cliente n„o encontrado.")
+        raise HTTPException(status_code=404, detail="Cliente n√£o encontrado.")
 
     # -----------------------------------------------------
-    # BUSCAR ESPA«OS DO CLIENTE
+    # BUSCAR ESPA√áOS DO CLIENTE
     # -----------------------------------------------------
 
     espacos = (
@@ -1627,7 +1627,7 @@ def excluir_item_espaco(
 ):
 
     # -----------------------------------------------------
-    # BUSCAR ITEM E VERIFICAR PROPRIET¡RIO
+    # BUSCAR ITEM E VERIFICAR PROPRIET√ÅRIO
     # -----------------------------------------------------
 
     item = (
@@ -1646,11 +1646,11 @@ def excluir_item_espaco(
     if item is None:
         raise HTTPException(
             status_code=404,
-            detail="Item n„o encontrado na casa deste cliente.",
+            detail="Item n√£o encontrado na casa deste cliente.",
         )
 
     # -----------------------------------------------------
-    # EXCLUS√O L”GICA
+    # EXCLUS√ÉO L√ìGICA
     # -----------------------------------------------------
 
     if item.status == "VENDA":
@@ -1664,7 +1664,7 @@ def excluir_item_espaco(
     db.commit()
 
     return {
-        "mensagem": "Produto excluÌdo da casa com sucesso.",
+        "mensagem": "Produto exclu√≠do da casa com sucesso.",
         "item_id": item.id,
     }
 
@@ -1820,7 +1820,7 @@ def listar_produtos_usados(db: Session = Depends(get_db)):
 
 
 # =========================================================
-# SUGEST’ES DOS CLIENTES
+# SUGEST√ïES DOS CLIENTES
 # =========================================================
 
 
@@ -1844,7 +1844,7 @@ def criar_sugestao(
     db.refresh(sugestao)
 
     return {
-        "mensagem": "Sugest„o enviada com sucesso!",
+        "mensagem": "Sugest√£o enviada com sucesso!",
         "id": sugestao.id,
         "status": sugestao.status,
         "resposta_admin": sugestao.resposta_admin,
@@ -1856,7 +1856,7 @@ def criar_sugestao(
 # =========================================================
 
 # =========================================================
-# ATUALIZA«√O DO STATUS DA SUGEST√O
+# ATUALIZA√á√ÉO DO STATUS DA SUGEST√ÉO
 # =========================================================
 
 @app.put("/sugestoes/{sugestao_id}/status")
@@ -1885,7 +1885,7 @@ def atualizar_status_sugestao(
 
     status_permitidos = [
         "Pendente",
-        "Em an·lise",
+        "Em an√°lise",
         "Respondida",
         "Encerrada",
     ]
@@ -1893,7 +1893,7 @@ def atualizar_status_sugestao(
     if status not in status_permitidos:
         raise HTTPException(
             status_code=400,
-            detail="Status inv·lido.",
+            detail="Status inv√°lido.",
         )
 
     sugestao = (
@@ -1905,7 +1905,7 @@ def atualizar_status_sugestao(
     if sugestao is None:
         raise HTTPException(
             status_code=404,
-            detail="Sugest„o n„o encontrada.",
+            detail="Sugest√£o n√£o encontrada.",
         )
 
     sugestao.status = status
@@ -1917,11 +1917,11 @@ def atualizar_status_sugestao(
     db.refresh(sugestao)
 
     if status == "Respondida" and sugestao.resposta_admin:
-        assunto = "Resposta ‡ sua sugest„o - VALT-ON"
+        assunto = "Resposta √† sua sugest√£o - VALT-ON"
 
         mensagem_email = (
-            f"Ol·, {sugestao.nome}!\n\n"
-            "Recebemos sua sugest„o enviada ao VALT-ON.\n\n"
+            f"Ol√°, {sugestao.nome}!\n\n"
+            "Recebemos sua sugest√£o enviada ao VALT-ON.\n\n"
             f"Sua mensagem:\n{sugestao.mensagem}\n\n"
             "Resposta do administrador:\n"
             f"{sugestao.resposta_admin}\n\n"
@@ -1936,7 +1936,7 @@ def atualizar_status_sugestao(
         )
 
     return {
-        "mensagem": "Status da sugest„o atualizado com sucesso!",
+        "mensagem": "Status da sugest√£o atualizado com sucesso!",
         "id": sugestao.id,
         "status": sugestao.status,
         "resposta_admin": sugestao.resposta_admin,
@@ -1945,7 +1945,7 @@ def atualizar_status_sugestao(
 
 
 # =========================================================
-# LISTAGEM DAS SUGEST’ES
+# LISTAGEM DAS SUGEST√ïES
 # =========================================================
 
 @app.get("/sugestoes")
@@ -2014,7 +2014,7 @@ def enviar_oferta_produto_usado(
     if comprador is None:
         raise HTTPException(
             status_code=404,
-            detail="Comprador n„o encontrado.",
+            detail="Comprador n√£o encontrado.",
         )
 
     venda = (
@@ -2026,19 +2026,19 @@ def enviar_oferta_produto_usado(
     if venda is None:
         raise HTTPException(
             status_code=404,
-            detail="Venda n„o encontrada.",
+            detail="Venda n√£o encontrada.",
         )
 
     if venda.status != "DISPONIVEL":
         raise HTTPException(
             status_code=400,
-            detail="Esta venda n„o est· mais disponÌvel.",
+            detail="Esta venda n√£o est√° mais dispon√≠vel.",
         )
 
     if venda.vendedor_id == dados.comprador_id:
         raise HTTPException(
             status_code=400,
-            detail="VocÍ n„o pode fazer uma oferta para o prÛprio produto.",
+            detail="Voc√™ n√£o pode fazer uma oferta para o pr√≥prio produto.",
         )
 
     if dados.valor_oferta <= 0:
@@ -2050,7 +2050,7 @@ def enviar_oferta_produto_usado(
     if dados.valor_oferta > venda.preco_venda:
         raise HTTPException(
             status_code=400,
-            detail="A oferta n„o pode ultrapassar o preÁo anunciado.",
+            detail="A oferta n√£o pode ultrapassar o pre√ßo anunciado.",
         )
 
     oferta = models.OfertaUsado(
