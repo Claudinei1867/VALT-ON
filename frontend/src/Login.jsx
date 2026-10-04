@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "https://api.valt-on.com";
 
 function Login({ onLogin, onVoltar }) {
   const [email, setEmail] = useState("");

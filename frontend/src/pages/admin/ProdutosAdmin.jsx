@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "https://api.valt-on.com";
 
 export default function ProdutosAdmin({
   onVoltar,

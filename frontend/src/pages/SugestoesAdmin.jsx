@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://valt-on.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.valt-on.com";
 
 export default function SugestoesAdmin({ usuario }) {
   const [sugestoes, setSugestoes] = useState([]);

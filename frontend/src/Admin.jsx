@@ -4,7 +4,7 @@ import PedidosAdmin from "./pages/admin/PedidosAdmin";
 import ProdutosAdmin from "./pages/admin/ProdutosAdmin";
 import { CATEGORIAS } from "./categorias";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "https://api.valt-on.com";
 
 function Admin({ usuario, onVoltar, onLogout }) {
   const [produtos, setProdutos] = useState([]);

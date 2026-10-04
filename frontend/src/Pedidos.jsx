@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PresenteRecebido from "./presente/PresenteRecebido";
 
-const API_URL = "https://valt-on.onrender.com";
+const API_URL = "https://api.valt-on.com";
 
 function Pedidos({ cliente, voltar }) {
   const [pedidos, setPedidos] = useState([]);
