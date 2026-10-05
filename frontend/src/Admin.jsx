@@ -529,28 +529,28 @@ function Admin({ usuario, onVoltar, onLogout }) {
   const estoqueBaixo = produtos.filter((item) => Number(item.estoque) > 0 && Number(item.estoque) <= 5).length;
   const alertas = produtos.filter((item) => Number(item.estoque) <= 5).slice(0, 8);
   const metricas = [
-    { simbolo: "â—ˆ", rotulo: "Produtos cadastrados", valor: quantidadeProdutos, tom: "gold" },
-    { simbolo: "â™™", rotulo: "Clientes", valor: quantidadeClientes, tom: "violet" },
+    { simbolo: "◈", rotulo: "Produtos cadastrados", valor: quantidadeProdutos, tom: "gold" },
+    { simbolo: "♡", rotulo: "Clientes", valor: quantidadeClientes, tom: "violet" },
     { simbolo: "●", rotulo: "Visitantes ativos (2 min)", valor: visitantesAtivos ?? "—", tom: "blue" },
-    { simbolo: "â–£", rotulo: "Pedidos carregados", valor: pedidos.length, tom: "blue" },
+    { simbolo: "▣", rotulo: "Pedidos carregados", valor: pedidos.length, tom: "blue" },
     { simbolo: "🛒", rotulo: "Produtos novos comprados (30 dias)", valor: vendasResumo?.comprados30 ?? "—", tom: "gold" },
     { simbolo: "🛒", rotulo: "Produtos novos comprados (total)", valor: vendasResumo?.compradosTotal ?? "—", tom: "gold" },
     { simbolo: "↗", rotulo: "Produtos usados vendidos (30 dias)", valor: vendasResumo?.usados30 ?? "—", tom: "violet" },
     { simbolo: "↗", rotulo: "Produtos usados vendidos (total)", valor: vendasResumo?.usadosTotal ?? "—", tom: "violet" },
-    { simbolo: "â—‡", rotulo: "Sem estoque", valor: semEstoque, tom: "gray" },
+    { simbolo: "◇", rotulo: "Sem estoque", valor: semEstoque, tom: "gray" },
     { simbolo: "⚠", rotulo: "Estoque baixo (até 5)", valor: estoqueBaixo, tom: "gold" },
   ];
 
   return (
     <div className="valt-admin-v6">
       <aside className="valt-admin-sidebar" aria-label="Navegação administrativa">
-        <div className="valt-admin-brand"><span className="valt-admin-brand-icon">â–£</span><div><strong>VALT-<em>ON</em></strong><small>SIMULADOR DE COMPRAS</small></div></div>
+        <div className="valt-admin-brand"><span className="valt-admin-brand-icon">▣</span><div><strong>VALT-<em>ON</em></strong><small>SIMULADOR DE COMPRAS</small></div></div>
         <div className="valt-admin-nav-label">PAINEL</div>
         <nav className="valt-admin-nav">
           <button className="active" type="button" aria-current="page" onClick={() => setSecaoAdmin("inicio")}>▦ <span>Visão geral</span></button>
-          <button type="button" onClick={() => setSecaoAdmin("produtos")}>â—ˆ <span>Produtos</span></button>
-          <button type="button" onClick={() => setSecaoAdmin("pedidos")}>â–£ <span>Pedidos</span></button>
-          <button type="button" onClick={() => document.getElementById("valt-admin-alertas")?.scrollIntoView({ behavior: "smooth" })}>âš  <span>Estoque</span></button>
+          <button type="button" onClick={() => setSecaoAdmin("produtos")}>◈ <span>Produtos</span></button>
+          <button type="button" onClick={() => setSecaoAdmin("pedidos")}>▣ <span>Pedidos</span></button>
+          <button type="button" onClick={() => document.getElementById("valt-admin-alertas")?.scrollIntoView({ behavior: "smooth" })}>⚠️ <span>Estoque</span></button>
           <button type="button" className="valt-admin-suggestions-nav" onClick={() => setSecaoAdmin("sugestoes")}>♧ <span>Sugestões</span></button>
           <button type="button" onClick={() => document.getElementById("valt-admin-formulario")?.scrollIntoView({ behavior: "smooth" })}>+ <span>Cadastrar produto</span></button>
         </nav>
@@ -563,7 +563,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
           <section className="valt-admin-metrics" aria-label="Indicadores da loja">{metricas.map((item) => <div className="valt-admin-metric" key={item.rotulo}><span className={`valt-admin-metric-icon ${item.tom}`}>{item.simbolo}</span><span className="valt-admin-metric-label">{item.rotulo}</span><strong>{item.valor}</strong><small>Dados atuais da loja</small></div>)}</section>
           <div className="valt-admin-columns">
             <section className="valt-admin-panel valt-admin-alerts" id="valt-admin-alertas"><div className="valt-admin-panel-title"><div><span className="valt-admin-panel-icon">⚠</span><h2>Alertas de estoque</h2></div><button type="button" onClick={() => setSecaoAdmin("produtos")}>Ver produtos ↗</button></div>
-              {alertas.length === 0 ? <p className="valt-admin-empty">Nenhum produto com estoque baixo no momento.</p> : <div className="valt-admin-alert-list">{alertas.map((item) => <div className="valt-admin-alert-row" key={item.id}><div className="valt-admin-alert-thumb">{item.imagem ? <img src={obterUrlImagem(item.imagem)} alt="" loading="lazy" /> : "â—ˆ"}</div><div className="valt-admin-alert-info"><strong>{item.nome}</strong><small>{item.categoria || "Produto"}</small></div><div className="valt-admin-alert-stock"><strong>{Number(item.estoque) <= 0 ? "Esgotado" : `${item.estoque} restantes`}</strong><span><i style={{ width: `${Math.min(100, Math.max(0, Number(item.estoque)) * 20)}%` }} /></span></div><button type="button" onClick={() => editarProduto(item)}>Editar</button></div>)}</div>}
+              {alertas.length === 0 ? <p className="valt-admin-empty">Nenhum produto com estoque baixo no momento.</p> : <div className="valt-admin-alert-list">{alertas.map((item) => <div className="valt-admin-alert-row" key={item.id}><div className="valt-admin-alert-thumb">{item.imagem ? <img src={obterUrlImagem(item.imagem)} alt="" loading="lazy" /> : "◈"}</div><div className="valt-admin-alert-info"><strong>{item.nome}</strong><small>{item.categoria || "Produto"}</small></div><div className="valt-admin-alert-stock"><strong>{Number(item.estoque) <= 0 ? "Esgotado" : `${item.estoque} restantes`}</strong><span><i style={{ width: `${Math.min(100, Math.max(0, Number(item.estoque)) * 20)}%` }} /></span></div><button type="button" onClick={() => editarProduto(item)}>Editar</button></div>)}</div>}
             </section>
             <section className="valt-admin-panel valt-admin-form-panel" id="valt-admin-formulario"><div className="valt-admin-panel-title"><div><span className="valt-admin-panel-icon">+</span><h2>{editandoId !== null ? "Editar produto" : "Cadastrar produto"}</h2></div></div><p className="valt-admin-panel-hint">Gerencie seu catálogo sem sair do painel.</p>
               {mensagem && <div className="valt-admin-message" role="status">{mensagem}</div>}
@@ -805,7 +805,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
                 <button type="submit">
                   {editandoId !== null
                     ? "💾 Salvar Alterações"
-                    : "âž• Cadastrar Produto"}
+                    : "➕ Cadastrar Produto"}
                 </button>
 
                 {editandoId !== null && (

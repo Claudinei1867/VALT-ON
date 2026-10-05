@@ -10,7 +10,7 @@ function Pedidos({ cliente, voltar }) {
 
   useEffect(() => {
     if (!cliente || !cliente.id) {
-      setErro("Cliente nÃ£o identificado.");
+      setErro("Cliente não identificado.");
       setCarregando(false);
       return;
     }
@@ -18,7 +18,7 @@ function Pedidos({ cliente, voltar }) {
     fetch(`${API_URL}/clientes/${cliente.id}/pedidos`)
       .then((resposta) => {
         if (!resposta.ok) {
-          throw new Error("NÃ£o foi possÃ­vel carregar os pedidos.");
+          throw new Error("Não foi possível carregar os pedidos.");
         }
 
         return resposta.json();
@@ -52,10 +52,10 @@ function Pedidos({ cliente, voltar }) {
           marginBottom: "20px",
         }}
       >
-        â† Voltar para a loja
+        ← Voltar para a loja
       </button>
 
-      <h1>ðŸ“¦ Meus Pedidos</h1>
+      <h1>📦 Meus Pedidos</h1>
 
       <p>
         Cliente: <strong>{cliente?.nome}</strong>
@@ -65,13 +65,13 @@ function Pedidos({ cliente, voltar }) {
 
       {erro && (
         <p style={{ color: "red" }}>
-          âŒ {erro}
+          ❌ {erro}
         </p>
       )}
 
       {!carregando && !erro && pedidos.length === 0 && (
         <div>
-          <p>VocÃª ainda nÃ£o possui pedidos.</p>
+          <p>Você ainda não possui pedidos.</p>
         </div>
       )}
 
@@ -117,7 +117,7 @@ function Pedidos({ cliente, voltar }) {
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             }}
           >
-            <h2>ðŸ“¦ Pedido #{pedido.id}</h2>
+            <h2>📦 Pedido #{pedido.id}</h2>
 
             <p>
               <strong>Status:</strong>{" "}
@@ -149,7 +149,7 @@ function Pedidos({ cliente, voltar }) {
                   </p>
 
                   <p>
-                    PreÃ§o unitÃ¡rio: CVT{" "}
+                    Preço unitário: CVT{" "}
                     {Number(
                       item.preco_unitario
                     ).toFixed(2)}
