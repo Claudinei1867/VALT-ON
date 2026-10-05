@@ -26,6 +26,7 @@ import schemas
 import figurinha_exclusiva.models
 from produtos.rotas import router as produtos_router
 from clientes.rotas import router as clientes_router
+from presenca.rotas import router as presenca_router
 from autenticacao.recuperacao_senha import router as recuperacao_senha_router
 from autenticacao.redefinir_senha import router as redefinir_senha_router
 from autenticacao.reenviar_confirmacao import router as reenviar_confirmacao_router
@@ -51,6 +52,7 @@ app.include_router(reenviar_confirmacao_router)
 app.include_router(figurinha_exclusiva_router)
 app.include_router(produtos_router)
 app.include_router(clientes_router)
+app.include_router(presenca_router)
 
 from routers import pagamentos_cvt
 app.include_router(pagamentos_cvt.router)
@@ -493,23 +495,6 @@ def teste():
 
 
 # Reenvio público por e-mail: resposta neutra para não revelar contas.
-# Contagem aproximada de navegadores ativos nos últimos 2 minutos.
-@app.post("/presenca/ping")
-def registrar_presenca(dados: schemas.PresencaPing, db: Session = Depends(get_db)):
-    sessao = dados.sessao
-    if not isinstance(sessao, str) or len(sessao) != 36 or any(c not in "0123456789abcdef-" for c in sessao.lower()):
-        raise HTTPException(status_code=422, detail="Sessão inválida.")
-    agora = datetime.now()
-    limite = (agora - timedelta(minutes=2)).isoformat()
-    db.query(models.PresencaVisitante).filter(models.PresencaVisitante.ultima_atividade < limite).delete(synchronize_session=False)
-    existente = db.query(models.PresencaVisitante).filter(models.PresencaVisitante.sessao == sessao).first()
-    if existente:
-        existente.ultima_atividade = agora.isoformat()
-    else:
-        db.add(models.PresencaVisitante(sessao=sessao, ultima_atividade=agora.isoformat()))
-    db.commit()
-    return {"ok": True}
-
 # =========================================================
 # RECUPERAÇÃO DE SENHA
 # ========================================================
@@ -2319,6 +2304,9 @@ def atualizar_vendas_usados_automaticamente(db):
             f"Venda usada #{venda.id}: "
             f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
         )
+
+
+
 
 
 
