@@ -28,6 +28,7 @@ from produtos.rotas import router as produtos_router
 from clientes.rotas import router as clientes_router
 from presenca.rotas import router as presenca_router
 from admin.rotas import router as admin_router
+from sugestoes.rotas import router as sugestoes_router
 from autenticacao.recuperacao_senha import router as recuperacao_senha_router
 from autenticacao.redefinir_senha import router as redefinir_senha_router
 from autenticacao.reenviar_confirmacao import router as reenviar_confirmacao_router
@@ -55,6 +56,7 @@ app.include_router(produtos_router)
 app.include_router(clientes_router)
 app.include_router(presenca_router)
 app.include_router(admin_router)
+app.include_router(sugestoes_router)
 
 from routers import pagamentos_cvt
 app.include_router(pagamentos_cvt.router)
@@ -1497,33 +1499,6 @@ def listar_produtos_usados(db: Session = Depends(get_db)):
 # =========================================================
 
 
-@app.post("/sugestoes")
-def criar_sugestao(
-    dados: schemas.SugestaoCriar,
-    db: Session = Depends(get_db),
-):
-    sugestao = models.Sugestao(
-        cliente_id=dados.cliente_id,
-        nome=dados.nome,
-        email=dados.email,
-        tipo=dados.tipo,
-        mensagem=dados.mensagem,
-        status="Pendente",
-        data_criacao=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    )
-
-    db.add(sugestao)
-    db.commit()
-    db.refresh(sugestao)
-
-    return {
-        "mensagem": "Sugestão enviada com sucesso!",
-        "id": sugestao.id,
-        "status": sugestao.status,
-        "resposta_admin": sugestao.resposta_admin,
-    }
-
-
 # =========================================================
 # DIAGNOSTICO TEMPORARIO
 # =========================================================
@@ -1532,136 +1507,6 @@ def criar_sugestao(
 # ATUALIZAÇÃO DO STATUS DA SUGESTÃO
 # =========================================================
 
-@app.put("/sugestoes/{sugestao_id}/status")
-def atualizar_status_sugestao(
-    sugestao_id: int,
-    status: str,
-    admin_id: int,
-    resposta_admin: str | None = None,
-    db: Session = Depends(get_db),
-):
-    if admin_id != 0:
-        administrador = (
-            db.query(models.Administrador)
-            .filter(
-                models.Administrador.id == admin_id,
-                models.Administrador.ativo == 1,
-            )
-            .first()
-        )
-
-        if administrador is None:
-            raise HTTPException(
-                status_code=403,
-                detail="Acesso permitido somente para administradores.",
-            )
-
-    status_permitidos = [
-        "Pendente",
-        "Em análise",
-        "Respondida",
-        "Encerrada",
-    ]
-
-    if status not in status_permitidos:
-        raise HTTPException(
-            status_code=400,
-            detail="Status inválido.",
-        )
-
-    sugestao = (
-        db.query(models.Sugestao)
-        .filter(models.Sugestao.id == sugestao_id)
-        .first()
-    )
-
-    if sugestao is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Sugestão não encontrada.",
-        )
-
-    sugestao.status = status
-
-    if resposta_admin is not None:
-        sugestao.resposta_admin = resposta_admin
-
-    db.commit()
-    db.refresh(sugestao)
-
-    if status == "Respondida" and sugestao.resposta_admin:
-        assunto = "Resposta à sua sugestão - VALT-ON"
-
-        mensagem_email = (
-            f"Olá, {sugestao.nome}!\n\n"
-            "Recebemos sua sugestão enviada ao VALT-ON.\n\n"
-            f"Sua mensagem:\n{sugestao.mensagem}\n\n"
-            "Resposta do administrador:\n"
-            f"{sugestao.resposta_admin}\n\n"
-            "Atenciosamente,\n"
-            "Equipe VALT-ON"
-        )
-
-        enviar_email(
-            sugestao.email,
-            assunto,
-            mensagem_email,
-        )
-
-    return {
-        "mensagem": "Status da sugestão atualizado com sucesso!",
-        "id": sugestao.id,
-        "status": sugestao.status,
-        "resposta_admin": sugestao.resposta_admin,
-    }
-
-
-
-# =========================================================
-# LISTAGEM DAS SUGESTÕES
-# =========================================================
-
-@app.get("/sugestoes")
-def listar_sugestoes(
-    admin_id: int,
-    db: Session = Depends(get_db),
-):
-    if admin_id != 0:
-        administrador = (
-            db.query(models.Administrador)
-            .filter(
-                models.Administrador.id == admin_id,
-                models.Administrador.ativo == 1,
-            )
-            .first()
-        )
-
-        if administrador is None:
-            raise HTTPException(
-                status_code=403,
-                detail="Acesso permitido somente para administradores.",
-            )
-
-    sugestoes = (
-        db.query(models.Sugestao)
-        .order_by(models.Sugestao.id.desc())
-        .all()
-    )
-
-    return [
-        {
-            "id": sugestao.id,
-            "cliente_id": sugestao.cliente_id,
-            "nome": sugestao.nome,
-            "email": sugestao.email,
-            "tipo": sugestao.tipo,
-            "mensagem": sugestao.mensagem,
-            "status": sugestao.status,
-            "resposta_admin": sugestao.resposta_admin,
-            "data_criacao": sugestao.data_criacao,
-        }
-        for sugestao in sugestoes
-    ]
 @app.get("/diagnostico-versao")
 def diagnostico_versao():
     return {
@@ -2265,6 +2110,10 @@ def atualizar_vendas_usados_automaticamente(db):
             f"Venda usada #{venda.id}: "
             f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
         )
+
+
+
+
 
 
 
