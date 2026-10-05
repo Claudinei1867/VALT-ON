@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+﻿from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -24,6 +24,7 @@ from database import engine, Base, SessionLocal
 import models
 import schemas
 import figurinha_exclusiva.models
+from produtos.rotas import router as produtos_router
 from autenticacao.recuperacao_senha import router as recuperacao_senha_router
 from autenticacao.redefinir_senha import router as redefinir_senha_router
 from autenticacao.reenviar_confirmacao import router as reenviar_confirmacao_router
@@ -47,6 +48,7 @@ app.include_router(recuperacao_senha_router)
 app.include_router(redefinir_senha_router)
 app.include_router(reenviar_confirmacao_router)
 app.include_router(figurinha_exclusiva_router)
+app.include_router(produtos_router)
 
 from routers import pagamentos_cvt
 app.include_router(pagamentos_cvt.router)
@@ -481,177 +483,6 @@ def inicio():
 def teste():
 
     return {"status": "ok", "projeto": "VALT-ON"}
-
-
-# =========================================================
-# PRODUTOS
-# =========================================================
-
-
-@app.get("/produtos", response_model=list[schemas.ProdutoResponse])
-def listar_produtos(db: Session = Depends(get_db)):
-
-    produtos = db.query(models.Produto).all()
-
-    return produtos
-
-
-# =========================================================
-# BUSCAR PRODUTO
-# =========================================================
-
-
-@app.get("/produtos/{produto_id}", response_model=schemas.ProdutoResponse)
-def buscar_produto(produto_id: int, db: Session = Depends(get_db)):
-
-    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
-
-    if produto is None:
-
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-    return produto
-
-
-# =========================================================
-# CADASTRAR PRODUTO
-# =========================================================
-
-
-@app.post("/produtos", response_model=schemas.ProdutoResponse)
-def cadastrar_produto(produto: schemas.ProdutoCreate, db: Session = Depends(get_db)):
-
-    if produto.exclusiva and produto.estoque > 1:
-        raise HTTPException(
-            status_code=400,
-            detail="Figurinha exclusiva nao pode ter estoque maior que 1."
-        )
-
-    novo_produto = models.Produto(
-        nome=produto.nome,
-        descricao=produto.descricao,
-        preco=produto.preco,
-        categoria=produto.categoria,
-        estoque=produto.estoque,
-        prazo_entrega_dias=produto.prazo_entrega_dias,
-        imagem=produto.imagem,
-        exclusiva=produto.exclusiva,
-    )
-
-    db.add(novo_produto)
-
-    db.commit()
-
-    db.refresh(novo_produto)
-
-    return novo_produto
-
-
-# =========================================================
-# ALTERAR PRODUTO
-# =========================================================
-
-
-@app.put("/produtos/{produto_id}", response_model=schemas.ProdutoResponse)
-def alterar_produto(
-    produto_id: int, dados: schemas.ProdutoCreate, db: Session = Depends(get_db)
-):
-
-    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
-
-    if produto is None:
-
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-    if dados.exclusiva and dados.estoque > 1:
-        raise HTTPException(
-            status_code=400,
-            detail="Figurinha exclusiva nao pode ter estoque maior que 1."
-        )
-    produto.nome = dados.nome
-    produto.descricao = dados.descricao
-    produto.preco = dados.preco
-    produto.categoria = dados.categoria
-    produto.estoque = dados.estoque
-    produto.prazo_entrega_dias = dados.prazo_entrega_dias
-    produto.imagem = dados.imagem
-    produto.exclusiva = dados.exclusiva
-
-    db.commit()
-
-    db.refresh(produto)
-
-    return produto
-
-
-# =========================================================
-# EXCLUIR PRODUTO
-# =========================================================
-
-
-@app.delete("/produtos/{produto_id}")
-def excluir_produto(produto_id: int, db: Session = Depends(get_db)):
-
-    produto = db.query(models.Produto).filter(models.Produto.id == produto_id).first()
-
-    if produto is None:
-
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-    db.delete(produto)
-
-    db.commit()
-
-    return {"mensagem": "Produto excluído com sucesso"}
-
-
-# =========================================================
-# UPLOAD DE IMAGEM
-# =========================================================
-
-
-@app.post("/upload-imagem")
-async def upload_imagem(file: UploadFile = File(...)):
-
-    extensoes_permitidas = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
-
-    extensao = Path(file.filename or "").suffix.lower()
-
-    if extensao not in extensoes_permitidas:
-        raise HTTPException(status_code=400, detail="Formato de imagem não permitido.")
-
-    nome_arquivo = Path(file.filename or "imagem").name
-
-    try:
-        conteudo = await file.read()
-
-        ftp = FTP()
-        ftp.connect(os.getenv("HOSTINGER_FTP_HOST"), 21, timeout=15)
-        ftp.login(
-            os.getenv("HOSTINGER_FTP_USER"),
-            os.getenv("HOSTINGER_FTP_PASSWORD"),
-        )
-        ftp.cwd(os.getenv("HOSTINGER_FTP_PATH"))
-
-        from io import BytesIO
-        ftp.storbinary(f"STOR {nome_arquivo}", BytesIO(conteudo))
-        ftp.quit()
-
-        url_publica = (
-            f"https://www.valt-on.com/"
-            f"produtos/{nome_arquivo}"
-        )
-
-        return {
-            "mensagem": "Imagem enviada com sucesso!",
-            "arquivo": nome_arquivo,
-            "url": url_publica,
-        }
-
-    except Exception as erro:
-        raise HTTPException(
-            status_code=500, detail=f"Erro ao enviar imagem: {str(erro)}"
-        )
 
 
 # =========================================================
@@ -2592,3 +2423,5 @@ def atualizar_vendas_usados_automaticamente(db):
             f"Venda usada #{venda.id}: "
             f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
         )
+
+
