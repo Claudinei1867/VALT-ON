@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PresenteRecebido from "./presente/PresenteRecebido";
 
 const API_URL = "https://api.valt-on.com";
@@ -52,14 +52,14 @@ function MinhaConta({
   const [notificacoesPedidos,setNotificacoesPedidos]=useState([]);
 
   // =====================================================
-  // MONITORAMENTO DE ALTERAÃ‡ÃƒO DE STATUS
+  // MONITORAMENTO DE ALTERAÇÃO DE STATUS
   // =====================================================
 
 
   const statusPedidosAnterior = useRef({});
 
   // =====================================================
-  // ESPAÃ‡OS
+  // ESPAÇOS
   // =====================================================
 
 
@@ -89,7 +89,7 @@ function MinhaConta({
     useState(false);
 
   // =====================================================
-  // COMPRA DE CRÃ‰DITOS CVT
+  // COMPRA DE CRÉDITOS CVT
   // =====================================================
 
   const [mostrarCompraCVT, setMostrarCompraCVT] =
@@ -116,7 +116,7 @@ function MinhaConta({
     useState(null);
 
   // =====================================================
-  // COMPRAR CRÃ‰DITOS CVT
+  // COMPRAR CRÉDITOS CVT
   // =====================================================
 
   const comprarCVT = async (quantidadeSelecionada = quantidadeCVT) => {
@@ -127,7 +127,7 @@ function MinhaConta({
     const quantidade = Number(quantidadeSelecionada);
 
     if (!Number.isFinite(quantidade) || quantidade <= 0) {
-      alert("Informe uma quantidade vÃ¡lida de CVT.");
+      alert("Informe uma quantidade válida de CVT.");
       return;
     }
 
@@ -153,13 +153,13 @@ function MinhaConta({
       if (!resposta.ok) {
         throw new Error(
           dados.detail ||
-            "NÃ£o foi possÃ­vel criar o pagamento."
+            "Não foi possível criar o pagamento."
         );
       }
 
       if (!dados.init_point) {
         throw new Error(
-          "O Mercado Pago nÃ£o retornou o endereÃ§o do pagamento."
+          "O Mercado Pago não retornou o endereço do pagamento."
         );
       }
 
@@ -172,7 +172,7 @@ function MinhaConta({
 
       alert(
         error.message ||
-          "NÃ£o foi possÃ­vel iniciar a compra de CVT."
+          "Não foi possível iniciar a compra de CVT."
       );
     } finally {
       setComprandoCVT(false);
@@ -198,7 +198,7 @@ function MinhaConta({
 
       if (!resposta.ok) {
         throw new Error(
-          "NÃ£o foi possÃ­vel carregar os pedidos."
+          "Não foi possível carregar os pedidos."
         );
       }
 
@@ -209,7 +209,7 @@ function MinhaConta({
         dados
       );
 
-      // Verificar alteraÃ§Ã£o de status
+      // Verificar alteração de status
       if (Object.keys(statusPedidosAnterior.current).length > 0) {
 
         dados.forEach((pedido) => {
@@ -239,7 +239,7 @@ function MinhaConta({
               ].slice(0, 5)
             );
             console.log(
-              "ALTERAÃ‡ÃƒO DE STATUS DETECTADA:",
+              "ALTERAÇÃO DE STATUS DETECTADA:",
               pedido.pedido_id,
               statusAnterior,
               "->",
@@ -283,7 +283,7 @@ function MinhaConta({
             } catch (erroAudio) {
 
               console.error(
-                "NÃ£o foi possÃ­vel reproduzir o som:",
+                "Não foi possível reproduzir o som:",
                 erroAudio
               );
 
@@ -312,7 +312,7 @@ function MinhaConta({
       );
 
       setErro(
-        "NÃ£o foi possÃ­vel carregar seus pedidos."
+        "Não foi possível carregar seus pedidos."
       );
     } finally {
       setCarregandoPedidos(false);
@@ -320,7 +320,7 @@ function MinhaConta({
   };
 
   // =====================================================
-  // VERIFICAR AUTOMATICAMENTE ALTERAÃ‡Ã•ES NOS PEDIDOS
+  // VERIFICAR AUTOMATICAMENTE ALTERAÇÕES NOS PEDIDOS
   // =====================================================
 
   useEffect(() => {
@@ -340,7 +340,7 @@ function MinhaConta({
   }, [mostrarPedidos, usuario]);
 
   // =====================================================
-  // BUSCAR ESPAÃ‡OS DO CLIENTE
+  // BUSCAR ESPAÇOS DO CLIENTE
   // =====================================================
 
   const excluirFigurinha = async () => {
@@ -360,11 +360,11 @@ function MinhaConta({
 
       if (!resposta.ok) {
         throw new Error(
-          dados.detail || "NÃ£o foi possÃ­vel excluir a figurinha."
+          dados.detail || "Não foi possível excluir a figurinha."
         );
       }
 
-      alert("Figurinha excluÃ­da com sucesso.");
+      alert("Figurinha excluída com sucesso.");
 
       setFigurinhaSelecionada(null);
       await carregarEspacos();
@@ -391,7 +391,7 @@ function MinhaConta({
 
       alert(
         error.message ||
-        "NÃ£o foi possÃ­vel excluir a figurinha."
+        "Não foi possível excluir a figurinha."
       );
     }
   };
@@ -410,9 +410,9 @@ function MinhaConta({
     );
 
     const preco = window.prompt(
-      `PreÃ§o original: ${precoOriginal.toFixed(2)} CVT\n` +
-      `PreÃ§o mÃ¡ximo para venda: ${precoMaximo.toFixed(2)} CVT\n\n` +
-      "Digite o preÃ§o de venda da figurinha em CVT:"
+      `Preço original: ${precoOriginal.toFixed(2)} CVT\n` +
+      `Preço máximo para venda: ${precoMaximo.toFixed(2)} CVT\n\n` +
+      "Digite o preço de venda da figurinha em CVT:"
     );
 
     if (preco === null) {
@@ -424,7 +424,7 @@ function MinhaConta({
     );
 
     if (!Number.isFinite(precoVenda) || precoVenda <= 0) {
-      alert("Informe um preÃ§o de venda vÃ¡lido.");
+      alert("Informe um preço de venda válido.");
       return;
     }
 
@@ -449,12 +449,12 @@ function MinhaConta({
       if (!resposta.ok) {
         throw new Error(
           dados.detail ||
-          "NÃ£o foi possÃ­vel colocar a figurinha Ã  venda."
+          "Não foi possível colocar a figurinha à venda."
         );
       }
 
       alert(
-        "Figurinha colocada Ã  venda com sucesso."
+        "Figurinha colocada à venda com sucesso."
       );
 
       setFigurinhaSelecionada(null);
@@ -482,13 +482,13 @@ function MinhaConta({
       });
     } catch (error) {
       console.error(
-        "ERRO AO COLOCAR FIGURINHA Ã€ VENDA:",
+        "ERRO AO COLOCAR FIGURINHA À VENDA:",
         error
       );
 
       alert(
         error.message ||
-        "NÃ£o foi possÃ­vel colocar a figurinha Ã  venda."
+        "Não foi possível colocar a figurinha à venda."
       );
     }
   };
@@ -508,14 +508,14 @@ function MinhaConta({
 
       if (!resposta.ok) {
         throw new Error(
-          "NÃ£o foi possÃ­vel carregar os espaÃ§os."
+          "Não foi possível carregar os espaços."
         );
       }
 
       const dados = await resposta.json();
 
       console.log(
-        "ESPAÃ‡OS DO CLIENTE:",
+        "ESPAÇOS DO CLIENTE:",
         dados
       );
 
@@ -523,12 +523,12 @@ function MinhaConta({
       setMostrarEspacos(true);
     } catch (error) {
       console.error(
-        "ERRO AO BUSCAR ESPAÃ‡OS:",
+        "ERRO AO BUSCAR ESPAÇOS:",
         error
       );
 
       setErroEspacos(
-        "NÃ£o foi possÃ­vel carregar seus espaÃ§os."
+        "Não foi possível carregar seus espaços."
       );
     } finally {
       setCarregandoEspacos(false);
@@ -562,7 +562,7 @@ function MinhaConta({
 
       if (!resposta.ok) {
         throw new Error(
-          dados.detail || "NÃ£o foi possÃ­vel comprar a casa."
+          dados.detail || "Não foi possível comprar a casa."
         );
       }
 
@@ -585,7 +585,7 @@ function MinhaConta({
 
       alert(
         error.message ||
-        "NÃ£o foi possÃ­vel comprar a casa."
+        "Não foi possível comprar a casa."
       );
     } finally {
       setComprandoCasa(false);
@@ -612,27 +612,27 @@ function MinhaConta({
     {
       numero: 1,
       nome: "Pago",
-      icone: "âœ“",
+      icone: "✓",
     },
     {
       numero: 2,
       nome: "Preparando",
-      icone: "ðŸ“¦",
+      icone: "📦",
     },
     {
       numero: 3,
       nome: "Enviado",
-      icone: "ðŸšš",
+      icone: "🚚",
     },
     {
       numero: 4,
       nome: "A caminho",
-      icone: "ðŸ›µ",
+      icone: "🛵",
     },
     {
       numero: 5,
       nome: "Entregue",
-      icone: "âœ“",
+      icone: "✓",
     },
   ];
 
@@ -672,7 +672,7 @@ function MinhaConta({
   };
 
   // =====================================================
-  // VERIFICAR USUÃRIO
+  // VERIFICAR USUÁRIO
   // =====================================================
 
   if (!usuario) {
@@ -684,7 +684,7 @@ function MinhaConta({
         }}
       >
         <h2>
-          VocÃª nÃ£o estÃ¡ logado.
+          Você não está logado.
         </h2>
 
         <button
@@ -694,7 +694,7 @@ function MinhaConta({
             cursor: "pointer",
           }}
         >
-          ðŸ›ï¸ Voltar para a loja
+          🛍️ Voltar para a loja
         </button>
       </div>
     );
@@ -712,7 +712,7 @@ function MinhaConta({
         padding: "30px 20px",
       }}
     >
-      <section className="valt-account-favorites"><h2>â™¡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronizaÃ§Ã£o entre dispositivos estarÃ¡ disponÃ­vel apÃ³s a implantaÃ§Ã£o de autenticaÃ§Ã£o segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>VocÃª ainda nÃ£o salvou nenhum produto.</p>}</div></section>
+      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronização entre dispositivos estará disponível após a implantação de autenticação segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
       <div
         style={{
           maxWidth: "950px",
@@ -721,7 +721,7 @@ function MinhaConta({
       >
 
         {/* =================================================
-            CABEÃ‡ALHO
+            CABEÇALHO
         ================================================= */}
 
         <div
@@ -744,7 +744,7 @@ function MinhaConta({
               margin: 0,
             }}
           >
-            ðŸ‘¤ Minha Conta
+            👤 Minha Conta
           </h1>
 
           <button
@@ -754,7 +754,7 @@ function MinhaConta({
               cursor: "pointer",
             }}
           >
-            ðŸ›ï¸ Voltar para a loja
+            🛍️ Voltar para a loja
           </button>
         </div>
 
@@ -773,7 +773,7 @@ function MinhaConta({
           }}
         >
           <h2>
-            ðŸ‘¤ Dados da conta
+            👤 Dados da conta
           </h2>
 
           <p>
@@ -786,7 +786,7 @@ function MinhaConta({
             {usuario.email}
           </p>
 
-          <p className="valt-client-number"><strong>Seu nÃºmero de cliente:</strong> #{usuario.id} <small>Compartilhe este nÃºmero para receber 300 CVT quando um novo cliente indicado confirmar o e-mail.</small></p>
+          <p className="valt-client-number"><strong>Seu número de cliente:</strong> #{usuario.id} <small>Compartilhe este número para receber 300 CVT quando um novo cliente indicado confirmar o e-mail.</small></p>
           <p>
             <strong>Saldo CVT:</strong>{" "}
             {Number(usuario.saldo_cvt || 0).toFixed(2)} CVT
@@ -794,7 +794,7 @@ function MinhaConta({
         </div>
 
         {/* =================================================
-            BOTÃ•ES DA CONTA
+            BOTÕES DA CONTA
         ================================================= */}
 
         <div
@@ -818,7 +818,7 @@ function MinhaConta({
               flexWrap: "wrap",
             }}
           >
-            {/* COMPRAR CRÃ‰DITOS CVT */}
+            {/* COMPRAR CRÉDITOS CVT */}
 
             <button
               onClick={() =>
@@ -830,7 +830,7 @@ function MinhaConta({
                 fontWeight: "bold",
               }}
             >
-              ?? Comprar crÃ©ditos CVT
+              ?? Comprar créditos CVT
             </button>
 
             {/* PEDIDOS */}
@@ -847,11 +847,11 @@ function MinhaConta({
               }}
             >
               {carregandoPedidos
-                ? "â³ Carregando..."
-                : "ðŸ“¦ Ver meus pedidos"}
+                ? "⏳ Carregando..."
+                : "📦 Ver meus pedidos"}
             </button>
 
-            {/* ESPAÃ‡OS */}
+            {/* ESPAÇOS */}
 
             <button
               onClick={carregarEspacos}
@@ -865,8 +865,8 @@ function MinhaConta({
               }}
             >
               {carregandoEspacos
-                ? "â³ Carregando..."
-                : "ðŸ  Meus EspaÃ§os"}
+                ? "⏳ Carregando..."
+                : "🏠 Meus Espaços"}
             </button>
 
             {/* SAIR */}
@@ -878,7 +878,7 @@ function MinhaConta({
                 cursor: "pointer",
               }}
             >
-              ðŸšª Sair da conta
+              🚪 Sair da conta
             </button>
           </div>
 
@@ -893,11 +893,11 @@ function MinhaConta({
               }}
             >
               <h3 style={{ marginTop: 0 }}>
-                ?? Comprar crÃ©ditos CVT
+                ?? Comprar créditos CVT
               </h3>
 
               <p>
-                Escolha a quantidade de crÃ©ditos CVT que deseja comprar:
+                Escolha a quantidade de créditos CVT que deseja comprar:
               </p>
 
               <div
@@ -975,7 +975,7 @@ function MinhaConta({
         )}
 
         {/* =================================================
-            ERRO DOS ESPAÃ‡OS
+            ERRO DOS ESPAÇOS
         ================================================= */}
 
         {erroEspacos && (
@@ -993,7 +993,7 @@ function MinhaConta({
         )}
 
         {/* =================================================
-            MEUS ESPAÃ‡OS
+            MEUS ESPAÇOS
         ================================================= */}
 
         {mostrarEspacos && !espacoAberto && (
@@ -1012,7 +1012,7 @@ function MinhaConta({
                 marginTop: 0,
               }}
             >
-              ðŸ  Meus EspaÃ§os
+              🏠 Meus Espaços
             </h2>
 
             <button
@@ -1028,7 +1028,7 @@ function MinhaConta({
                 fontWeight: "bold",
               }}
             >
-              ðŸ  Comprar nova casa
+              🏠 Comprar nova casa
             </button>
 
             {mostrarCompraCasa && (
@@ -1042,7 +1042,7 @@ function MinhaConta({
                 }}
               >
                 <h3 style={{ marginTop: 0 }}>
-                  ðŸ  Escolha sua nova casa
+                  🏠 Escolha sua nova casa
                 </h3>
 
                 <p>
@@ -1070,7 +1070,7 @@ function MinhaConta({
                   >
                     <img
                       src="/casas/casa-media.png"
-                      alt="Casa MÃ©dia"
+                      alt="Casa Média"
                       style={{
                         width: "110px",
                         height: "110px",
@@ -1079,7 +1079,7 @@ function MinhaConta({
                         margin: "0 auto 6px",
                       }}
                     />
-                    ðŸ  Casa MÃ©dia
+                    🏠 Casa Média
                     <br />
                     3.000,00 CVT
                   </button>
@@ -1107,7 +1107,7 @@ function MinhaConta({
                         margin: "0 auto 6px",
                       }}
                     />
-                    ðŸ  Casa Grande
+                    🏠 Casa Grande
                     <br />
                     5.000,00 CVT
                   </button>
@@ -1128,7 +1128,7 @@ function MinhaConta({
                   >
                     <img
                       src="/casas/mansao.png"
-                      alt="MansÃ£o"
+                      alt="Mansão"
                       style={{
                         width: "110px",
                         height: "110px",
@@ -1137,7 +1137,7 @@ function MinhaConta({
                         margin: "0 auto 6px",
                       }}
                     />
-                    ðŸ  MansÃ£o
+                    🏠 Mansão
                     <br />
                     10.000,00 CVT
                   </button>
@@ -1165,7 +1165,7 @@ function MinhaConta({
 
             {espacos.length === 0 ? (
               <p>
-                VocÃª ainda nÃ£o possui espaÃ§os.
+                Você ainda não possui espaços.
               </p>
             ) : (
               espacos.map((espaco) => (
@@ -1185,7 +1185,7 @@ function MinhaConta({
                       marginTop: 0,
                     }}
                   >
-                    ðŸ  {espaco.nome}
+                    🏠 {espaco.nome}
                   </h3>
                   <button
                     onClick={() => {
@@ -1203,7 +1203,7 @@ function MinhaConta({
                       marginBottom: "15px",
                     }}
                   >
-                    ðŸ  Entrar na casa
+                    🏠 Entrar na casa
                   </button>
                   <img
                     src={
@@ -1254,7 +1254,7 @@ function MinhaConta({
 
                   <p>
                     <strong>
-                      ID do espaÃ§o:
+                      ID do espaço:
                     </strong>{" "}
                     {espaco.id}
                   </p>
@@ -1270,7 +1270,7 @@ function MinhaConta({
                             marginBottom: "15px",
                           }}
                         >
-                          ðŸŽ Figurinhas
+                          🎁 Figurinhas
                         </h4>
 
                         <div
@@ -1345,11 +1345,11 @@ function MinhaConta({
                 marginBottom: "20px",
               }}
             >
-              â† Voltar para Meus EspaÃ§os
+              ← Voltar para Meus Espaços
             </button>
 
             <h2>
-              ðŸ  {espacoAberto.nome}
+              🏠 {espacoAberto.nome}
             </h2>
 
             <div
@@ -1361,7 +1361,7 @@ function MinhaConta({
                 color: "#222",
               }}
             >
-              ðŸ  Figurinhas:{" "}
+              🏠 Figurinhas:{" "}
               {espacoAberto.figurinhas
                 ? espacoAberto.figurinhas.length
                 : 0}
@@ -1451,7 +1451,7 @@ function MinhaConta({
                       marginBottom: "15px",
                     }}
                   >
-                    ðŸŽ Figurinhas das compras
+                    🎁 Figurinhas das compras
                   </h4>
 
                   <div
@@ -1511,8 +1511,8 @@ function MinhaConta({
                   textAlign: "center",
                 }}
               >
-                <h3>{figurinhaSelecionada.exclusiva ? "â­ " : ""}{figurinhaSelecionada.nome}</h3>
-                {figurinhaSelecionada.exclusiva&&<div style={{padding:12,background:"#fff3bf",borderRadius:8,marginBottom:12}}><strong>â­ Exclusiva â€” rende 3% do valor original toda quarta Ã s 00:00</strong>{ofertasExclusiva.length===0?<p>Nenhuma oferta pendente.</p>:ofertasExclusiva.map(o=><div key={o.oferta_id} style={{background:"#fff",padding:10,marginTop:8}}>{o.comprador_nome} ofereceu <strong>{Number(o.valor_oferta).toFixed(2)} CVT</strong><br/><button onClick={()=>responderExclusiva(o,true)}>Aceitar</button> <button onClick={()=>responderExclusiva(o,false)}>Recusar</button></div>)}</div>}
+                <h3>{figurinhaSelecionada.exclusiva ? "⭐ " : ""}{figurinhaSelecionada.nome}</h3>
+                {figurinhaSelecionada.exclusiva&&<div style={{padding:12,background:"#fff3bf",borderRadius:8,marginBottom:12}}><strong>⭐ Exclusiva — rende 3% do valor original toda quarta às 00:00</strong>{ofertasExclusiva.length===0?<p>Nenhuma oferta pendente.</p>:ofertasExclusiva.map(o=><div key={o.oferta_id} style={{background:"#fff",padding:10,marginTop:8}}>{o.comprador_nome} ofereceu <strong>{Number(o.valor_oferta).toFixed(2)} CVT</strong><br/><button onClick={()=>responderExclusiva(o,true)}>Aceitar</button> <button onClick={()=>responderExclusiva(o,false)}>Recusar</button></div>)}</div>}
 
                 <button
                   onClick={excluirFigurinha}
@@ -1527,7 +1527,7 @@ function MinhaConta({
                     cursor: "pointer",
                   }}
                 >
-                  ðŸ—‘ï¸ Excluir
+                  🗑️ Excluir
                 </button>
 
                 <button
@@ -1543,7 +1543,7 @@ function MinhaConta({
                     cursor: "pointer",
                   }}
                 >
-                  ðŸ·ï¸ Colocar Ã  venda
+                  🏷️ Colocar à venda
                 </button>
 
                 <button
@@ -1561,7 +1561,7 @@ function MinhaConta({
                     cursor: "pointer",
                   }}
                 >
-                  âŒ Cancelar
+                  ❌ Cancelar
                 </button>
               </div>
             )}
@@ -1587,13 +1587,13 @@ function MinhaConta({
                 marginTop: 0,
               }}
             >
-              ðŸ“¦ Meus Pedidos
+              📦 Meus Pedidos
             </h2>
 
-            {notificacoesPedidos.length>0&&<div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>AtualizaÃ§Ãµes recentes</strong><button type="button" onClick={()=>setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n=><p key={n.id}>{n.texto}</p>)}</div>}
+            {notificacoesPedidos.length>0&&<div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>Atualizações recentes</strong><button type="button" onClick={()=>setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n=><p key={n.id}>{n.texto}</p>)}</div>}
             {pedidos.length === 0 ? (
               <p>
-                VocÃª ainda nÃ£o possui
+                Você ainda não possui
                 pedidos.
               </p>
             ) : (
@@ -1617,7 +1617,7 @@ function MinhaConta({
                       background: "#fff",
                     }}
                   >
-                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status||"").toLowerCase()==="cancelado"?<strong className="valt-order-cancelled">Pedido cancelado</strong>:etapasPedido.map((etapa,i)=><div key={etapa} className={i<=etapaIndice?"done":""}><span>{i<etapaIndice?"âœ“":i+1}</span><small>{etapa}</small></div>)}</div>
+                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status||"").toLowerCase()==="cancelado"?<strong className="valt-order-cancelled">Pedido cancelado</strong>:etapasPedido.map((etapa,i)=><div key={etapa} className={i<=etapaIndice?"done":""}><span>{i<etapaIndice?"✓":i+1}</span><small>{etapa}</small></div>)}</div>
                     {/* RESUMO DO PEDIDO */}
 
                     <div
@@ -1642,7 +1642,7 @@ function MinhaConta({
                             margin: 0,
                           }}
                         >
-                          ðŸ“¦ Pedido #{pedido.pedido_id}
+                          📦 Pedido #{pedido.pedido_id}
                         </h3>
 
                         <span
@@ -1687,7 +1687,7 @@ function MinhaConta({
                               "25px",
                           }}
                         >
-                          ðŸ“¦ Acompanhamento do pedido
+                          📦 Acompanhamento do pedido
                         </h4>
 
                         <div
@@ -1756,7 +1756,7 @@ function MinhaConta({
                                       />
                                     )}
 
-                                  {/* CÃRCULO */}
+                                  {/* CÍRCULO */}
 
                                   <div
                                     style={{
@@ -1835,7 +1835,7 @@ function MinhaConta({
                                           "#2e7d32",
                                       }}
                                     >
-                                      VocÃª estÃ¡ aqui
+                                      Você está aqui
                                     </div>
                                   )}
                                 </div>
@@ -1890,8 +1890,8 @@ function MinhaConta({
                           }}
                         >
                           {aberto
-                            ? "ðŸ”½ Ocultar detalhes"
-                            : "ðŸ”Ž Ver detalhes"}
+                            ? "🔽 Ocultar detalhes"
+                            : "🔎 Ver detalhes"}
                         </button>
                       </div>
                     </div>
@@ -1927,7 +1927,7 @@ function MinhaConta({
                               marginBottom: "12px",
                             }}
                           >
-                            ðŸšš Entrega
+                            🚚 Entrega
                           </h4>
 
                           <p>
@@ -1939,7 +1939,7 @@ function MinhaConta({
                             <strong>Data do pedido:</strong>{" "}
                             {pedido.data_pedido
                               ? new Date(pedido.data_pedido).toLocaleString("pt-BR")
-                              : "NÃ£o informado"}
+                              : "Não informado"}
                           </p>
 
                           <p>
@@ -1948,14 +1948,14 @@ function MinhaConta({
                               ? new Date(
                                 pedido.data_entrega_prevista
                               ).toLocaleString("pt-BR")
-                              : "NÃ£o informado"}
+                              : "Não informado"}
                           </p>
                         </div>
 
                         {/* PRODUTOS */}
 
                         <h4>
-                          ðŸ›ï¸ Produtos
+                          🛍️ Produtos
                         </h4>
 
                         {pedido.itens &&
@@ -2045,7 +2045,7 @@ function MinhaConta({
                                               .parentElement
                                           ) {
                                             evento.currentTarget.parentElement.innerHTML =
-                                              "ðŸ›ï¸";
+                                              "🛍️";
 
                                             evento.currentTarget.parentElement.style.fontSize =
                                               "45px";
@@ -2070,12 +2070,12 @@ function MinhaConta({
                                             "45px",
                                         }}
                                       >
-                                        ðŸ›ï¸
+                                        🛍️
                                       </span>
                                     )}
                                   </div>
 
-                                  {/* INFORMAÃ‡Ã•ES */}
+                                  {/* INFORMAÇÕES */}
 
                                   <div
                                     style={{
@@ -2101,7 +2101,7 @@ function MinhaConta({
                                           "8px 0",
                                       }}
                                     >
-                                      ðŸ”¢ Quantidade:{" "}
+                                      🔢 Quantidade:{" "}
                                       {
                                         item.quantidade
                                       }
@@ -2113,7 +2113,7 @@ function MinhaConta({
                                           "8px 0",
                                       }}
                                     >
-                                      ðŸ’µ PreÃ§o unitÃ¡rio:{" "}
+                                      💵 Preço unitário:{" "}
                                       <strong>
                                         CVT{" "}
                                         {Number(
@@ -2130,7 +2130,7 @@ function MinhaConta({
                                           "8px 0",
                                       }}
                                     >
-                                      ðŸ’° Subtotal:{" "}
+                                      💰 Subtotal:{" "}
                                       <strong>
                                         CVT{" "}
                                         {subtotal.toFixed(
@@ -2214,7 +2214,7 @@ function MinhaConta({
               fontSize: "16px",
             }}
           >
-            ðŸ›ï¸ Voltar para a loja
+            🛍️ Voltar para a loja
           </button>
         </div>
       </div>
