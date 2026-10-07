@@ -1,8 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
 import pacote1 from "./pacote-presente-1.jpeg";
 import pacote2 from "./pacote-presente-2.jpeg";
 import pacote3 from "./pacote-presente-3.jpeg";
+
+const API_URL = "https://api.valt-on.com";
 
 const imagensEmbalagens = {
   pacote1,
@@ -11,18 +13,62 @@ const imagensEmbalagens = {
 };
 
 export default function PresenteRecebido({
+  pedidoId,
+  destinatarioId,
   embalagemPresente,
+  presenteAberto = false,
   itens = [],
   mensagemPresente,
   remetenteNome,
+  onPresenteAberto,
 }) {
-  const [aberto, setAberto] = useState(false);
+  const [aberto, setAberto] = useState(Boolean(presenteAberto));
+  const [itensAtuais, setItensAtuais] = useState(itens);
+  const [mensagemAtual, setMensagemAtual] = useState(mensagemPresente);
+  const [abrindo, setAbrindo] = useState(false);
+  const [erro, setErro] = useState("");
 
   const imagemEmbalagem = imagensEmbalagens[embalagemPresente];
 
-  if (!imagemEmbalagem) {
-    return null;
-  }
+  const abrirPresente = async () => {
+    if (aberto || abrindo) {
+      return;
+    }
+
+    setAbrindo(true);
+    setErro("");
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/presentes/${pedidoId}/abrir?destinatario_id=${destinatarioId}`,
+        {
+          method: "POST",
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados.detail || "Nao foi possivel abrir o presente."
+        );
+      }
+
+      setItensAtuais(dados.itens || []);
+      setMensagemAtual(dados.mensagem_presente || null);
+      setAberto(true);
+
+      if (onPresenteAberto) {
+        onPresenteAberto(dados);
+      }
+    } catch (erroAbrir) {
+      setErro(
+        erroAbrir.message || "Nao foi possivel abrir o presente."
+      );
+    } finally {
+      setAbrindo(false);
+    }
+  };
 
   return (
     <div
@@ -35,46 +81,57 @@ export default function PresenteRecebido({
         textAlign: "center",
       }}
     >
-      <h3>Presente recebido</h3>
-
-      {remetenteNome && (
-        <p>
-          <strong>De:</strong> {remetenteNome}
-        </p>
-      )}
-
       {!aberto ? (
         <button
           type="button"
-          onClick={() => setAberto(true)}
+          onClick={abrirPresente}
+          disabled={abrindo}
           style={{
             border: "none",
             background: "transparent",
-            cursor: "pointer",
+            cursor: abrindo ? "wait" : "pointer",
             padding: "10px",
+            width: "100%",
           }}
         >
-          <img
-            src={imagemEmbalagem}
-            alt="Presente"
-            style={{
-              width: "180px",
-              height: "180px",
-              objectFit: "contain",
-              display: "block",
-              margin: "0 auto 10px",
-            }}
-          />
+          {imagemEmbalagem ? (
+            <img
+              src={imagemEmbalagem}
+              alt="Presente fechado"
+              style={{
+                width: "180px",
+                height: "180px",
+                objectFit: "contain",
+                display: "block",
+                margin: "0 auto 10px",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: "90px",
+                marginBottom: "10px",
+              }}
+            >
+              🎁
+            </div>
+          )}
 
-          <strong>Clique para abrir seu presente</strong>
+          <strong>
+            {abrindo
+              ? "Abrindo presente..."
+              : "Clique para abrir seu presente"}
+          </strong>
         </button>
       ) : (
         <div>
+          <h3>🎁 Presente de {remetenteNome || "alguém especial"}</h3>
+
           <p>
-            <strong>Seu presente:</strong>
+            <strong>Seu presente chegou!</strong>
           </p>
 
-          {itens.length > 0 ? (
+          {itensAtuais.length > 0 ? (
             <div
               style={{
                 display: "flex",
@@ -83,7 +140,7 @@ export default function PresenteRecebido({
                 alignItems: "center",
               }}
             >
-              {itens.map((item, indice) => (
+              {itensAtuais.map((item, indice) => (
                 <div
                   key={indice}
                   style={{
@@ -97,7 +154,11 @@ export default function PresenteRecebido({
                   {item.imagem && (
                     <img
                       src={item.imagem}
-                      alt={item.nome || item.produto_nome || "Item do presente"}
+                      alt={
+                        item.nome ||
+                        item.produto_nome ||
+                        "Item do presente"
+                      }
                       style={{
                         width: "140px",
                         height: "140px",
@@ -119,10 +180,10 @@ export default function PresenteRecebido({
               ))}
             </div>
           ) : (
-            <p>O presente foi entregue, mas os itens não foram encontrados.</p>
+            <p>O presente foi aberto, mas os itens nao foram encontrados.</p>
           )}
 
-          {mensagemPresente && (
+          {mensagemAtual && (
             <div
               style={{
                 marginTop: "15px",
@@ -131,26 +192,31 @@ export default function PresenteRecebido({
                 backgroundColor: "#f5f5f5",
               }}
             >
-              <strong>Mensagem:</strong>
-              <p>{mensagemPresente}</p>
+              <strong>Mensagem de {remetenteNome || "quem enviou"}:</strong>
+              <p>{mensagemAtual}</p>
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => setAberto(false)}
+          <p
             style={{
               marginTop: "15px",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              backgroundColor: "#fff",
-              cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            Fechar presente
-          </button>
+            🎁 Este item foi recebido como presente.
+          </p>
         </div>
+      )}
+
+      {erro && (
+        <p
+          style={{
+            marginTop: "10px",
+            color: "red",
+          }}
+        >
+          {erro}
+        </p>
       )}
     </div>
   );

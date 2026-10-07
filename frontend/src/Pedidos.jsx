@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import PresenteRecebido from "./presente/PresenteRecebido";
+﻿import { useEffect, useState } from "react";
 
 const API_URL = "https://api.valt-on.com";
 
@@ -10,7 +9,7 @@ function Pedidos({ cliente, voltar }) {
 
   useEffect(() => {
     if (!cliente || !cliente.id) {
-      setErro("Cliente não identificado.");
+      setErro("Cliente nÃ£o identificado.");
       setCarregando(false);
       return;
     }
@@ -18,7 +17,7 @@ function Pedidos({ cliente, voltar }) {
     fetch(`${API_URL}/clientes/${cliente.id}/pedidos`)
       .then((resposta) => {
         if (!resposta.ok) {
-          throw new Error("Não foi possível carregar os pedidos.");
+          throw new Error("NÃ£o foi possÃ­vel carregar os pedidos.");
         }
 
         return resposta.json();
@@ -52,10 +51,10 @@ function Pedidos({ cliente, voltar }) {
           marginBottom: "20px",
         }}
       >
-        ← Voltar para a loja
+        â† Voltar para a loja
       </button>
 
-      <h1>📦 Meus Pedidos</h1>
+      <h1>ðŸ“¦ Meus Pedidos</h1>
 
       <p>
         Cliente: <strong>{cliente?.nome}</strong>
@@ -65,43 +64,15 @@ function Pedidos({ cliente, voltar }) {
 
       {erro && (
         <p style={{ color: "red" }}>
-          ❌ {erro}
+          âŒ {erro}
         </p>
       )}
 
       {!carregando && !erro && pedidos.length === 0 && (
         <div>
-          <p>Você ainda não possui pedidos.</p>
+          <p>VocÃª ainda nÃ£o possui pedidos.</p>
         </div>
       )}
-
-      {!carregando &&
-        !erro &&
-        pedidos.some((pedido) => pedido.eh_presente && pedido.remetente_id) && (
-          <div
-            style={{
-              border: "2px solid #f0c14b",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "25px",
-              background: "#fff8dc",
-            }}
-          >
-            <h2>Você recebeu um presente!</h2>
-
-            {pedidos
-              .filter((pedido) => pedido.eh_presente && pedido.remetente_id)
-              .map((presente) => (
-                <PresenteRecebido
-                  key={presente.pedido_id}
-                  embalagemPresente={presente.embalagem_presente}
-                  itens={presente.itens}
-                  mensagemPresente={presente.mensagem_presente}
-                  remetenteNome={presente.remetente_nome}
-                />
-              ))}
-          </div>
-        )}
 
       {!carregando &&
         !erro &&
@@ -117,7 +88,7 @@ function Pedidos({ cliente, voltar }) {
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             }}
           >
-            <h2>📦 Pedido #{pedido.id}</h2>
+            <h2>ðŸ“¦ Pedido #{pedido.id}</h2>
 
             <p>
               <strong>Status:</strong>{" "}
@@ -149,7 +120,7 @@ function Pedidos({ cliente, voltar }) {
                   </p>
 
                   <p>
-                    Preço unitário: CVT{" "}
+                    PreÃ§o unitÃ¡rio: CVT{" "}
                     {Number(
                       item.preco_unitario
                     ).toFixed(2)}
@@ -174,3 +145,4 @@ function Pedidos({ cliente, voltar }) {
 }
 
 export default Pedidos;
+

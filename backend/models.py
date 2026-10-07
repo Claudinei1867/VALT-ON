@@ -1,4 +1,4 @@
-from sqlalchemy import (  # type: ignore[import-not-found]
+﻿from sqlalchemy import (  # type: ignore[import-not-found]
     Column,
     Integer,
     String,
@@ -79,7 +79,7 @@ class Cliente(Base):
 
 
 # =========================================================
-# INDICAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã¢â‚¬Â¢ES: uma recompensa por novo cliente confirmado
+# INDICAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ES: uma recompensa por novo cliente confirmado
 # =========================================================
 
 class Indicacao(Base):
@@ -158,6 +158,12 @@ class Pedido(Base):
         nullable=True
     )
 
+    presente_aberto = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
 # =========================================================
 # ITENS DO PEDIDO
 # =========================================================
@@ -192,7 +198,7 @@ class ItemPedido(Base):
 
 
 # =========================================================
-# ESPAÃƒÆ’Ã¢â‚¬Â¡OS DO CLIENTE
+# ESPAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡OS DO CLIENTE
 # =========================================================
 
 class EspacoCliente(Base):
@@ -223,11 +229,11 @@ class EspacoCliente(Base):
 
     adquirido = Column(
         String,
-        default="NÃƒÆ’Ã‚Â£o"
+        default="NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o"
     )
 
 # =========================================================
-# ITENS DOS ESPAÃƒÆ’Ã¢â‚¬Â¡OS DO CLIENTE
+# ITENS DOS ESPAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡OS DO CLIENTE
 # =========================================================
 
 
@@ -535,8 +541,10 @@ class PagamentoCVT(Base):
     )
 
 
-# PresenÃƒÆ’Ã‚Â§a anÃƒÆ’Ã‚Â´nima por navegador; nÃƒÆ’Ã‚Â£o guarda e-mail, nome ou IP.
+# PresenÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§a anÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´nima por navegador; nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o guarda e-mail, nome ou IP.
 class PresencaVisitante(Base):
     __tablename__ = "presenca_visitantes"
     sessao = Column(String(64), primary_key=True)
     ultima_atividade = Column(String(32), nullable=False, index=True)
+
+

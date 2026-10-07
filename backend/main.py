@@ -29,6 +29,8 @@ from clientes.rotas import router as clientes_router
 from presenca.rotas import router as presenca_router
 from admin.rotas import router as admin_router
 from sugestoes.rotas import router as sugestoes_router
+from presentes.rotas import router as presentes_router
+from presentes.servicos import listar_presentes_espaco
 from autenticacao.recuperacao_senha import router as recuperacao_senha_router
 from autenticacao.redefinir_senha import router as redefinir_senha_router
 from autenticacao.reenviar_confirmacao import router as reenviar_confirmacao_router
@@ -57,6 +59,7 @@ app.include_router(clientes_router)
 app.include_router(presenca_router)
 app.include_router(admin_router)
 app.include_router(sugestoes_router)
+app.include_router(presentes_router)
 
 from routers import pagamentos_cvt
 app.include_router(pagamentos_cvt.router)
@@ -299,7 +302,7 @@ def atualizar_status_pedidos_automaticamente(db):
         # CRIAR FIGURINHAS DOS PRODUTOS ENTREGUES
         # -------------------------------------------------
 
-        if novo_status == "Entregue" and pedido.espaco_id:
+        if novo_status == "Entregue" and pedido.espaco_id and not pedido.eh_presente:
 
             itens = (
                 db.query(models.ItemPedido)
@@ -1261,6 +1264,12 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
         figurinhas = []
 
+        presentes = listar_presentes_espaco(
+            db,
+            espaco.id,
+            cliente_id
+        )
+
         for item_espaco, produto in itens:
 
             figurinhas.append(
@@ -1284,6 +1293,7 @@ def listar_espacos_cliente(cliente_id: int, db: Session = Depends(get_db)):
                 "valor": espaco.valor,
                 "adquirido": espaco.adquirido,
                 "figurinhas": figurinhas,
+                "presentes": presentes,
             }
         )
 
@@ -2110,6 +2120,14 @@ def atualizar_vendas_usados_automaticamente(db):
             f"Venda usada #{venda.id}: "
             f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
         )
+
+
+
+
+
+
+
+
 
 
 
