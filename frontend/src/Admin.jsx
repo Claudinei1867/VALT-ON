@@ -282,6 +282,8 @@ function Admin({ usuario, onVoltar, onLogout }) {
   // =====================================================
 
   const enviarImagem = async () => {
+    console.log("DEBUG: entrou em enviarImagem", arquivoImagem);
+
     if (!arquivoImagem) {
       return imagem;
     }
@@ -290,10 +292,18 @@ function Admin({ usuario, onVoltar, onLogout }) {
 
     formularioImagem.append("file", arquivoImagem);
 
-    const resposta = await fetch(`${API_URL}/upload-imagem`, {
-      method: "POST",
-      body: formularioImagem,
-    });
+    console.log("DEBUG: antes do fetch upload", API_URL, arquivoImagem);
+
+    let resposta;
+
+    try {
+      resposta = await fetch(`${API_URL}/upload-imagem`, {
+        method: "POST",
+        body: formularioImagem,
+      });
+    } catch (erro) {
+      throw new Error("UPLOAD: " + (erro?.message || String(erro)));
+    }
 
     if (!resposta.ok) {
       throw new Error("Erro ao enviar imagem");
@@ -304,9 +314,6 @@ function Admin({ usuario, onVoltar, onLogout }) {
     console.log("Resposta do upload:", dados);
     console.log("URL DA IMAGEM:", dados.url);
 
-    // O backend retorna:
-    // /uploads/nome-da-imagem.png
-
     return dados.url;
   };
 
@@ -316,6 +323,7 @@ function Admin({ usuario, onVoltar, onLogout }) {
 
   const salvarProduto = async (evento) => {
     evento.preventDefault();
+    console.log("DEBUG: entrou em salvarProduto");
 
     try {
       setMensagem("⏳ Salvando produto...");
