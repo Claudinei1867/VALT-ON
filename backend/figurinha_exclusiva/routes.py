@@ -5,8 +5,17 @@ from datetime import datetime, timedelta
 from database import SessionLocal
 from dependencies import get_db
 import models
+from cvt import registrar_movimento_cvt
 from .models import FigurinhaExclusiva, RendimentoExclusiva, OfertaFigurinhaExclusiva
 from . import schemas, services
+
+CASAS_CONFIG = {
+    "PEQUENA": {"capacidade": 25},
+    "MEDIA": {"capacidade": 50},
+    "GRANDE": {"capacidade": 100},
+    "MANSAO": {"capacidade": 200},
+}
+
 router=APIRouter(prefix="/figurinhas-exclusivas",tags=["figurinhas-exclusivas"])
 class OfertaDireta(BaseModel):
     comprador_id:int
@@ -125,7 +134,15 @@ def responder(oferta_id:int,dono_id:int,aceitar:bool,db:Session=Depends(get_db))
     if not aceitar: o.status="RECUSADA";db.commit();return {"status":"RECUSADA"}
     comprador=db.query(models.Cliente).filter(models.Cliente.id==o.comprador_id).first()
     if not comprador or comprador.saldo_cvt<o.valor_oferta: raise HTTPException(400,"Comprador sem saldo suficiente.")
-    comprador.saldo_cvt-=o.valor_oferta;v.preco_venda=o.valor_oferta;v.comprador_id=o.comprador_id;v.espaco_comprador_id=o.espaco_id;v.status="EM_ENTREGA";v.data_venda=datetime.now().strftime("%Y-%m-%d %H:%M:%S");v.data_entrega_prevista=(datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S");o.status="ACEITA";db.commit();return {"status":"ACEITA"}
+    comprador.saldo_cvt-=o.valor_oferta
+    registrar_movimento_cvt(
+        db,
+        comprador.id,
+        "SAIDA",
+        "Compra de figurinha exclusiva por oferta",
+        -o.valor_oferta,
+        comprador.saldo_cvt
+    );v.preco_venda=o.valor_oferta;v.comprador_id=o.comprador_id;v.espaco_comprador_id=o.espaco_id;v.status="EM_ENTREGA";v.data_venda=datetime.now().strftime("%Y-%m-%d %H:%M:%S");v.data_entrega_prevista=(datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S");o.status="ACEITA";db.commit();return {"status":"ACEITA"}
 def pagar_rendimento_semanal():
     db=SessionLocal()
     try:
@@ -137,8 +154,11 @@ def pagar_rendimento_semanal():
             if not casa or db.query(RendimentoExclusiva).filter(RendimentoExclusiva.figurinha_exclusiva_id==reg.id,RendimentoExclusiva.semana==semana).first(): continue
             cliente=db.query(models.Cliente).filter(models.Cliente.id==casa.cliente_id).first()
             if not cliente: continue
-            valor=round(reg.valor_original*0.03,2);cliente.saldo_cvt+=valor;db.add(RendimentoExclusiva(figurinha_exclusiva_id=reg.id,cliente_id=cliente.id,semana=semana,valor=valor))
-        db.commit()
+            valor=round(reg.valor_original*0.03,2)
+            cliente.saldo_cvt+=valor
+            registrar_movimento_cvt(db, cliente.id, "ENTRADA", "Rendimento semanal de figurinha exclusiva", valor, cliente.saldo_cvt)
+            db.add(RendimentoExclusiva(figurinha_exclusiva_id=reg.id,cliente_id=cliente.id,semana=semana,valor=valor))
+            db.commit()
     finally: db.close()
 
 from sqlalchemy.orm import Session
@@ -427,7 +447,24 @@ def aceitar_oferta_figurinha_exclusiva(
         )
 
     comprador.saldo_cvt -= oferta.valor_oferta
+    registrar_movimento_cvt(
+        db,
+        comprador.id,
+        "SAIDA",
+        "Compra de figurinha exclusiva",
+        -oferta.valor_oferta,
+        comprador.saldo_cvt
+    )
     proprietario.saldo_cvt += oferta.valor_oferta
+    
+    registrar_movimento_cvt(
+        db,
+        proprietario.id,
+        "ENTRADA",
+        "Venda de figurinha exclusiva",
+        oferta.valor_oferta,
+        proprietario.saldo_cvt
+    )
 
     item_atual.status = "EXCLUIDO"
     item_atual.preco_venda = None

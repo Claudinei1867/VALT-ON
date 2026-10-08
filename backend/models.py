@@ -79,8 +79,20 @@ class Cliente(Base):
 
 
 # =========================================================
-# INDICAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ES: uma recompensa por novo cliente confirmado
+# INDICAÇÕES: uma recompensa por novo cliente confirmado
 # =========================================================
+
+class CVTMovimento(Base):
+    __tablename__ = "cvt_movimentos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cliente_id = Column(Integer, ForeignKey("clientes.id"), nullable=False, index=True)
+    tipo = Column(String, nullable=False)
+    motivo = Column(String, nullable=False)
+    quantidade = Column(Float, nullable=False)
+    saldo_apos = Column(Float, nullable=False)
+    criado_em = Column(String, nullable=False)
+
 
 class Indicacao(Base):
     __tablename__ = "indicacoes"

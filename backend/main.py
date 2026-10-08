@@ -22,6 +22,7 @@ import bcrypt
 from dotenv import load_dotenv
 from database import engine, Base, SessionLocal
 import models
+from cvt import registrar_movimento_cvt
 import schemas
 import figurinha_exclusiva.models
 from produtos.rotas import router as produtos_router
@@ -132,7 +133,7 @@ def get_db():
 # =========================================================
 # CRÉDITO SEMANAL CVT
 # =========================================================
-
+
 
 def conceder_credito_semanal(db: Session):
 
@@ -156,6 +157,15 @@ def conceder_credito_semanal(db: Session):
         if cliente.ultimo_credito_cvt != data_domingo:
 
             cliente.saldo_cvt += 500.0
+            
+            registrar_movimento_cvt(
+                db,
+                cliente.id,
+                "ENTRADA",
+                "Crédito semanal",
+                500.0,
+                cliente.saldo_cvt
+            )
 
             cliente.ultimo_credito_cvt = data_domingo
 
@@ -811,6 +821,15 @@ def finalizar_compra(compra: schemas.CompraCreate, db: Session = Depends(get_db)
     # -----------------------------------------------------
 
     cliente.saldo_cvt -= total
+    
+    registrar_movimento_cvt(
+        db,
+        cliente.id,
+        "SAIDA",
+        "Compra de produtos",
+        -total,
+        cliente.saldo_cvt
+    )
 
     # -----------------------------------------------------
     # CRIAR PEDIDO
@@ -926,6 +945,11 @@ def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
     # -----------------------------------------------------
 
     for pedido in pedidos:
+        espaco = (
+            db.query(models.EspacoCliente)
+            .filter(models.EspacoCliente.id == pedido.espaco_id)
+            .first()
+        )
 
         itens = (
             db.query(models.ItemPedido)
@@ -964,6 +988,8 @@ def listar_pedidos_cliente(cliente_id: int, db: Session = Depends(get_db)):
         resultado.append(
             {
                 "pedido_id": pedido.id,
+                "espaco_id": pedido.espaco_id,
+                "espaco_nome": espaco.nome if espaco else None,
                 "status": pedido.status,
                 "total": pedido.total,
                 "prazo_entrega": pedido.prazo_entrega,
@@ -1183,6 +1209,15 @@ def comprar_casa(
     # -----------------------------------------------------
 
     cliente.saldo_cvt -= valor
+    
+    registrar_movimento_cvt(
+        db,
+        cliente.id,
+        "SAIDA",
+        "Compra de casa",
+        -valor,
+        cliente.saldo_cvt
+    )
 
     # -----------------------------------------------------
     # CRIAR CASA
@@ -1796,6 +1831,15 @@ def comprar_produto_usado(
     data_entrega_prevista = data_venda + timedelta(days=1)
 
     comprador.saldo_cvt -= venda.preco_venda
+    
+    registrar_movimento_cvt(
+        db,
+        comprador.id,
+        "SAIDA",
+        "Compra de produto usado",
+        -venda.preco_venda,
+        comprador.saldo_cvt
+    )
 
     venda.comprador_id = compra.cliente_id
     venda.espaco_comprador_id = compra.espaco_id
@@ -1941,6 +1985,15 @@ def aceitar_oferta_produto_usado(
     data_entrega_prevista = data_venda + timedelta(days=1)
 
     comprador.saldo_cvt -= oferta.valor_oferta
+    
+    registrar_movimento_cvt(
+        db,
+        comprador.id,
+        "SAIDA",
+        "Compra de produto usado por oferta",
+        -oferta.valor_oferta,
+        comprador.saldo_cvt
+    )
 
     venda.preco_venda = oferta.valor_oferta
     venda.comprador_id = oferta.comprador_id
@@ -2088,6 +2141,15 @@ def atualizar_vendas_usados_automaticamente(db):
         valor_valt_on = round(venda.preco_venda * 0.40, 2)
 
         vendedor.saldo_cvt += valor_vendedor
+        
+        registrar_movimento_cvt(
+            db,
+            vendedor.id,
+            "ENTRADA",
+            "Venda de produto usado",
+            valor_vendedor,
+            vendedor.saldo_cvt
+        )
 
         venda.valor_vendedor = valor_vendedor
         venda.valor_valt_on = valor_valt_on
@@ -2120,6 +2182,10 @@ def atualizar_vendas_usados_automaticamente(db):
             f"Venda usada #{venda.id}: "
             f"VALT-ON recebeu {valor_valt_on:.2f} CVT"
         )
+
+
+
+
 
 
 

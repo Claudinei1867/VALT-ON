@@ -8,6 +8,7 @@ import mercadopago
 import models
 import schemas
 from dependencies import get_db
+from cvt import registrar_movimento_cvt
 
 router = APIRouter()
 
@@ -119,8 +120,18 @@ async def pagamento_cvt_webhook(
 
     payment_id = None
 
-    if dados.get("data") and dados["data"].get("id"):
-        payment_id = str(dados["data"]["id"])
+    tipo = request.query_params.get("type")
+    topic = request.query_params.get("topic")
+
+    if tipo == "payment" or topic == "payment":
+        payment_id = (
+            request.query_params.get("data.id")
+            or request.query_params.get("id")
+    )
+
+    if not payment_id:
+        if dados.get("data") and dados["data"].get("id"):
+            payment_id = str(dados["data"]["id"])
 
     if not payment_id:
         return {"status": "ok"}
@@ -166,6 +177,15 @@ async def pagamento_cvt_webhook(
         pagamento.mp_payment_id = str(payment_id)
 
         cliente.saldo_cvt += pagamento.quantidade_cvt
+        
+        registrar_movimento_cvt(
+            db,
+            cliente.id,
+            "ENTRADA",
+            "Compra de CVT",
+            pagamento.quantidade_cvt,
+            cliente.saldo_cvt
+        )
 
         db.commit()
 

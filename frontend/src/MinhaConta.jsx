@@ -49,7 +49,7 @@ function MinhaConta({
     useState(false);
   const [mostrarPedidos, setMostrarPedidos] =
     useState(false);
-  const [notificacoesPedidos,setNotificacoesPedidos]=useState([]);
+  const [notificacoesPedidos, setNotificacoesPedidos] = useState([]);
 
   // =====================================================
   // MONITORAMENTO DE ALTERAÇÃO DE STATUS
@@ -78,9 +78,9 @@ function MinhaConta({
     useState(null);
 
   const [figurinhaSelecionada, setFigurinhaSelecionada] = useState(null);
-  const [ofertasExclusiva,setOfertasExclusiva]=useState([]);
-  useEffect(()=>{if(!figurinhaSelecionada?.exclusiva||!usuario?.id){setOfertasExclusiva([]);return;}fetch(API_URL+"/figurinhas-exclusivas/ofertas-exclusivas/"+usuario.id).then(r=>r.ok?r.json():[]).then(d=>setOfertasExclusiva(d.filter(o=>o.produto_id===figurinhaSelecionada.produto_id))).catch(()=>setOfertasExclusiva([]));},[figurinhaSelecionada,usuario]);
-  const responderExclusiva=async(o,aceitar)=>{const r=await fetch(API_URL+"/figurinhas-exclusivas/ofertas-exclusivas/"+o.oferta_id+"/responder?dono_id="+usuario.id+"&aceitar="+aceitar,{method:"POST"});const d=await r.json();if(!r.ok)return alert(d.detail||"Erro.");alert(aceitar?"Oferta aceita!":"Oferta recusada.");setOfertasExclusiva(a=>a.filter(x=>x.oferta_id!==o.oferta_id));};
+  const [ofertasExclusiva, setOfertasExclusiva] = useState([]);
+  useEffect(() => { if (!figurinhaSelecionada?.exclusiva || !usuario?.id) { setOfertasExclusiva([]); return; } fetch(API_URL + "/figurinhas-exclusivas/ofertas-exclusivas/" + usuario.id).then(r => r.ok ? r.json() : []).then(d => setOfertasExclusiva(d.filter(o => o.produto_id === figurinhaSelecionada.produto_id))).catch(() => setOfertasExclusiva([])); }, [figurinhaSelecionada, usuario]);
+  const responderExclusiva = async (o, aceitar) => { const rota = aceitar ? "/figurinhas-exclusivas/ofertas/aceitar" : "/figurinhas-exclusivas/ofertas/recusar"; const r = await fetch(API_URL + rota + "?oferta_id=" + o.oferta_id + "&proprietario_id=" + usuario.id, { method: "POST" }); const d = await r.json(); if (!r.ok) return alert(d.detail || "Erro."); alert(aceitar ? "Oferta aceita!" : "Oferta recusada!"); setOfertasExclusiva(a => a.filter(x => x.oferta_id !== o.oferta_id)); };
 
   const [mostrarCompraCasa, setMostrarCompraCasa] =
     useState(false);
@@ -100,6 +100,12 @@ function MinhaConta({
 
   const [comprandoCVT, setComprandoCVT] =
     useState(false);
+
+  const [mostrarExtratoCVT, setMostrarExtratoCVT] =
+    useState(false);
+
+  const [extratoCVT, setExtratoCVT] =
+    useState([]);
 
   // =====================================================
   // ERRO GERAL
@@ -153,7 +159,7 @@ function MinhaConta({
       if (!resposta.ok) {
         throw new Error(
           dados.detail ||
-            "Não foi possível criar o pagamento."
+          "Não foi possível criar o pagamento."
         );
       }
 
@@ -172,16 +178,103 @@ function MinhaConta({
 
       alert(
         error.message ||
-          "Não foi possível iniciar a compra de CVT."
+        "Não foi possível iniciar a compra de CVT."
       );
     } finally {
       setComprandoCVT(false);
     }
   };
 
+  const carregarExtratoCVT = async () => {
+    if (!usuario?.id) {
+      return;
+    }
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/clientes/${usuario.id}/extrato-cvt`
+      );
+
+      if (!resposta.ok) {
+        throw new Error("Não foi possível carregar o extrato de CVT.");
+      }
+
+      const dados = await resposta.json();
+      setExtratoCVT(dados);
+      setMostrarExtratoCVT(true);
+    } catch (error) {
+      console.error("ERRO AO CARREGAR EXTRATO CVT:", error);
+      alert(error.message);
+    }
+  };
+
   // =====================================================
   // BUSCAR PEDIDOS DO CLIENTE
   // =====================================================
+
+  const chaveNotificacoesEntregas = usuario?.id
+    ? `valt_on_notificacoes_entregas_${usuario.id}`
+    : null;
+
+  const obterNotificacoesEntregas = () => {
+    if (!chaveNotificacoesEntregas) return [];
+
+    try {
+      return JSON.parse(
+        localStorage.getItem(chaveNotificacoesEntregas) || "[]"
+      );
+    } catch {
+      return [];
+    }
+  };
+
+  const salvarNotificacoesEntregas = (notificacoes) => {
+    if (!chaveNotificacoesEntregas) return;
+
+    localStorage.setItem(
+      chaveNotificacoesEntregas,
+      JSON.stringify(notificacoes)
+    );
+  };
+
+  const limparNotificacoesDaCasa = (espacoId) => {
+    const atuais = obterNotificacoesEntregas();
+
+    const restantes = atuais.filter(
+      (notificacao) =>
+        notificacao.espaco_id !== espacoId
+    );
+
+    salvarNotificacoesEntregas(restantes);
+    setNotificacoesPedidos(restantes);
+  };
+
+  const chaveEntregasConhecidas = usuario?.id
+    ? `valt_on_entregas_conhecidas_${usuario.id}`
+    : null;
+
+  const obterEntregasConhecidas = () => {
+    if (!chaveEntregasConhecidas) return null;
+
+    try {
+      const salvo = localStorage.getItem(
+        chaveEntregasConhecidas
+      );
+
+      return salvo === null ? null : JSON.parse(salvo);
+    } catch {
+      return [];
+    }
+  };
+
+  const salvarEntregasConhecidas = (pedidosEntregues) => {
+    if (!chaveEntregasConhecidas) return;
+
+    localStorage.setItem(
+      chaveEntregasConhecidas,
+      JSON.stringify(pedidosEntregues)
+    );
+  };
 
   const carregarPedidos = async () => {
     if (!usuario || !usuario.id) {
@@ -209,6 +302,67 @@ function MinhaConta({
         dados
       );
 
+      // Detectar entregas que aconteceram enquanto o usuario estava fora
+      const entregasConhecidas = obterEntregasConhecidas();
+
+      if (entregasConhecidas === null) {
+        const idsEntregues = dados
+          .filter((pedido) => pedido.status === "Entregue")
+          .map((pedido) => pedido.pedido_id);
+
+        salvarEntregasConhecidas(idsEntregues);
+      } else {
+        const idsEntreguesAtuais = dados
+          .filter((pedido) => pedido.status === "Entregue")
+          .map((pedido) => pedido.pedido_id);
+
+        const novasEntregas = dados.filter(
+          (pedido) =>
+            pedido.status === "Entregue" &&
+            !entregasConhecidas.includes(pedido.pedido_id)
+        );
+
+        if (novasEntregas.length > 0) {
+          const atuais = obterNotificacoesEntregas();
+
+          const novasNotificacoes = novasEntregas
+            .filter(
+              (pedido) =>
+                !atuais.some(
+                  (notificacao) =>
+                    notificacao.pedido_id === pedido.pedido_id
+                )
+            )
+            .map((pedido) => ({
+              id: `entrega-${pedido.pedido_id}`,
+              pedido_id: pedido.pedido_id,
+              espaco_id: pedido.espaco_id,
+              texto: pedido.eh_presente
+                ? `\uD83C\uDF81 Voc\u00EA recebeu um presente na ${pedido.espaco_nome || "sua casa"}!`
+                : `\uD83D\uDCE6 Sua compra chegou na ${pedido.espaco_nome || "sua casa"}!`,
+            }));
+
+          if (novasNotificacoes.length > 0) {
+            salvarNotificacoesEntregas([
+              ...novasNotificacoes,
+              ...atuais,
+            ]);
+
+            setNotificacoesPedidos([
+              ...novasNotificacoes,
+              ...atuais,
+            ]);
+          }
+        }
+
+        salvarEntregasConhecidas([
+          ...new Set([
+            ...entregasConhecidas,
+            ...idsEntreguesAtuais,
+          ]),
+        ]);
+      }
+
       // Verificar alteração de status
       if (Object.keys(statusPedidosAnterior.current).length > 0) {
 
@@ -225,19 +379,52 @@ function MinhaConta({
             const textoNotificacao =
               pedido.status === "Entregue"
                 ? pedido.eh_presente
-                  ? "Você recebeu um presente! Vá até sua casa para conferir."
-                  : "Sua compra chegou! Vá até sua casa para ver o que chegou."
+                  ? `🎁 Você recebeu um presente na ${pedido.espaco_nome || "sua casa"}!`
+                  : `📦 Sua compra chegou na ${pedido.espaco_nome || "sua casa"}!`
                 : `Pedido #${pedido.pedido_id}: status atualizado para ${pedido.status}.`;
 
-            setNotificacoesPedidos(
-              (atuais) => [
-                {
-                  id: `${pedido.pedido_id}-${pedido.status}-${Date.now()}`,
+            if (pedido.status === "Entregue") {
+              const atuais = obterNotificacoesEntregas();
+
+              if (
+                !atuais.some(
+                  (notificacao) =>
+                    notificacao.pedido_id === pedido.pedido_id
+                )
+              ) {
+                const novaNotificacao = {
+                  id: `entrega-${pedido.pedido_id}`,
+                  pedido_id: pedido.pedido_id,
+                  espaco_id: pedido.espaco_id,
                   texto: textoNotificacao,
-                },
-                ...atuais,
-              ].slice(0, 5)
-            );
+                };
+
+                salvarNotificacoesEntregas([
+                  novaNotificacao,
+                  ...atuais,
+                ]);
+
+                setNotificacoesPedidos((notificacoes) => [
+                  novaNotificacao,
+                  ...notificacoes.filter(
+                    (notificacao) =>
+                      notificacao.pedido_id !== pedido.pedido_id
+                  ),
+                ]);
+              }
+            }
+
+            if (pedido.status !== "Entregue") {
+              setNotificacoesPedidos(
+                (atuais) => [
+                  {
+                    id: `${pedido.pedido_id}-${pedido.status}-${Date.now()}`,
+                    texto: textoNotificacao,
+                  },
+                  ...atuais,
+                ].slice(0, 5)
+              );
+            }
             console.log(
               "ALTERAÇÃO DE STATUS DETECTADA:",
               pedido.pedido_id,
@@ -318,6 +505,27 @@ function MinhaConta({
       setCarregandoPedidos(false);
     }
   };
+
+  // =====================================================
+  // CARREGAR NOTIFICAÇÕES DE ENTREGAS PENDENTES
+  // =====================================================
+
+  useEffect(() => {
+    if (!usuario?.id) {
+      setNotificacoesPedidos([]);
+      return;
+    }
+
+    setNotificacoesPedidos(obterNotificacoesEntregas());
+  }, [usuario]);
+
+  useEffect(() => {
+    if (!usuario?.id) {
+      return;
+    }
+
+    carregarPedidos();
+  }, [usuario]);
 
   // =====================================================
   // VERIFICAR AUTOMATICAMENTE ALTERAÇÕES NOS PEDIDOS
@@ -712,7 +920,7 @@ function MinhaConta({
         padding: "30px 20px",
       }}
     >
-      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronização entre dispositivos estará disponível após a implantação de autenticação segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length?produtosFavoritos.map((produto)=><button key={produto.id} onClick={()=>onAbrirProduto?.(produto)}>{produto.imagem&&<img src={obterUrlImagem(produto.imagem)} alt=""/>}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span></button>):<p>Você ainda não salvou nenhum produto.</p>}</div></section>
+      <section className="valt-account-favorites"><h2>♡ Seus favoritos</h2><p>Produtos salvos para esta conta neste navegador. A sincronização entre dispositivos estará disponível após a implantação de autenticação segura.</p><div className="valt-account-favorites-grid">{produtosFavoritos.length ? produtosFavoritos.map((produto) => <button key={produto.id} onClick={() => onAbrirProduto?.(produto)}>{produto.imagem && <img src={obterUrlImagem(produto.imagem)} alt="" />}<strong>{produto.nome}</strong><span>CVT {Number(produto.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span></button>) : <p>Você ainda não salvou nenhum produto.</p>}</div></section>
       <div
         style={{
           maxWidth: "950px",
@@ -746,6 +954,17 @@ function MinhaConta({
           >
             👤 Minha Conta
           </h1>
+
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: "10px 20px",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+          >
+            Atualizar
+          </button>
 
           <button
             onClick={onVoltar}
@@ -811,6 +1030,24 @@ function MinhaConta({
             Minha conta
           </h2>
 
+          {notificacoesPedidos
+            .filter((notificacao) => notificacao.espaco_id)
+            .map((notificacao) => (
+              <div
+                key={notificacao.id}
+                style={{
+                  marginTop: "12px",
+                  padding: "12px 15px",
+                  borderRadius: "8px",
+                  background: "#fff3cd",
+                  border: "1px solid #ffe69c",
+                  fontWeight: "bold",
+                }}
+              >
+                {notificacao.texto}
+              </div>
+            ))}
+
           <div
             style={{
               display: "flex",
@@ -831,6 +1068,12 @@ function MinhaConta({
               }}
             >
               ?? Comprar créditos CVT
+            </button>
+
+            <button
+              onClick={carregarExtratoCVT}
+            >
+              📊 Extrato de CVT
             </button>
 
             {/* PEDIDOS */}
@@ -1189,6 +1432,7 @@ function MinhaConta({
                   </h3>
                   <button
                     onClick={() => {
+                      limparNotificacoesDaCasa(espaco.id);
                       setEspacoAberto(espaco);
                     }}
                     className="valt-enter-house"
@@ -1512,7 +1756,7 @@ function MinhaConta({
                 }}
               >
                 <h3>{figurinhaSelecionada.exclusiva ? "⭐ " : ""}{figurinhaSelecionada.nome}</h3>
-                {figurinhaSelecionada.exclusiva&&<div style={{padding:12,background:"#fff3bf",borderRadius:8,marginBottom:12}}><strong>⭐ Exclusiva — rende 3% do valor original toda quarta às 00:00</strong>{ofertasExclusiva.length===0?<p>Nenhuma oferta pendente.</p>:ofertasExclusiva.map(o=><div key={o.oferta_id} style={{background:"#fff",padding:10,marginTop:8}}>{o.comprador_nome} ofereceu <strong>{Number(o.valor_oferta).toFixed(2)} CVT</strong><br/><button onClick={()=>responderExclusiva(o,true)}>Aceitar</button> <button onClick={()=>responderExclusiva(o,false)}>Recusar</button></div>)}</div>}
+                {figurinhaSelecionada.exclusiva && <div style={{ padding: 12, background: "#fff3bf", borderRadius: 8, marginBottom: 12 }}><strong>⭐ Exclusiva — rende 3% do valor original toda quarta às 00:00</strong>{ofertasExclusiva.length === 0 ? <p>Nenhuma oferta pendente.</p> : ofertasExclusiva.map(o => <div key={o.oferta_id} style={{ background: "#fff", padding: 10, marginTop: 8 }}>{o.comprador_nome} ofereceu <strong>{Number(o.valor_oferta).toFixed(2)} CVT</strong><br /><button onClick={() => responderExclusiva(o, true)}>Aceitar</button> <button onClick={() => responderExclusiva(o, false)}>Recusar</button></div>)}</div>}
 
                 <button
                   onClick={excluirFigurinha}
@@ -1590,7 +1834,7 @@ function MinhaConta({
               📦 Meus Pedidos
             </h2>
 
-            {notificacoesPedidos.length>0&&<div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>Atualizações recentes</strong><button type="button" onClick={()=>setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n=><p key={n.id}>{n.texto}</p>)}</div>}
+            {notificacoesPedidos.length > 0 && <div className="valt-order-notices" role="status" aria-live="polite"><div className="valt-order-notices-head"><strong>Atualizações recentes</strong><button type="button" onClick={() => setNotificacoesPedidos([])}>Dispensar</button></div>{notificacoesPedidos.map(n => <p key={n.id}>{n.texto}</p>)}</div>}
             {pedidos.length === 0 ? (
               <p>
                 Você ainda não possui
@@ -1602,8 +1846,8 @@ function MinhaConta({
                   pedidoAberto === pedido.pedido_id;
 
                 const etapaAtual = obterEtapaPedido(pedido.status);
-                const etapasPedido=["Pago","Preparando","Enviado","A caminho","Entregue"];
-                const etapaIndice=etapasPedido.findIndex(etapa=>etapa.toLowerCase()===String(pedido.status||"").toLowerCase());
+                const etapasPedido = ["Pago", "Preparando", "Enviado", "A caminho", "Entregue"];
+                const etapaIndice = etapasPedido.findIndex(etapa => etapa.toLowerCase() === String(pedido.status || "").toLowerCase());
 
                 return (
                   <div
@@ -1617,7 +1861,7 @@ function MinhaConta({
                       background: "#fff",
                     }}
                   >
-                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status||"").toLowerCase()==="cancelado"?<strong className="valt-order-cancelled">Pedido cancelado</strong>:etapasPedido.map((etapa,i)=><div key={etapa} className={i<=etapaIndice?"done":""}><span>{i<etapaIndice?"✓":i+1}</span><small>{etapa}</small></div>)}</div>
+                    <div className="valt-order-timeline" aria-label={`Andamento do pedido: ${pedido.status}`}>{String(pedido.status || "").toLowerCase() === "cancelado" ? <strong className="valt-order-cancelled">Pedido cancelado</strong> : etapasPedido.map((etapa, i) => <div key={etapa} className={i <= etapaIndice ? "done" : ""}><span>{i < etapaIndice ? "✓" : i + 1}</span><small>{etapa}</small></div>)}</div>
                     {/* RESUMO DO PEDIDO */}
 
                     <div
@@ -2206,6 +2450,17 @@ function MinhaConta({
             marginTop: "25px",
           }}
         >
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: "10px 20px",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+          >
+            Atualizar
+          </button>
+
           <button
             onClick={onVoltar}
             style={{

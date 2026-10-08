@@ -134,3 +134,25 @@ def cadastrar_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_
     )
 
     return novo_cliente
+
+@router.get("/clientes/{cliente_id}/extrato-cvt")
+def extrato_cvt(cliente_id: int, db: Session = Depends(get_db)):
+    movimentos = (
+        db.query(models.CVTMovimento)
+        .filter(models.CVTMovimento.cliente_id == cliente_id)
+        .order_by(models.CVTMovimento.id.desc())
+        .limit(100)
+        .all()
+    )
+
+    return [
+        {
+            "id": movimento.id,
+            "tipo": movimento.tipo,
+            "motivo": movimento.motivo,
+            "quantidade": movimento.quantidade,
+            "saldo_apos": movimento.saldo_apos,
+            "criado_em": movimento.criado_em,
+        }
+        for movimento in movimentos
+    ]
