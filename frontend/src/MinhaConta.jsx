@@ -108,6 +108,19 @@ function MinhaConta({
     useState([]);
 
   // =====================================================
+  // ENCONTRAR AMIGO OU CONHECIDO
+  // =====================================================
+
+  const [buscaCliente, setBuscaCliente] =
+    useState("");
+
+  const [resultadosBuscaCliente, setResultadosBuscaCliente] =
+    useState([]);
+
+  const [buscandoCliente, setBuscandoCliente] =
+    useState(false);
+
+  // =====================================================
   // ERRO GERAL
   // =====================================================
 
@@ -205,6 +218,50 @@ function MinhaConta({
     } catch (error) {
       console.error("ERRO AO CARREGAR EXTRATO CVT:", error);
       alert(error.message);
+    }
+  };
+
+  // =====================================================
+  // ENCONTRAR AMIGO OU CONHECIDO
+  // =====================================================
+
+  const buscarCliente = async () => {
+    const termo = buscaCliente.trim();
+
+    if (!termo) {
+      setResultadosBuscaCliente([]);
+      return;
+    }
+
+    setBuscandoCliente(true);
+    setResultadosBuscaCliente([]);
+
+    try {
+      const resposta = await fetch(
+        `${API_URL}/clientes/buscar?q=${encodeURIComponent(termo)}`
+      );
+
+      if (resposta.status === 404) {
+        setResultadosBuscaCliente([
+          {
+            id: null,
+            nome: "Nome ou e-mail não encontrado.",
+          },
+        ]);
+        return;
+      }
+
+      if (!resposta.ok) {
+        throw new Error("Não foi possível realizar a pesquisa.");
+      }
+
+      const dados = await resposta.json();
+      setResultadosBuscaCliente(dados);
+    } catch (error) {
+      console.error("ERRO AO BUSCAR CLIENTE:", error);
+      alert(error.message || "Não foi possível realizar a pesquisa.");
+    } finally {
+      setBuscandoCliente(false);
     }
   };
 
@@ -519,13 +576,7 @@ function MinhaConta({
     setNotificacoesPedidos(obterNotificacoesEntregas());
   }, [usuario]);
 
-  useEffect(() => {
-    if (!usuario?.id) {
-      return;
-    }
 
-    carregarPedidos();
-  }, [usuario]);
 
   // =====================================================
   // VERIFICAR AUTOMATICAMENTE ALTERAÇÕES NOS PEDIDOS
@@ -1125,6 +1176,99 @@ function MinhaConta({
             </button>
           </div>
 
+          {/* =================================================
+              ENCONTRAR AMIGO OU CONHECIDO
+          ================================================= */}
+
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "20px",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              background: "#f8f9fa",
+            }}
+          >
+            <h3 style={{ marginTop: 0 }}>
+              👥 Encontrar amigo ou conhecido
+            </h3>
+
+            <p>
+              Digite o nome ou e-mail para descobrir o número VALT-ON.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+              <input
+                type="text"
+                value={buscaCliente}
+                onChange={(e) => setBuscaCliente(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    buscarCliente();
+                  }
+                }}
+                placeholder="Digite o nome ou e-mail"
+                style={{
+                  flex: "1",
+                  minWidth: "240px",
+                  padding: "12px",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                }}
+              />
+
+              <button
+                onClick={buscarCliente}
+                disabled={buscandoCliente}
+                style={{
+                  padding: "12px 20px",
+                  cursor: buscandoCliente
+                    ? "default"
+                    : "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                {buscandoCliente
+                  ? "⏳ Pesquisando..."
+                  : "🔎 Pesquisar"}
+              </button>
+            </div>
+
+            {resultadosBuscaCliente.length > 0 && (
+              <div style={{ marginTop: "15px" }}>
+                {resultadosBuscaCliente.map((cliente, index) => (
+                  <div
+                    key={cliente.id ?? `resultado-${index}`}
+                    style={{
+                      padding: "12px 15px",
+                      marginBottom: "8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      background: "white",
+                    }}
+                  >
+                    {cliente.id === null ? (
+                      <strong>{cliente.nome}</strong>
+                    ) : (
+                      <>
+                        <strong>{cliente.nome}</strong>
+                        <div>
+                          Número VALT-ON: #{cliente.id}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {mostrarCompraCVT && (
             <div
               style={{
@@ -1198,6 +1342,57 @@ function MinhaConta({
             </div>
           )}
         </div>
+
+        {mostrarExtratoCVT && (
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "20px",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              background: "#f8f9fa",
+            }}
+          >
+            <h3 style={{ marginTop: 0 }}>
+              📊 Extrato de CVT
+            </h3>
+
+            {extratoCVT.length === 0 ? (
+              <p>Nenhuma movimentação de CVT encontrada.</p>
+            ) : (
+              <div>
+                {extratoCVT.map((movimento) => (
+                  <div
+                    key={movimento.id}
+                    style={{
+                      padding: "12px 0",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    <strong>
+                      {movimento.tipo === "ENTRADA" ? "🟢" : "🔴"}{" "}
+                      {movimento.motivo}
+                    </strong>
+
+                    <div>
+                      Quantidade:{" "}
+                      {Number(movimento.quantidade).toLocaleString("pt-BR")}
+                    </div>
+
+                    <div>
+                      Saldo após:{" "}
+                      {Number(movimento.saldo_apos).toLocaleString("pt-BR")}
+                    </div>
+
+                    <div style={{ fontSize: "13px", color: "#666" }}>
+                      {new Date(movimento.criado_em).toLocaleString("pt-BR")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* =================================================
             ERRO DOS PEDIDOS
